@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel.c,v 1.6 2002/02/14 08:05:26 a1kmm Exp $
+ * $Id: channel.c,v 1.7 2002/04/26 04:00:29 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -299,15 +299,18 @@ send_members(struct Client *client_p,
 }
 
 /*
- * send_channel_modes
+ * ts_burst_channel
  *
- * inputs       - pointer to client client_p
- *              - pointer to channel pointer
- * output       - NONE
- * side effects - send "client_p" a full list of the modes for channel chptr.
+ * Input: - client_p: Client to burst channel to.
+ *        - chptr: Channel to burst.
+ *        - bursttype: Type of burst to do.
+ *        - burstflags: Flags relating to the burst.
+ * Output: None.
+ * Side-effects: Burst the TS5 server client_p 
  */
 void
-send_channel_modes(struct Client *client_p, struct Channel *chptr)
+ts_burst_channel(struct Client *client_p, struct Channel *chptr, int bursttype,
+                 int burstflags)
 {
   if (*chptr->chname != '#')
     return;
@@ -342,6 +345,11 @@ send_channel_modes(struct Client *client_p, struct Channel *chptr)
 
   if (IsCapable(client_p, CAP_IE))
     send_mode_list(client_p, chptr->chname, &chptr->invexlist, 'I', 0);
+
+  /* and burst the topic... */
+  if (chptr->topic[0])
+    sendto_one(client_p, ":%s TOPIC %s %lu :%s", me.name, chptr->topic_info,
+               chptr->topic_time, chptr->topic);
 }
 
 /*

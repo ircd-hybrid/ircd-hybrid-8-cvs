@@ -19,12 +19,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_irc.c,v 1.3 2002/04/19 10:56:20 a1kmm Exp $
+ *   $Id: p_irc.c,v 1.4 2002/04/26 04:00:30 a1kmm Exp $
  */
 
 #include "client.h"
 #include "numeric.h"
 #include "channel.h"
+#include "channel_mode.h"
 #include "s_protocol.h"
 #include "send.h"
 #include "debug.h"
@@ -121,6 +122,28 @@ static void
 usr_burst_channel(struct Client *client_p, struct Channel *chptr,
                   int bursttype, int burstflags)
 {
+  const char *name = (chptr->root_chptr ? chptr->root_chptr : chptr)->chname;
+  if (chptr->topic[0] != '\0')
+  {
+    sendto_one(client_p, form_str(RPL_TOPIC), me.name,
+               client_p->name, name, chptr->topic);
+
+    if (!(chptr->mode.mode & MODE_HIDEOPS) ||
+        (bursttype & CHFL_CHANOP) || (bursttype & CHFL_HALFOP))
+    {
+      sendto_one(client_p, form_str(RPL_TOPICWHOTIME),
+                 me.name, client_p->name, name,
+                 chptr->topic_info, chptr->topic_time);
+    }
+    else /* Hide from nonops */
+    {
+      sendto_one(client_p, form_str(RPL_TOPICWHOTIME),
+                 me.name, client_p->name, name,
+                 me.name, chptr->topic_time);
+    }
+  }
+  
+  channel_member_names(client_p, chptr, (char*)name, 1);
 }
 
 /* Some special protocols are declared here... */

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: send.c,v 1.4 2002/02/26 04:55:57 a1kmm Exp $
+ *   $Id: send.c,v 1.5 2002/04/26 04:00:30 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -667,7 +667,7 @@ sendto_server(struct Client *one, struct Client *source_p,
           continue;             /* we can't introduce the unknown source_p, skip */
 
         if (llflags & LL_ICHAN)
-          burst_channel(client_p, chptr);
+          ll_burst_channel(client_p, chptr);
         else
           continue;             /* we can't introduce the unknown chptr, skip */
       }

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: client.c,v 1.6 2002/04/19 10:56:20 a1kmm Exp $
+ *  $Id: client.c,v 1.7 2002/04/26 04:00:29 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -1567,7 +1567,7 @@ del_all_accepts(struct Client *client_p)
  * This function is only called to set up an initially registering
  * client. 
  */
-int
+void
 set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
 {
   char buf[USERLEN + 1];
@@ -1603,11 +1603,9 @@ set_initial_nick(struct Client *client_p, struct Client *source_p, char *nick)
      */
     BeginAuthorization(source_p);
 #else
-    if (register_local_user(client_p, source_p, nick, buf) == CLIENT_EXITED)
-      return CLIENT_EXITED;
+    register_local_user(client_p, source_p, nick, buf);
 #endif
   }
-  return 0;
 }
 
 /*

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: client.h,v 1.5 2002/02/26 04:55:41 a1kmm Exp $
+ * $Id: client.h,v 1.6 2002/04/26 04:00:24 a1kmm Exp $
  */
 
 #ifndef INCLUDED_client_h
@@ -616,8 +616,8 @@ extern int accept_message(struct Client *source, struct Client *target);
 extern void del_from_accept(struct Client *source, struct Client *target);
 extern void del_all_accepts(struct Client *client_p);
 
-extern int set_initial_nick(struct Client *client_p, struct Client *source_p,
-                            char *nick);
+extern void set_initial_nick(struct Client *client_p, struct Client *source_p,
+                             char *nick);
 extern int change_local_nick(struct Client *client_p, struct Client *source_p,
                              char *nick);
 

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: s_serv.c,v 1.5 2002/02/26 04:55:56 a1kmm Exp $
+ *   $Id: s_serv.c,v 1.6 2002/04/26 04:00:30 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -86,7 +86,7 @@ int refresh_user_links = 0;
 struct Client *uplink = NULL;
 
 static void start_io(struct Client *server);
-static void burst_members(struct Client *client_p, dlink_list * list);
+/* static void burst_members(struct Client *client_p, dlink_list * list); */
 static void burst_ll_members(struct Client *client_p, dlink_list * list);
 
 static SlinkRplHnd slink_error;
@@ -1247,9 +1247,10 @@ start_io(struct Client *server)
     buf = MyRealloc(buf, (c + READBUF_SIZE + 64));
 
     /* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-    linelen = linebuf_get(&server->localClient->buf_recvq, (char *)(buf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_RAW);  /* include partial lines & don't
-                                                                                                                                   parse data */
-
+    /* include partial lines & don't parse data */
+    linelen = linebuf_get(&server->localClient->buf_recvq,
+                          (char *)(buf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL,
+                          LINEBUF_RAW);  
     if (linelen)
     {
       buf[c++] = SLINKCMD_INJECT_RECVQ;
@@ -1268,8 +1269,10 @@ start_io(struct Client *server)
     buf = MyRealloc(buf, (c + BUF_DATA_SIZE + 64));
 
     /* store data in c+3 to allow for SLINKCMD_INJECT_RECVQ and len u16 */
-    linelen = linebuf_get(&server->localClient->buf_sendq, (char *)(buf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL, LINEBUF_PARSED);       /* include partial lines */
-
+    /* include partial lines */
+    linelen = linebuf_get(&server->localClient->buf_sendq,
+                          (char *)(buf + c + 3), READBUF_SIZE, LINEBUF_PARTIAL,
+                          LINEBUF_PARSED);       
     if (linelen)
     {
       buf[c++] = SLINKCMD_INJECT_SENDQ;
@@ -1541,7 +1544,6 @@ server_burst(struct Client *client_p)
 
   /* Always send a PING after connect burst is done */
   sendto_one(client_p, "PING :%s", me.name);
-
 }
 
 /*
@@ -1560,74 +1562,42 @@ burst_all(struct Client *client_p)
   struct hook_burst_channel hinfo;
   dlink_node *ptr;
 
-  /* serial counter borrowed from send.c */
-  current_serial++;
+  /* Burst all the clients first... */
+  for (target_p = GlobalClientList; target_p; target_p = target_p->next)
+    client_p->protocol->burst_client(client_p, target_p, 0, 0);
 
   for (chptr = GlobalChannelList; chptr; chptr = chptr->nextch)
   {
     /* Don't send vchannels twice; vchannels will be
      * sent along as subchannels of the top channel
+     * (to ensure vchans are sent after the root)
      */
-
     if (IsVchan(chptr))
       continue;
 
     if (chptr->users != 0)
-    {
-      burst_members(client_p, &chptr->chanops);
-#ifdef REQUIRE_OANDV
-      burst_members(client_p, &chptr->chanops_voiced);
-#endif
-      burst_members(client_p, &chptr->voiced);
-      burst_members(client_p, &chptr->halfops);
-      burst_members(client_p, &chptr->peons);
-      send_channel_modes(client_p, chptr);
-      hinfo.chptr = chptr;
-      hinfo.client = client_p;
-      hook_call_event("burst_channel", &hinfo);
-    }
+      client_p->protocol->burst_channel(client_p, chptr, 0, 0);
+    hinfo.chptr = chptr;
+    hinfo.client = client_p;
+    hook_call_event("burst_channel", &hinfo);
 
     if (IsVchanTop(chptr))
-    {
       for (ptr = chptr->vchan_list.head; ptr; ptr = ptr->next)
       {
-        vchan = ptr->data;
+        vchan = (struct Channel*)ptr->data;
         if (vchan->users != 0)
         {
-          burst_members(client_p, &vchan->chanops);
-#ifdef REQUIRE_OANDV
-          burst_members(client_p, &vchan->chanops_voiced);
-#endif
-          burst_members(client_p, &vchan->voiced);
-          burst_members(client_p, &vchan->halfops);
-          burst_members(client_p, &vchan->peons);
-          send_channel_modes(client_p, vchan);
+          client_p->protocol->burst_channel(client_p, chptr, 0, 0);
           hinfo.chptr = chptr;
           hinfo.client = client_p;
           hook_call_event("burst_channel", &hinfo);
         }
       }
-    }
   }
 
-  /*
-     ** also send out those that are not on any channel
+  /* And send an "end of burst" message to let the remote host know that we
+   * have sent everything, for timing statistics and possibly later security.
    */
-  for (target_p = &me; target_p; target_p = target_p->prev)
-  {
-    if (target_p->serial != current_serial)
-    {
-      target_p->serial = current_serial;
-      if (target_p->from != client_p)
-        sendnick_TS(client_p, target_p);
-    }
-  }
-
-  /* We send the time we started the burst, and let the remote host determine an EOB time,
-     ** as otherwise we end up sending a EOB of 0   Sending here means it gets sent last -- fl
-   */
-  /* Its simpler to just send EOB and use the time its been connected.. --fl_ */
-
   if (IsCapable(client_p, CAP_EOB))
     sendto_one(client_p, ":%s EOB", me.name);
 }
@@ -1662,11 +1632,8 @@ cjoin_all(struct Client *client_p)
  *		  so client_p is always guaranteed to be a LL leaf.
  */
 void
-burst_channel(struct Client *client_p, struct Channel *chptr)
+ll_burst_channel(struct Client *client_p, struct Channel *chptr)
 {
-  dlink_node *ptr;
-  struct Channel *vchan;
-
   burst_ll_members(client_p, &chptr->chanops);
 #ifdef REQUIRE_OANDV
   burst_ll_members(client_p, &chptr->chanops_voiced);
@@ -1674,43 +1641,8 @@ burst_channel(struct Client *client_p, struct Channel *chptr)
   burst_ll_members(client_p, &chptr->voiced);
   burst_ll_members(client_p, &chptr->halfops);
   burst_ll_members(client_p, &chptr->peons);
-  send_channel_modes(client_p, chptr);
+  client_p->protocol->burst_channel(client_p, chptr, 0, 0);
   add_lazylinkchannel(client_p, chptr);
-
-  if (chptr->topic[0])
-  {
-    sendto_one(client_p, ":%s TOPIC %s %s %lu :%s",
-               me.name,
-               chptr->chname,
-               chptr->topic_info,
-               (unsigned long)chptr->topic_time, chptr->topic);
-  }
-
-  if (IsVchanTop(chptr))
-  {
-    for (ptr = chptr->vchan_list.head; ptr; ptr = ptr->next)
-    {
-      vchan = ptr->data;
-      burst_ll_members(client_p, &vchan->chanops);
-#ifdef REQUIRE_OANDV
-      burst_ll_members(client_p, &vchan->chanops_voiced);
-#endif
-      burst_ll_members(client_p, &vchan->voiced);
-      burst_ll_members(client_p, &vchan->halfops);
-      burst_ll_members(client_p, &vchan->peons);
-      send_channel_modes(client_p, vchan);
-      add_lazylinkchannel(client_p, vchan);
-
-      if (vchan->topic[0])
-      {
-        sendto_one(client_p, ":%s TOPIC %s %s %lu :%s",
-                   me.name,
-                   vchan->chname,
-                   vchan->topic_info,
-                   (unsigned long)vchan->topic_time, vchan->topic);
-      }
-    }
-  }
 }
 
 /*
@@ -1819,6 +1751,7 @@ remove_lazylink_flags(unsigned long mask)
  * output	- NONE
  * side effects	-
  */
+#if 0
 void
 burst_members(struct Client *client_p, dlink_list * list)
 {
@@ -1836,6 +1769,7 @@ burst_members(struct Client *client_p, dlink_list * list)
     }
   }
 }
+#endif
 
 /*
  * burst_ll_members
@@ -1860,6 +1794,7 @@ burst_ll_members(struct Client *client_p, dlink_list * list)
       if (target_p->from != client_p)
       {
         add_lazylinkclient(client_p, target_p);
+        client_p->protocol->burst_client(client_p, target_p, 0, 0);
         sendnick_TS(client_p, target_p);
       }
     }

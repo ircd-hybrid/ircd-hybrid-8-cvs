@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: channel.h,v 1.3 2002/02/14 08:05:21 a1kmm Exp $
+ * $Id: channel.h,v 1.4 2002/04/26 04:00:23 a1kmm Exp $
  */
 
 #include <sys/types.h>        /* time_t */
@@ -148,12 +148,14 @@ extern void    channel_member_list(struct Client *source_p,
 				   int *cur_len,
 				   int *reply_to_send);
 
-extern void    send_channel_modes (struct Client *, struct Channel *);
-extern void    channel_modes(struct Channel *chptr, struct Client *who,
-                             char *, char *);
+extern void channel_modes(struct Channel *chptr, struct Client *who,
+                          char *, char *);
 
-extern void    check_spambot_warning(struct Client *source_p, const
-                                     char *name);
+extern void check_spambot_warning(struct Client *source_p,
+                                  const char *name);
+
+extern void ts_burst_channel(struct Client *client_p, struct Channel *chptr,
+                             int bursttype, int burstflags);
 
 extern void check_splitmode();
 

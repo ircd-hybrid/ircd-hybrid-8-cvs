@@ -19,10 +19,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_ts.c,v 1.2 2002/04/19 10:56:20 a1kmm Exp $
+ *   $Id: p_ts.c,v 1.3 2002/04/26 04:00:30 a1kmm Exp $
  */
 
+#include "ircd.h"
 #include "s_protocol.h"
+#include "s_user.h"
+#include "channel.h"
 #include "send.h"
 #include "debug.h"
 #include "client.h"
@@ -55,7 +58,8 @@ tsm_error(struct Client *client_p, struct Client *source_p,
 struct Protocol p_ts5 =
 {
   m_error: tsm_error,
-  /* burst_channel: ts_burst_channel */
+  burst_channel: ts_burst_channel,
+  burst_client: ts_burst_client
 };
 
 #endif

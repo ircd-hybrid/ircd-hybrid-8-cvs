@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: s_user.h,v 1.2 2002/01/06 07:18:13 a1kmm Exp $
+ *   $Id: s_user.h,v 1.3 2002/04/26 04:00:24 a1kmm Exp $
  */
 
 #ifndef INCLUDED_s_user_h
@@ -36,23 +36,22 @@ struct Client;
 extern time_t LastUsedWallops;
 
 
-extern int   user_mode(struct Client* , struct Client* , int, char** );
-extern void  send_umode (struct Client* , struct Client* ,
-                         int, int, char* );
-extern void  send_umode_out(struct Client* , struct Client* , int);
-extern int   show_lusers(struct Client* source_p);
-extern int   register_local_user(struct Client* ,struct Client* ,
-				 char* ,char* );
-extern int   register_remote_user(struct Client* ,struct Client* ,
-				  char* ,char* );
-extern int   do_local_user(char* ,struct Client* ,struct Client*,
-			   char* ,char *,char *,char *);
+extern void user_mode(struct Client* , struct Client* , int, char**);
+extern void send_umode (struct Client* , struct Client* ,
+                        int, int, char* );
+extern void send_umode_out(struct Client*, struct Client*, int);
+extern void show_lusers(struct Client *source_p);
+extern void register_local_user(struct Client*, struct Client*,
+                               char*, char*);
+extern void register_remote_user(struct Client*, struct Client*, char*, char*);
+extern void do_local_user(char*, struct Client*, struct Client*,
+                          char*, char*, char*, char*);
 
-extern int   do_remote_user(char* ,struct Client* ,struct Client*,
-			    char* ,char *,char *,char *,char *);
+extern void do_remote_user(char*, struct Client*, struct Client*,
+                           char*, char*, char*, char*, char*);
 
-extern int   user_modes_from_c_to_bitmask[];
-extern void  show_isupport(struct Client *);
-
-
+extern int user_modes_from_c_to_bitmask[];
+extern void show_isupport(struct Client*);
+extern void ts_burst_client(struct Client *client_p, struct Client *target_p,
+                            int bursttype, int burstflags);
 #endif

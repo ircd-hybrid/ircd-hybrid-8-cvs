@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_join.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
+ *   $Id: m_join.c,v 1.6 2002/04/26 04:00:27 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -72,7 +72,7 @@ _moddeinit(void)
   mod_del_cmd(join_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 
 #endif
 static void do_join_0(struct Client *client_p, struct Client *source_p);
@@ -372,27 +372,8 @@ m_join(struct Client *client_p,
 
     del_invite(chptr, source_p);
 
-    if (chptr->topic[0] != '\0')
-    {
-      sendto_one(source_p, form_str(RPL_TOPIC), me.name,
-                 parv[0], root_chptr->chname, chptr->topic);
-
-      if (!(chptr->mode.mode & MODE_HIDEOPS) ||
-          (flags & CHFL_CHANOP) || (flags & CHFL_HALFOP))
-      {
-        sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
-                   me.name, parv[0], root_chptr->chname,
-                   chptr->topic_info, chptr->topic_time);
-      }
-      else                      /* Hide from nonops */
-      {
-        sendto_one(source_p, form_str(RPL_TOPICWHOTIME),
-                   me.name, parv[0], root_chptr->chname,
-                   me.name, chptr->topic_time);
-      }
-    }
-
-    channel_member_names(source_p, chptr, root_chptr->chname, 1);
+    if (source_p->protocol->burst_channel)
+      source_p->protocol->burst_channel(source_p, chptr, flags, 0);
 
     if (successful_join_count)
       source_p->localClient->last_join_time = CurrentTime;
