@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel.c,v 1.7 2002/04/26 04:00:29 a1kmm Exp $
+ * $Id: channel.c,v 1.8 2002/04/27 02:49:07 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -63,6 +63,8 @@ static int check_banned(struct Channel *chptr, struct Client *who,
 static char buf[BUFSIZE];
 static char modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
 
+int splitchecking;
+
 /* 
  * init_channels
  *
@@ -78,7 +80,7 @@ channelheap_garbage_collect(void *unused)
 void
 init_channels(void)
 {
-  channel_heap = BlockHeapCreate(sizeof(struct Channel), 1024);
+  channel_heap = BlockHeapCreate(sizeof(struct Channel), 2048);
   ban_heap = BlockHeapCreate(sizeof(struct Ban), 2048);
   eventAddIsh("channelheap_garbage_collect", channelheap_garbage_collect,
               NULL, 45);
@@ -266,11 +268,11 @@ send_members(struct Client *client_p,
   int data_to_send = 0;
   char *t;                      /* temp char pointer */
 
-  ircsprintf(buf, ":%s SJOIN %lu %s %s %s :", me.name,
-             (unsigned long)chptr->channelts,
-             chptr->chname, lmodebuf, lparabuf);
+  cur_len = ircsprintf(buf, ":%s SJOIN %lu %s %s %s :", me.name,
+                       (unsigned long)chptr->channelts,
+                       chptr->chname, lmodebuf, lparabuf);
 
-  cur_len = mlen = strlen(buf);
+  mlen = cur_len;
   t = buf + mlen;
 
   for (ptr = list->head; ptr && ptr->data; ptr = ptr->next)
@@ -1246,26 +1248,25 @@ check_spambot_warning(struct Client *source_p, const char *name)
 void
 check_splitmode(void *unused)
 {
-  if (splitmode)
-  {
-    if ((Count.server >= split_servers) && (Count.total >= split_users))
-    {
-      splitmode = 0;
-
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "Network rejoined, deactivating splitmode");
-      eventDelete(check_splitmode, NULL);
-    }
-  }
-  else
+  if (splitchecking &&
+      (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
   {
     if ((Count.server < split_servers) && (Count.total < split_users))
     {
-      splitmode = 1;
-
+      if (!splitmode)
+      {
+        splitmode = 1;
+        sendto_realops_flags(FLAGS_ALL, L_ALL,
+                             "Network split, activating splitmode");
+        eventAdd("check_splitmode", check_splitmode, NULL, 60);
+      }
+    }
+    else if (splitmode)
+    {
+      splitmode = 0;
       sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "Network split, activating splitmode");
-      eventAdd("check_splitmode", check_splitmode, NULL, 60);
+                           "Network rejoined, deactivating splitmode");
+      eventDelete(check_splitmode, NULL);
     }
   }
 }

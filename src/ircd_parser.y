@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd_parser.y,v 1.3 2002/01/06 07:18:49 a1kmm Exp $
+ * $Id: ircd_parser.y,v 1.4 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 %{
@@ -496,6 +496,11 @@ serverinfo_description: DESCRIPTION '=' QSTRING ';'
 
 serverinfo_network_name: NETWORK_NAME '=' QSTRING ';'
   {
+    char *p;
+    /* Clean out spaces... */
+    while ((p = strchr(yylval.string, ' ')) ||
+           (p = strchr(yylval.string, '\t')))
+      strcpy(p, p + 1);
     MyFree(ServerInfo.network_name);
     DupString(ServerInfo.network_name,yylval.string);
   };

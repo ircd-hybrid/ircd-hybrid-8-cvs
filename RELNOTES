@@ -1,7 +1,7 @@
- ircd-hybrid-7b8 Release Notes
+ ircd-hybrid-8a1 Release Notes
 --------------------------------------------------------------------------------
 
-This is the current beta version of ircd-hybrid-7.
+This is the current beta version of ircd-hybrid-8.
 
 NOTE: This is still BETA code.  Run it at your own risk.  By running this
  code you assume FULL responsibility for any problems it may cause.  We do
@@ -38,4 +38,4 @@ Other files recommended for reading: BUGS, README.FIRST, INSTALL
   *************************************************************************
 
 --------------------------------------------------------------------------------
-$Id: RELNOTES,v 1.1 2002/01/04 09:10:22 a1kmm Exp $
+$Id: RELNOTES,v 1.2 2002/04/27 02:48:44 a1kmm Exp $

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: class.c,v 1.3 2002/01/06 07:18:47 a1kmm Exp $
+ *   $Id: class.c,v 1.4 2002/04/27 02:49:07 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -114,34 +114,22 @@ get_client_class(struct Client *target_p)
 int
 get_client_ping(struct Client *target_p)
 {
-  int ping = 0;
-  int ping2;
+  int ping = DEFAULT_PINGFREQUENCY, ping2;
   struct ConfItem *aconf;
   dlink_node *nlink;
 
-
-  if (target_p->localClient->confs.head != NULL)
+  for (nlink = target_p->localClient->confs.head; nlink;
+       nlink = nlink->next)
   {
-    for (nlink = target_p->localClient->confs.head; nlink;
-         nlink = nlink->next)
+    aconf = nlink->data;
+    if (aconf->status & (CONF_CLIENT | CONF_SERVER))
     {
-      aconf = nlink->data;
-      if (aconf->status & (CONF_CLIENT | CONF_SERVER))
-      {
-        ping2 = get_conf_ping(aconf);
-        if ((ping2 != BAD_PING) && ((ping > ping2) || !ping))
-          ping = ping2;
-      }
+      ping2 = get_conf_ping(aconf);
+      if ((ping2 != BAD_PING) && ping2 > 0)
+        ping = ping2;
     }
   }
-  else
-  {
-    ping = DEFAULT_PINGFREQUENCY;
-    Debug((DEBUG_DEBUG, "No Attached Confs"));
-  }
 
-  if (ping <= 0)
-    ping = DEFAULT_PINGFREQUENCY;
   Debug((DEBUG_DEBUG, "Client %s Ping %d", target_p->name, ping));
   return (ping);
 }

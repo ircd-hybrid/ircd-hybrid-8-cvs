@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: send.c,v 1.5 2002/04/26 04:00:30 a1kmm Exp $
+ *   $Id: send.c,v 1.6 2002/04/27 02:49:09 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -110,7 +110,7 @@ dead_link(struct Client *to, char *notice)
     sendto_realops_flags(FLAGS_ALL, L_OPER, notice,
                          get_client_name(to, MASK_IP));
   }
-  exit_client(to, to, &me, notice);
+  exit_client(to, to, &me, "Dead link");
   Debug((DEBUG_ERROR, notice, get_client_name(to, HIDE_IP)));
   return -1;
 }

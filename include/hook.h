@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: hook.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ *  $Id: hook.h,v 1.3 2002/04/27 02:48:58 a1kmm Exp $
  */
 
 #ifndef __HOOK_H_INCLUDED

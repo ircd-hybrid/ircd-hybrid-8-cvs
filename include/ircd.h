@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: ircd.h,v 1.3 2002/01/06 07:18:12 a1kmm Exp $
+ *   $Id: ircd.h,v 1.4 2002/04/27 02:48:58 a1kmm Exp $
  */
 
 #ifndef INCLUDED_ircd_h
@@ -95,6 +95,7 @@ extern time_t         nextconnect;
 extern int            default_server_capabs;
 
 extern int splitmode;
+extern int splitchecking;
 extern int split_users;
 extern int split_servers;
 

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: s_serv.c,v 1.6 2002/04/26 04:00:30 a1kmm Exp $
+ *   $Id: s_serv.c,v 1.7 2002/04/27 02:49:09 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -262,13 +262,10 @@ collect_zipstats(void *unused)
         target_p->localClient->slinkq_len = 1;
 
         /* schedule a write */
-        comm_setselect(target_p->localClient->ctrlfd, FDLIST_IDLECLIENT,
-                       COMM_SELECT_WRITE, send_queued_slink_write,
-                       target_p, 0);
+        send_queued_slink_write(target_p->localClient->ctrlfd, target_p);
       }
     }
   }
-
 }
 
 
@@ -517,6 +514,12 @@ hunt_server(struct Client *client_p, struct Client *source_p, char *command,
 
   if (target_p)
   {
+    if (!IsRegistered(target_p))
+    {
+      sendto_one(source_p, form_str(ERR_NOSUCHSERVER), me.name,
+                 parv[0], parv[server]);
+      return HUNTED_NOSUCH;
+    }
     if (IsMe(target_p) || MyClient(target_p))
       return HUNTED_ISME;
 
@@ -1363,8 +1366,14 @@ fork_server(struct Client *server)
   slink_fds[1][0][1] = fd_temp[1];
 #endif
 
+  /* XXX do we really want a goto? */
+#ifdef __CYGWIN__
+  if ((ret = vfork()) < 0)
+    goto fork_error;
+#else
   if ((ret = fork()) < 0)
     goto fork_error;
+#endif
   else if (ret == 0)
   {
     /* set our fds as non blocking and close everything else */
@@ -1386,8 +1395,9 @@ fork_server(struct Client *server)
       }
       else
       {
-#ifdef VMS
-        if (i > 2)              /* don't close std* */
+#if defined(VMS) || defined(__CYGWIN__)
+        /* don't close std* */
+        if (i > 2) 
 #endif
           close(i);
       }
@@ -1476,8 +1486,8 @@ fork_server(struct Client *server)
 
     comm_setselect(slink_fds[0][1][0], FDLIST_SERVER, COMM_SELECT_READ,
                    read_ctrl_packet, server, 0);
-    comm_setselect(slink_fds[1][1][0], FDLIST_SERVER, COMM_SELECT_READ,
-                   read_packet, server, 0);
+    read_ctrl_packet(slink_fds[0][1][0], server);
+    read_packet(slink_fds[1][1][0], server);
   }
 
   return 0;

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_protocol.h,v 1.2 2002/04/26 04:00:24 a1kmm Exp $
+ *  $Id: s_protocol.h,v 1.3 2002/04/27 02:48:58 a1kmm Exp $
  */
 
 #ifndef INCLUDED_S_PROTOCOL_H
@@ -44,6 +44,8 @@ struct Protocol
                         int bursttype, int burstflags);
   void (*burst_client)(struct Client *client_p, struct Client *target_p,
                        int bursttype, int burstflags);
+  void (*change_nick)(struct Client *client_p, struct Client *target_p,
+                      const char *new_nick);
 };
 
 extern struct Protocol p_unregistered, p_user, p_operuser;

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: supported.h,v 1.2 2002/01/06 07:18:13 a1kmm Exp $
+ * $Id: supported.h,v 1.3 2002/04/27 02:48:58 a1kmm Exp $
  * 
  */
 
@@ -33,10 +33,12 @@
                 " MAXTARGETS=%i" \
                 " NICKLEN=%i" \
                 " TOPICLEN=%i" \
-                " KICKLEN=%i" \
-                " CHANTYPES=%s" \
-                " PREFIX=%s" \
-                " CHANMODES=%s"
+                " KICKLEN=%i"
+
+#define FEATURES2 " CHANTYPES=%s" \
+                  " PREFIX=%s" \
+                  " CHANMODES=%s" \
+                  " NETWORK=%s"
 
 #define FEATURESVALUES ConfigChannel.use_knock ? " KNOCK" : "", \
         ConfigChannel.use_vchans ? " VCHANS" : "", \
@@ -44,9 +46,11 @@
         ConfigChannel.use_invex ? " INVEX" : "", \
         MAXMODEPARAMS,ConfigChannel.max_chans_per_user, \
         ConfigChannel.maxbans, \
-        ConfigFileEntry.max_targets,NICKLEN,TOPICLEN,TOPICLEN, \
-	ConfigServerHide.disable_local_channels ? "#" : "#&","(ohv)@%+", \
-        "beI,k,l,imnpsta"
+        ConfigFileEntry.max_targets,NICKLEN,TOPICLEN,TOPICLEN
+
+#define FEATURES2VALUES ConfigServerHide.disable_local_channels ? "#" : "#&", \
+                        "(ohv)@%+", "beI,k,l,imnpsta", \
+                        ServerInfo.network_name
 
 /*
  * - from mirc's versions.txt

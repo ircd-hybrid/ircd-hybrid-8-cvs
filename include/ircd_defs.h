@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- * $Id: ircd_defs.h,v 1.1 2002/01/04 09:12:56 a1kmm Exp $
+ * $Id: ircd_defs.h,v 1.2 2002/04/27 02:48:58 a1kmm Exp $
  *
  * ircd_defs.h - Global size definitions for record entries used
  * througout ircd. Please think 3 times before adding anything to this
@@ -35,11 +35,6 @@
 #define HOSTLEN         63      /* Length of hostname.  Updated to         */
                                 /* comply with RFC1123                     */
 
-#define NICKLEN         9       /* Necessary to put 9 here instead of 10
-                                 * if s_msg.c/m_nick has been corrected.
-                                 * This preserves compatibility with old
-                                 * servers --msa
-                                 */
 #define USERLEN         10
 #define REALLEN         50
 #define TOPICLEN        120     /* old value 90, truncated on other servers */

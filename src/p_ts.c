@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_ts.c,v 1.3 2002/04/26 04:00:30 a1kmm Exp $
+ *   $Id: p_ts.c,v 1.4 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 #include "ircd.h"
@@ -33,7 +33,9 @@
 
 #ifdef ENABLE_TS5
 
-void tsm_error(struct Client*, struct Client*, int, char **);
+void tsm_error(struct Client*, struct Client*, int, char**);
+void ts_change_nick(struct Client*, struct Client*, char*);
+
 
 void
 tsm_error(struct Client *client_p, struct Client *source_p,
@@ -53,6 +55,14 @@ tsm_error(struct Client *client_p, struct Client *source_p,
     sendto_realops_flags(FLAGS_ALL, L_ALL, "ERROR :from %s via %s -- %s",
                          source_p->name, get_client_name(client_p, MASK_IP),
                          para);
+}
+
+void
+ts_change_nick(struct Client *client_p, struct Client *target_p,
+               char *new_nick)
+{
+  sendto_one(client_p, ":%s NICK %s :%lu", target_p->name, new_nick,
+             target_p->tsinfo);
 }
 
 struct Protocol p_ts5 =

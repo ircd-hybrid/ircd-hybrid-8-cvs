@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: balloc.c,v 1.6 2002/04/19 10:56:19 a1kmm Exp $
+ *   $Id: balloc.c,v 1.7 2002/04/27 02:49:07 a1kmm Exp $
  */
 
 /* A note on the algorithm:
@@ -155,7 +155,10 @@ initBlockHeap(void)
 static GINLINE void*
 get_block(size_t size)
 {
-  return (mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, zero_fd, 0));
+  void *ptr;
+  ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, zero_fd, 0);
+  return (ptr != MAP_FAILED) ? ptr : NULL;
+  
 }
 #else /* MAP_ANON */ 
 
@@ -184,7 +187,10 @@ initBlockHeap(void)
 static INLINE void*
 get_block(size_t size)
 {
-  return (mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0));
+  void *ptr;
+  ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1,
+             0);
+  return (ptr != MAP_FAILED) ? ptr : NULL;
 }
 
 #endif /* MAP_ANON */

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: channel.h,v 1.4 2002/04/26 04:00:23 a1kmm Exp $
+ * $Id: channel.h,v 1.5 2002/04/27 02:48:58 a1kmm Exp $
  */
 
 #include <sys/types.h>        /* time_t */
@@ -157,7 +157,7 @@ extern void check_spambot_warning(struct Client *source_p,
 extern void ts_burst_channel(struct Client *client_p, struct Channel *chptr,
                              int bursttype, int burstflags);
 
-extern void check_splitmode();
+extern void check_splitmode(void *);
 
 /*
 ** Channel Related macros follow

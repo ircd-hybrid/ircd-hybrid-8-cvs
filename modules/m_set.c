@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_set.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $ */
+ *   $Id: m_set.c,v 1.5 2002/04/27 02:49:01 a1kmm Exp $ */
 
 /* rewritten by jdc */
 
@@ -65,7 +65,7 @@ _moddeinit(void)
   mod_del_cmd(set_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /* Structure used for the SET table itself */
 struct SetStruct
@@ -89,7 +89,7 @@ static void quote_max(struct Client *, int);
 static void quote_msglocale(struct Client *, char *);
 static void quote_spamnum(struct Client *, int);
 static void quote_spamtime(struct Client *, int);
-static void quote_splitmode(struct Client *, int);
+static void quote_splitmode(struct Client *, char *);
 static void quote_splitnum(struct Client *, int);
 static void quote_splitusers(struct Client *, int);
 static void list_quote_commands(struct Client *);
@@ -115,7 +115,7 @@ static struct SetStruct set_cmd_table[] = {
   {"MSGLOCALE", quote_msglocale, 1, 0},
   {"SPAMNUM", quote_spamnum, 0, 1},
   {"SPAMTIME", quote_spamtime, 0, 1},
-  {"SPLITMODE", quote_splitmode, 0, 1},
+  {"SPLITMODE", quote_splitmode, 1, 0},
   {"SPLITNUM", quote_splitnum, 0, 1},
   {"SPLITUSERS", quote_splitusers, 0, 1},
   /* -------------------------------------------------------- */
@@ -387,38 +387,90 @@ quote_spamtime(struct Client *source_p, int newval)
   }
 }
 
+
+/* this table is what splitmode may be set to */
+
+static const char *splitmode_values[] =
+{
+  "OFF",
+  "ON",  
+  "AUTO",
+  NULL
+};
+ 
+/* this table is what splitmode may be */
+static const char *splitmode_status[] =
+{  
+  "OFF",
+  "AUTO (OFF)",
+  "ON",
+  "AUTO (ON)",
+  NULL
+};
+
+enum
+{
+  SPLITVALUE_OFF = 0,
+  SPLITVALUE_ON,
+  SPLITVALUE_AUTO,
+  SPLITVALUE_ILLEGAL /* This must remain last. */
+};
+
 /* SET SPLITMODE */
 static void
-quote_splitmode(struct Client *source_p, int newval)
+quote_splitmode(struct Client *source_p, char *charval)
 {
-  if (newval >= 0)
+  if (charval)
   {
-    if ((newval > 0) && !splitmode)
+    int newval;
+    for (newval = 0; splitmode_values[newval]; newval++)  
     {
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "%s is manually activating splitmode",
-                           get_oper_name(source_p));
-      sendto_one(source_p, ":%s NOTICE %s :SPLITMODE has been activated",
-                 me.name, source_p->name);
-      splitmode = 1;
+      if (!irccmp(splitmode_values[newval], charval))
+        break;
     }
-    else if ((newval == 0) && splitmode)
+    
+    switch (newval)
     {
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "%s is manually deactivating splitmode",
-                           get_oper_name(source_p));
-      sendto_one(source_p, ":%s NOTICE %s :SPLITMODE has been deactivated",
-                 me.name, source_p->name);
-
-      splitmode = 0;
-
-      /* we might be deactivating an automatic splitmode, so pull the event */
-      eventDelete(check_splitmode, NULL);
+      case SPLITVALUE_OFF:
+        splitmode = 0;
+        splitchecking = 0;
+        sendto_realops_flags(FLAGS_ALL, L_ALL,
+                             "%s is disabling splitmode",
+                             get_oper_name(source_p));
+        /* we might be deactivating an automatic splitmode, so pull the event
+         */
+        eventDelete(check_splitmode, NULL);
+        break;
+      case SPLITVALUE_ON:
+        splitmode = 1;
+        splitchecking = 0;
+        sendto_realops_flags(FLAGS_ALL, L_ALL,
+                             "%s is enabling and activating splitmode",
+                             get_oper_name(source_p));
+        break;
+      case SPLITVALUE_AUTO:
+        splitchecking = 1;
+        sendto_realops_flags(FLAGS_ALL, L_ALL,                            
+                             "%s is enabling automatic splitmode",                            
+                             get_oper_name(source_p));
+        check_splitmode(NULL);
+        break;
+      case SPLITVALUE_ILLEGAL:
+        sendto_one(source_p, ":%s NOTICE %s :You have chosen an invalid "
+                   "option. Read '/quote help set'", me.name, source_p->name);
+        break;
     }
   }
   else
-    sendto_one(source_p, ":%s NOTICE %s :SPLITMODE is currently %i",
-               me.name, source_p->name, splitmode);
+  {
+    /* Map splitmode onto a 2 bit case table with the least significant bit
+     * being the current state of splitchecking and the other bit being
+     * whether splitmode is actually on, and look it up in the table.
+     */
+    sendto_one(source_p, ":%s NOTICE %s :SPLITMODE is currently %s",
+               me.name, source_p->name,
+               splitmode_status[splitmode | (splitchecking<<1)]);
+  }
 }
 
 /* SET SPLITNUM */
@@ -431,6 +483,8 @@ quote_splitnum(struct Client *source_p, int newval)
                          "%s has changed SPLITNUM to %i",
                          source_p->name, newval);
     split_servers = newval;
+    if (splitchecking)
+      check_splitmode(NULL);
   }
   else
     sendto_one(source_p, ":%s NOTICE %s :SPLITNUM is currently %i",
@@ -447,6 +501,8 @@ quote_splitusers(struct Client *source_p, int newval)
                          "%s has changed SPLITUSERS to %i",
                          source_p->name, newval);
     split_users = newval;
+    if (splitchecking)
+      check_splitmode(NULL);
   }
   else
     sendto_one(source_p, ":%s NOTICE %s :SPLITUSERS is currently %i",

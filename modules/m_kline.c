@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.7 2002/04/19 11:25:32 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.8 2002/04/27 02:49:01 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -84,7 +84,7 @@ _moddeinit(void)
   mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.7 $";
+char *_version = "$Revision: 1.8 $";
 #endif
 
 /* Local function prototypes */
@@ -135,7 +135,6 @@ mo_kline(struct Client *client_p,
   const char *target_server = NULL;
   struct ConfItem *aconf;
   time_t tkline_time = 0;
-  time_t cur_time;
 
   if (!IsOperK(source_p))
   {
@@ -204,8 +203,7 @@ mo_kline(struct Client *client_p,
   if (!valid_comment(source_p, reason))
     return;
 
-  cur_time = time(NULL);
-  current_date = smalldate(cur_time);
+  current_date = smalldate(CurrentTime);
   aconf = make_conf();
   aconf->status = CONF_KILL;
   DupString(aconf->host, host);
@@ -251,7 +249,8 @@ mo_kline(struct Client *client_p,
   {
     ircsprintf(buffer, "%s (%s)", reason, current_date);
     DupString(aconf->passwd, buffer);
-    apply_kline(source_p, aconf, reason, oper_reason, current_date, cur_time);
+    apply_kline(source_p, aconf, reason, oper_reason, current_date,
+                CurrentTime);
   }
 }                               /* mo_kline() */
 
@@ -267,7 +266,6 @@ ms_kline(struct Client *client_p,
   const char *current_date;
   struct ConfItem *aconf = NULL;
   int tkline_time;
-  time_t cur_time;
 
   char *kuser;
   char *khost;
@@ -344,13 +342,11 @@ ms_kline(struct Client *client_p,
     DupString(aconf->passwd, kreason);
     current_date = smalldate((time_t) 0);
 
-    cur_time = time(NULL);
-
     if (tkline_time)
       apply_tkline(source_p, aconf, current_date, tkline_time);
     else
       apply_kline(source_p, aconf, aconf->passwd, NULL,
-                  current_date, cur_time);
+                  current_date, CurrentTime);
 
   }
 }                               /* ms_kline() */
@@ -584,7 +580,6 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   int bits, t;
   char dlbuffer[1024];
   const char *current_date;
-  time_t cur_time;
 
   if (!IsOperK(source_p))
   {
@@ -699,8 +694,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
                  me.name, parv[0], dlhost, aconf->host, creason);
     return;
   }
-  cur_time = time(0);
-  current_date = smalldate(cur_time);
+  current_date = smalldate(CurrentTime);
 
   aconf = make_conf();
 
@@ -722,7 +716,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
    * Write dline to configuration file
    */
   write_ban(DLINE_TYPE, source_p, NULL, (char*)dlhost, reason,
-            oper_reason, current_date, cur_time);
+            oper_reason, current_date, CurrentTime);
   check_klines();
 }                               /* m_dline() */
 

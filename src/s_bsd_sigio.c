@@ -44,7 +44,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: s_bsd_sigio.c,v 1.3 2002/01/06 07:18:51 a1kmm Exp $
+ *  $Id: s_bsd_sigio.c,v 1.4 2002/04/27 02:49:09 a1kmm Exp $
  */
 
 #ifndef _GNU_SOURCE
@@ -115,40 +115,6 @@ typedef struct _pollfd_list pollfd_list_t;
 pollfd_list_t pollfd_list;
 static void poll_update_pollfds(int, short, PF *);
 
-/*
- * static void set_sigio(int fd)
- *
- * Input: File descriptor to modify
- * Output: None
- * Side Effects:  Sets O_ASYNC on the said descriptor
- */
-static void
-set_sigio(int fd)
-{
-  int flags;
-  fcntl(fd, F_GETFL, &flags);
-  flags |= O_ASYNC | O_NONBLOCK;
-  fcntl(fd, F_SETFL, flags);
-}
-
-/*
- * static void clear_sigio(int fd)
- *
- * Input: File descriptor to modify
- * Output: None
- * Side Effects: Removes O_ASYNC from the fd
- */
-static void
-clear_sigio(int fd)
-{
-  int flags;
-  fcntl(fd, F_GETFL, &flags);
-  flags &= ~O_ASYNC;
-  /* This _is_ needed... */
-  flags |= O_NONBLOCK;
-  fcntl(fd, F_SETFL, flags);
-}
-
 /* 
  * static void mask_our_signal(int s)
  *
@@ -196,7 +162,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
 
   if (F->comm_index < 0)
   {
-    set_sigio(fd);
     F->comm_index = poll_findslot();
   }
   comm_index = F->comm_index;
@@ -218,7 +183,6 @@ poll_update_pollfds(int fd, short event, PF * handler)
       pollfd_list.pollfds[comm_index].events &= ~event;
       if (pollfd_list.pollfds[comm_index].events == 0)
       {
-        clear_sigio(fd);
         pollfd_list.pollfds[comm_index].fd = -1;
         pollfd_list.pollfds[comm_index].revents = 0;
         F->comm_index = -1;
@@ -314,8 +278,6 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
     F->read_handler = handler;
     F->read_data = client_data;
     poll_update_pollfds(fd, POLLIN, handler);
-    if (new_hdl && handler != NULL)
-      handler(fd, client_data);
   }
   if (type & COMM_SELECT_WRITE)
   {
@@ -323,8 +285,6 @@ comm_setselect(int fd, fdlist_t list, unsigned int type, PF * handler,
     F->write_handler = handler;
     F->write_data = client_data;
     poll_update_pollfds(fd, POLLOUT, handler);
-    if (new_hdl && handler != NULL)
-      handler(fd, client_data);
   }
   if (timeout)
     F->timeout = CurrentTime + (timeout / 1000);

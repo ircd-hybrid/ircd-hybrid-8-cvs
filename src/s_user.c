@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_user.c,v 1.7 2002/04/26 04:00:30 a1kmm Exp $
+ *  $Id: s_user.c,v 1.8 2002/04/27 02:49:09 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -270,6 +270,9 @@ show_isupport(struct Client *source_p)
   ircsprintf(isupportbuffer, FEATURES, FEATURESVALUES);
   sendto_one(source_p, form_str(RPL_ISUPPORT), me.name, source_p->name,
              isupportbuffer);
+  ircsprintf(isupportbuffer, FEATURES2, FEATURES2VALUES);
+  sendto_one(source_p, form_str(RPL_ISUPPORT), me.name, source_p->name,
+             isupportbuffer);
 }
 
 void
@@ -432,6 +435,10 @@ register_local_user(struct Client *client_p, struct Client *source_p,
                        nick, source_p->username, source_p->host,
                        ipaddr, get_client_class(source_p), source_p->info);
 
+  assert(!(source_p->umodes & FLAGS_INVISIBLE));
+  source_p->umodes |= FLAGS_INVISIBLE;
+  Count.invisi++;
+
   if ((++Count.local) > Count.max_loc)
   {
     Count.max_loc = Count.local;
@@ -501,7 +508,7 @@ register_remote_user(struct Client *client_p, struct Client *source_p,
     kill_client(client_p, source_p, "%s (Server doesn't exist)", me.name);
 
     source_p->flags |= FLAGS_KILLED;
-    exit_client(NULL, source_p, &me, "Ghost");
+    exit_client(NULL, source_p, &me, "Ghosted Client");
     return;
   }
 
@@ -729,7 +736,7 @@ void
 do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
               char *username, char *host, char *server, char *realname)
 {
-  unsigned int oflags;
+  unsigned int oldmode;
   struct User *user;
 
   assert(0 != source_p);
@@ -737,17 +744,13 @@ do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
 
   user = make_user(source_p);
 
-  oflags = source_p->flags;
+  oldmode = source_p->umodes;
 
   if (!IsUnknown(source_p))
   {
     sendto_one(source_p, form_str(ERR_ALREADYREGISTRED), me.name, nick);
     return;
   }
-  source_p->flags |= FLAGS_INVISIBLE;
-
-  if (!(oflags & FLAGS_INVISIBLE) && IsInvisible(source_p))
-    Count.invisi++;
 
   source_p->servptr = &me;
 
@@ -783,15 +786,12 @@ do_remote_user(char *nick, struct Client *client_p, struct Client *source_p,
                char *username, char *host, char *server, char *realname,
                char *id)
 {
-  unsigned int oflags;
   struct User *user;
 
   assert(0 != source_p);
   assert(source_p->username != username);
 
   user = make_user(source_p);
-
-  oflags = source_p->flags;
 
   /*
    * coming from another server, take the servers word for it

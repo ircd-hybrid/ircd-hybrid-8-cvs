@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: parse.c,v 1.6 2002/02/26 04:55:55 a1kmm Exp $
+ *   $Id: parse.c,v 1.7 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -105,6 +105,9 @@ string_to_array(char *string, char *parv[MAXPARA])
     if (*buf == '\0')
       return x;
   } while (x < MAXPARA - 1);
+
+  if (*p != ':')
+    p++;
 
   parv[x++] = p;
   parv[x] = NULL;

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: listener.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ *  $Id: listener.c,v 1.4 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 #include "config.h"
@@ -233,9 +233,7 @@ inetport(struct Listener *listener)
 
   /* Listen completion events are READ events .. */
 
-
-  comm_setselect(fd, FDLIST_SERVICE, COMM_SELECT_READ, accept_connection,
-                 listener, 0);
+  accept_connection(fd, listener);
 
   return 1;
 }
@@ -399,14 +397,17 @@ accept_connection(int pfd, void *data)
 
   if (fd < 0)
   {
-    /*
-     * slow down the whining to opers bit
-     */
-    if ((last_oper_notice + 20) <= CurrentTime)
+    if (!ignoreErrno(errno))
     {
-      report_error(L_ALL, "Error accepting connection %s:%s",
-                   listener->name, errno);
-      last_oper_notice = CurrentTime;
+      /*
+       * slow down the whining to opers bit
+       */
+      if ((last_oper_notice + 20) <= CurrentTime)
+      {
+        report_error(L_ALL, "Error accepting connection %s:%s",
+                     listener->name, errno);
+        last_oper_notice = CurrentTime;
+      }
     }
     /* Re-register a new IO request for the next accept .. */
     comm_setselect(listener->fd, FDLIST_SERVICE, COMM_SELECT_READ,

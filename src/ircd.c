@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd.c,v 1.7 2002/04/19 10:56:20 a1kmm Exp $
+ * $Id: ircd.c,v 1.8 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -333,14 +333,16 @@ io_loop(void)
     /* Check on the last activity, sleep for up to 1/2s if we are idle... */
     if (callbacks_called > 0)
       empty_cycles = 0;
+    else
+      empty_cycles++;
 
     /* Reset the callback counter... */
     callbacks_called = 0;
 
-    if (empty_cycles++ > 10)
-      comm_select((st = ((empty_cycles - 10) * 10) > 500 ? 500 : st));
-    else
-      comm_select(0);
+    st = (empty_cycles+1) * 15000;
+    if (st > 250000)
+      st = 250000;
+    usleep(st);
 
     /*
      * Check to see whether we have to rehash the configuration ..
@@ -380,9 +382,12 @@ initialize_global_set_options(void)
   split_users = ConfigChannel.split_server_count;
   split_servers = ConfigChannel.split_user_count;
 
-  if (split_users && split_servers)
+  if (split_users && split_servers &&
+      (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
+  {
     splitmode = 1;
-
+    splitchecking = 1;
+  }
   /* memset( &ConfigChannel, 0, sizeof(ConfigChannel)); */
 
   /* End of global set options */

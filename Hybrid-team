@@ -1,4 +1,4 @@
-$Id: Hybrid-team,v 1.1 2002/01/04 09:10:22 a1kmm Exp $
+$Id: Hybrid-team,v 1.2 2002/04/27 02:48:44 a1kmm Exp $
 
 The hybrid team is a group of ircd coders who were frustrated
 with the instability and all-out "dirtiness" of the EFnet ircd's
@@ -15,19 +15,17 @@ The core team as, of this major release:
 A1kmm, Andrew Miller <a1kmm@mware.virtualave.net>
 adrian, Adrian Chadd <adrian@creative.net.au>
 AndroSyn, Aaron Sethman <androsyn@ratbox.org>
-billy-jon, Bill Jonus <proggy@earthling.net>
+billy-jon, Bill Jonus <bill@mu.org>
 cosine, Patrick Alken <wnder@uwns.underworld.net>
 David-T, David Taylor <davidt@yadt.co.uk>
 Dianora, Diane Bruce <db@db.net>
 einride, Erik S. Johansen, <einride@einride.org>
 fl_, Lee Hardy <lee@leeh.co.uk>
-Habeeb, David Supuran <habeeb@cfl.rr.com>
 Hwy101, W. Campbell <wcampbel@botbay.net>
-is, Edward Brocklesby <ejb@leguin.org.uk>
+larne, Edward Brocklesby <ejb@sdf.lonestar.org>
 isomer, Perry Lorier <perry@coders.net>
+jmallett, Juli Mallett <jmallett@FreeBSD.org>
 k9, Jeremy Chadwick <yoshi@parodius.com>
-madmax, Paul Lomax <madmax@efnet.org>
-Neph|l|m, Adel Mezibra <adel@cybercable.fr>
 Rodder, Jon Lusky <lusky@blown.net>
 toot, Toby Verrall <to7@antipope.fsnet.co.uk>
 Wohali, Joan Touzet <joant@ieee.org>
@@ -36,18 +34,18 @@ xyst, Greg Prosser <gnp@arrogant.org>
 The following people have contributed blood, sweat, and/or code to
 this release of hybrid, in nick alphabetical order:
  
+adx, Piotr Nizynski <adx@crashnet.pl>
 bysin, Ben Kittridge <bkittridge@cfl.rr.com>
 desrt, Ryan Lortie <desertangel@mindless.com>
+Habeeb, David Supuran <habeeb@cfl.rr.com>
 jv, Jakub Vlasek <jv@pilsedu.cz>
 kre, Dinko Korunic <kreator@fly.srk.fer.hr>
-LarZ, Matthew Ramsey <mjr@blackened.com>
-orabidoo, Roger Espel Llima <espel@unix.bigots.org>
+madmax, Paul Lomax <madmax@efnet.org>
+Neph|l|m, Adel Mezibra <adel@cybercable.fr>
 Riedel, Dennis Vink, <vink@vuurwerk.nl>
-Seaner, Sean McVeigh <sdlmcvei@uwaterloo.ca>
 spookey, David Colburn <spookey@spookey.org>
-vx0, Mark Miller <mark@vx0.net>
-WintrHawk, Jake Khuon <khuon@GCtr.Net>
 vulture, Sean Stanek <vulture@cs.iastate.edu>
+vx0, Mark Miller <mark@vx0.net>
 zb^3, Alfred Perlstein <alfred@freebsd.org>
  
 Others are welcome.  Always.  And if we left anyone off the above list,

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: client.c,v 1.7 2002/04/26 04:00:29 a1kmm Exp $
+ *  $Id: client.c,v 1.8 2002/04/27 02:49:07 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -51,6 +51,7 @@
 #include "memory.h"
 #include "hostmask.h"
 #include "balloc.h"
+#include "s_protocol.h"
 
 #include <assert.h>
 #include <fcntl.h>
@@ -184,10 +185,9 @@ _free_client(struct Client *client_p)
   assert(0 == client_p->prev);
   assert(0 == client_p->next);
 
-  /* If localClient is non NULL, its a local client */
-  if (client_p->localClient != NULL)
+  if (MyConnect(client_p))
   {
-    if (-1 < client_p->localClient->fd)
+    if (client_p->localClient->fd >= 0)
       fd_close(client_p->localClient->fd);
 
 #ifndef NDEBUG
@@ -509,6 +509,23 @@ check_klines(void)
       }
     }
   }
+  /* also check the unknowns list for new dlines */
+  
+  for (ptr = unknown_list.head; ptr; ptr = next_ptr)
+    
+  {
+    next_ptr = ptr->next;    
+    client_p = ptr->data;
+
+    if((aconf = find_dline(&client_p->localClient->ip,
+                           client_p->localClient->aftype)))  
+    {
+      if (aconf->status & CONF_EXEMPTDLINE)
+        continue;      
+      sendto_one(client_p, "NOTICE DLINE :*** You have been D-lined");      
+      exit_client(client_p, client_p, &me, "D-lined"); 
+    } 
+  } 
 }
 
 /*
@@ -537,9 +554,8 @@ update_client_exit_stats(struct Client *client_p)
       --Count.invisi;
   }
 
-  if (!splitmode &&
-      (ConfigChannel.no_join_on_split || ConfigChannel.no_create_on_split))
-    check_splitmode();
+  if (splitchecking && !splitmode)
+    check_splitmode(NULL);
 }
 
 /*
@@ -1625,6 +1641,7 @@ change_local_nick(struct Client *client_p, struct Client *source_p,
      ** on a channel, send note of change to all clients
      ** on that channel. Propagate notice to other servers.
    */
+  dlink_node *servnode;
 
   source_p->tsinfo = CurrentTime;
 
@@ -1658,9 +1675,16 @@ change_local_nick(struct Client *client_p, struct Client *source_p,
        * hubs might not propogate a nick change, if the leaf
        * does not know about that client yet.
        */
-      sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS,
-                    NOFLAGS, ":%s NICK %s :%lu", source_p->name,
-                    nick, (unsigned long)source_p->tsinfo);
+      /* XXX we generate the linebuf once per protocol later for a
+       * speed boost if this gets to be too slow.
+       */
+      for (servnode = serv_list.head; servnode; servnode = servnode->next)
+      {
+        struct Client *target_p = (struct Client*)servnode->data;
+        if (target_p == client_p)
+          continue;
+        target_p->protocol->change_nick(target_p, source_p, nick);
+      }
     }
   }
   else

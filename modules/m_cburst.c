@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_cburst.c,v 1.4 2002/01/13 07:15:16 a1kmm Exp $
+ * $Id: m_cburst.c,v 1.5 2002/04/27 02:49:01 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -58,7 +58,7 @@ _moddeinit(void)
   mod_del_cmd(cburst_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
 ** m_cburst
@@ -122,7 +122,7 @@ ms_cburst(struct Client *client_p,
 
   if (IsCapable(client_p, CAP_LL))
   {
-    burst_channel(client_p, chptr);
+    client_p->protocol->burst_channel(client_p, chptr, 0, 0);
 
     if (nick)
       sendto_one(client_p, ":%s LLJOIN %s %s %s", me.name, name, nick, key);

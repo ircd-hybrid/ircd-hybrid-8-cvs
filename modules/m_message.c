@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_message.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
+ *   $Id: m_message.c,v 1.6 2002/04/27 02:49:01 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -122,7 +122,7 @@ _moddeinit(void)
   mod_del_cmd(privmsg_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 
 /*
@@ -175,11 +175,6 @@ m_message(int p_or_n,
           struct Client *source_p, int parc, char *parv[])
 {
   int i;
-
-#if 0                           /* Allow servers to send notices to individual people */
-  if (!IsPerson(source_p))
-    return;
-#endif
 
   /* It is stupid to disallow servers to send privmsgs but not notices.
    */

@@ -14,9 +14,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: s_auth.c,v 1.4 2002/02/26 04:55:55 a1kmm Exp $
+ *   $Id: s_auth.c,v 1.5 2002/04/27 02:49:08 a1kmm Exp $
  *
- *  $Id: s_auth.c,v 1.4 2002/02/26 04:55:55 a1kmm Exp $
+ *  $Id: s_auth.c,v 1.5 2002/04/27 02:49:08 a1kmm Exp $
  */
 
 /*
@@ -576,8 +576,7 @@ auth_connect_callback(int fd, int error, void *data)
   ClearAuthConnect(auth);
   SetAuthPending(auth);
   /* Its idle, because we don't mind this taking a little time -- adrian */
-  comm_setselect(auth->fd, FDLIST_IDLECLIENT, COMM_SELECT_READ,
-                 read_auth_reply, auth, 0);
+  read_auth_reply(auth->fd, auth);
 }
 
 

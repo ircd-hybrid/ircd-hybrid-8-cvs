@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_svinfo.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *   $Id: m_svinfo.c,v 1.5 2002/04/27 02:49:01 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -61,7 +61,7 @@ _moddeinit(void)
   mod_del_cmd(svinfo_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
  * ms_svinfo - SVINFO message handler
@@ -109,7 +109,7 @@ ms_svinfo(struct Client *client_p, struct Client *source_p,
   /*
    * since we're here, might as well set CurrentTime while we're at it
    */
-  CurrentTime = time(0);
+  set_time();
   theirtime = atol(parv[4]);
   deltat = abs(theirtime - CurrentTime);
 

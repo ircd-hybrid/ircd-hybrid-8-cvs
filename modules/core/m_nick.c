@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_nick.c,v 1.6 2002/02/26 04:55:51 a1kmm Exp $
+ *   $Id: m_nick.c,v 1.7 2002/04/27 02:49:05 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -59,10 +59,10 @@ static void tsm_nick(struct Client *, struct Client *, int, char **);
 static void tsm_client(struct Client *, struct Client *, int, char **);
 static void m_client(struct Client*, struct Client*, int, char**);
 
-static int nick_from_server(struct Client *, struct Client *, int, char **,
-                            time_t, char *);
-static int client_from_server(struct Client *, struct Client *, int, char **,
-                              time_t, char *);
+static void nick_from_server(struct Client *, struct Client *, int, char **,
+                             time_t, char *);
+static void client_from_server(struct Client *, struct Client *, int, char **,
+                               time_t, char *);
 
 static int check_clean_nick(struct Client *, struct Client *,
                             char *, char *, char *);
@@ -105,7 +105,7 @@ _moddeinit(void)
   mod_del_cmd(nick_msgtab);
 }
 
-char *_version = "$Revision: 1.6 $";
+char *_version = "$Revision: 1.7 $";
 #endif
 
 /*
@@ -638,7 +638,7 @@ clean_host_name(char *host)
 /*
  * nick_from_server()
  */
-static int
+static void
 nick_from_server(struct Client *client_p, struct Client *source_p, int parc,
                  char *parv[], time_t newts, char *nick)
 {
@@ -685,8 +685,9 @@ nick_from_server(struct Client *client_p, struct Client *source_p, int parc,
         m++;
       }
 
-      return do_remote_user(nick, client_p, source_p, parv[5], parv[6],
-                            parv[7], parv[8], NULL);
+      do_remote_user(nick, client_p, source_p, parv[5], parv[6],
+                     parv[7], parv[8], NULL);
+      return;
     }
   }
   else if (source_p->name[0])
@@ -717,15 +718,13 @@ nick_from_server(struct Client *client_p, struct Client *source_p, int parc,
 
   /* remove all accepts pointing to the client */
   del_all_accepts(source_p);
-
-  return 0;
 }
 
 
 /*
  * client_from_server()
  */
-static int
+static void
 client_from_server(struct Client *client_p, struct Client *source_p, int parc,
                    char *parv[], time_t newts, char *nick)
 {
@@ -767,8 +766,8 @@ client_from_server(struct Client *client_p, struct Client *source_p, int parc,
 
   }
 
-  return do_remote_user(nick, client_p, source_p, parv[5], parv[6],
-                        parv[7], name, id);
+  do_remote_user(nick, client_p, source_p, parv[5], parv[6],
+                 parv[7], name, id);
 }
 
 static int
