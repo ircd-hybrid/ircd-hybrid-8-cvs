@@ -1,0 +1,1160 @@
+[2002/1/2 16.48] Error loading module m_accept.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_accept.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_admin.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_admin.so: undefined symbol: mod_add_cmd
+[2002/1/2 16.48] Error loading module m_away.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_away.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_capab.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_capab.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_cburst.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_cburst.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_challenge.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_challenge.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_cjoin.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_cjoin.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_close.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_close.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_connect.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_connect.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_cryptlink.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_cryptlink.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_die.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_die.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_dmem.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_dmem.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_drop.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_drop.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_eob.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_eob.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_gline.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_gline.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_help.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_help.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_info.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_info.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_invite.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_invite.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_ison.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_ison.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_join.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_join.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_kick.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_kick.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_kill.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_kill.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_kline.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_kline.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_knock.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_knock.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_links.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_links.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_list.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_list.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_lljoin.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_lljoin.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_llnick.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_llnick.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_locops.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_locops.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_lusers.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_lusers.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_message.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_message.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_mode.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_mode.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_motd.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_motd.so: undefined symbol: SendMessageFile
+[2002/1/2 16.48] Error loading module m_names.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_names.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_nburst.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_nburst.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_nick.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_nick.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_oper.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_oper.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_operwall.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_operwall.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_part.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_part.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_pass.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_pass.so: undefined symbol: m_registered
+[2002/1/2 16.48] Error loading module m_ping.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_ping.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_pong.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_pong.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_post.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_post.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_quit.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_quit.so: undefined symbol: mod_add_cmd
+[2002/1/2 16.48] Error loading module m_rehash.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_rehash.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_restart.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_restart.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_resv.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_resv.so: undefined symbol: m_ignore
+[2002/1/2 16.48] Error loading module m_server.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_server.so: undefined symbol: m_registered
+[2002/1/2 16.48] Error loading module m_set.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_set.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_sjoin.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_sjoin.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_squit.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_squit.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_stats.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_stats.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_svinfo.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_svinfo.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_testline.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_testline.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_time.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_time.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_topic.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_topic.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_trace.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_trace.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_unkline.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_unkline.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_user.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_user.so: undefined symbol: m_registered
+[2002/1/2 16.48] Error loading module m_userhost.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_userhost.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_users.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_users.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_version.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_version.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_wallops.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_wallops.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_who.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_who.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_whois.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_whois.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module m_whowas.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//m_whowas.so: undefined symbol: m_unregistered
+[2002/1/2 16.48] Error loading module s_conf_report.so: /home/andrew/scratch/ircd-hybrid-8/loader//modules/autoload//s_conf_report.so: undefined symbol: ServerStats
+[2002/1/2 16.48] Module essential.so has no _modinit() function
+[2002/1/2 16.48] Failed in reading configuration file /home/andrew/scratch/ircd-hybrid-8/loader//etc/ircd.conf
+[2002/1/2 16.52] Failed in reading configuration file /home/andrew/scratch/ircd-hybrid-8/loader//etc/ircd.conf
+[2002/1/2 16.53] 1: parse error on line: 
+[2002/1/2 16.53] Failed reading kline file /home/andrew/scratch/ircd-hybrid-8/loader//etc/ircd.conf
+[2002/1/2 16.53] Failed reading dline file /home/andrew/scratch/ircd-hybrid-8/loader//etc/dline.conf
+[2002/1/2 16.53] No server name specified in serverinfo block.
+[2002/1/2 16.56] Failed reading kline file /home/andrew/scratch/ircd-hybrid-8/loader//etc/ircd.conf
+[2002/1/2 16.56] Failed reading dline file /home/andrew/scratch/ircd-hybrid-8/loader//etc/dline.conf
+[2002/1/2 16.56] No server name specified in serverinfo block.
+[2002/1/2 16.56] No server name specified in serverinfo block.
+[2002/1/2 16.57] 6: parse error on line: };
+[2002/1/2 16.57] No server name specified in serverinfo block.
+[2002/1/2 16.57] ERROR: No server description specified in serverinfo block.
+[2002/1/2 16.57] Server Ready
+[2002/1/2 16.57] Could not find module s_bsd_poll.so
+[2002/1/2 16.57] Server Ready
+[2002/1/2 16.57] Could not find module s_bsd_poll.so
+[2002/1/2 16.59] Server Ready
+[2002/1/2 16.59] Could not find module s_bsd_poll.so
+[2002/1/2 16.59] Server Ready
+[2002/1/2 16.59] Could not find module s_bsd_poll.so
+[2002/1/2 17.02] Server Ready
+[2002/1/2 17.02] Could not find module s_bsd_poll.so
+[2002/1/2 17.03] Server Ready
+[2002/1/2 17.03] Could not find module s_bsd_poll.so
+[2002/1/2 17.05] Server Ready
+[2002/1/2 17.05] Could not find module s_bsd_poll.so
+[2002/1/2 17.06] Server Ready
+[2002/1/2 17.06] Could not find module s_bsd_poll.so
+[2002/1/2 17.07] Server Ready
+[2002/1/2 17.07] Could not find module s_bsd_poll.so
+[2002/1/2 17.07] Cannot locate module s_bsd_conf.so
+[2002/1/2 17.07] Cannot locate module s_conf_report.so
+[2002/1/2 17.07] 1: parse error on line: 
+[2002/1/2 17.07] Server Ready
+[2002/1/2 17.07] Could not find module s_bsd_poll.so
+[2002/1/2 17.08] Cannot locate module s_bsd_conf.so
+[2002/1/2 17.08] Cannot locate module s_conf_report.so
+[2002/1/2 17.08] 1: parse error on line: 
+[2002/1/2 17.08] Server Ready
+[2002/1/2 17.08] Could not find module s_bsd_poll.so
+[2002/1/2 17.09] Cannot locate module s_bsd_conf.so
+[2002/1/2 17.09] Cannot locate module s_conf_report.so
+[2002/1/2 17.09] 1: parse error on line: 
+[2002/1/2 17.09] Server Ready
+[2002/1/2 17.09] Could not find module s_bsd_poll.so
+[2002/1/2 17.13] Cannot locate module s_bsd_sigio.so
+[2002/1/2 17.13] Cannot locate module s_bsd_poll.so
+[2002/1/2 17.13] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 17.13] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 17.13] Cannot locate module s_bsd.so
+[2002/1/2 17.13] Cannot locate module s_conf_report.so
+[2002/1/2 17.13] 1: parse error on line: 
+[2002/1/2 17.13] Server Ready
+[2002/1/2 17.13] Could not find module s_bsd_poll.so
+[2002/1/2 17.14] Cannot locate module s_bsd_sigio.so
+[2002/1/2 17.14] Cannot locate module s_bsd_poll.so
+[2002/1/2 17.14] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 17.14] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 17.14] Cannot locate module s_bsd.so
+[2002/1/2 17.14] Cannot locate module s_conf_report.so
+[2002/1/2 17.14] 1: parse error on line: 
+[2002/1/2 17.14] Server Ready
+[2002/1/2 17.14] Could not find module s_bsd_poll.so
+[2002/1/2 18.05] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.05] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.05] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.05] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.05] Cannot locate module s_bsd.so
+[2002/1/2 18.05] Cannot locate module s_conf_report.so
+[2002/1/2 18.05] 1: parse error on line: 
+[2002/1/2 18.05] Server Ready
+[2002/1/2 18.05] Could not find module s_bsd_poll.so
+[2002/1/2 18.06] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.06] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.06] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.06] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.06] Cannot locate module s_bsd.so
+[2002/1/2 18.06] Cannot locate module s_conf_report.so
+[2002/1/2 18.06] 1: parse error on line: 
+[2002/1/2 18.06] Server Ready
+[2002/1/2 18.06] Could not find module s_bsd_poll.so
+[2002/1/2 18.13] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.13] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.13] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.13] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.13] Cannot locate module s_bsd.so
+[2002/1/2 18.13] Cannot locate module s_conf_report.so
+[2002/1/2 18.13] 1: parse error on line: 
+[2002/1/2 18.13] Server Ready
+[2002/1/2 18.13] Could not find module s_bsd_poll.so
+[2002/1/2 18.15] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.15] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.15] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.15] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.15] Cannot locate module s_bsd.so
+[2002/1/2 18.15] Cannot locate module s_conf_report.so
+[2002/1/2 18.15] 1: parse error on line: 
+[2002/1/2 18.15] Server Ready
+[2002/1/2 18.15] Could not find module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.16] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.16] Cannot locate module s_bsd.so
+[2002/1/2 18.16] Cannot locate module s_conf_report.so
+[2002/1/2 18.16] 1: parse error on line: 
+[2002/1/2 18.16] Server Ready
+[2002/1/2 18.16] Could not find module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.16] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.16] Cannot locate module s_bsd.so
+[2002/1/2 18.16] Cannot locate module s_conf_report.so
+[2002/1/2 18.16] 1: parse error on line: 
+[2002/1/2 18.16] Server Ready
+[2002/1/2 18.16] Could not find module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.16] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.16] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.16] Cannot locate module s_bsd.so
+[2002/1/2 18.16] Cannot locate module s_conf_report.so
+[2002/1/2 18.16] 1: parse error on line: 
+[2002/1/2 18.16] Server Ready
+[2002/1/2 18.16] Could not find module s_bsd_poll.so
+[2002/1/2 18.17] 5: parse error on line:   module = "s_bsd_sigio.so";
+[2002/1/2 18.17] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.17] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.17] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.17] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.17] Cannot locate module s_bsd.so
+[2002/1/2 18.17] Cannot locate module s_conf_report.so
+[2002/1/2 18.17] 1: parse error on line: 
+[2002/1/2 18.17] Server Ready
+[2002/1/2 18.17] Could not find module s_bsd_poll.so
+[2002/1/2 18.17] 5: parse error on line:   module = "s_bsd_sigio.so";
+[2002/1/2 18.17] Cannot locate module s_bsd_sigio.so
+[2002/1/2 18.17] Cannot locate module s_bsd_poll.so
+[2002/1/2 18.17] Cannot locate module s_bsd_devpoll.so
+[2002/1/2 18.17] Cannot locate module s_bsd_kqueue.so
+[2002/1/2 18.17] Cannot locate module s_bsd.so
+[2002/1/2 18.17] Cannot locate module s_conf_report.so
+[2002/1/2 18.17] 1: parse error on line: 
+[2002/1/2 18.17] Server Ready
+[2002/1/2 18.17] Could not find module s_bsd_poll.so
+[2002/1/2 18.17] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.17] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.17] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.17] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.17] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: ServerStats
+[2002/1/2 18.17] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: ServerStats
+[2002/1/2 18.17] 1: parse error on line: 
+[2002/1/2 18.17] Server Ready
+[2002/1/2 18.17] Could not find module s_bsd_poll.so
+[2002/1/2 18.18] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.18] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.18] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.18] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.18] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: ServerStats
+[2002/1/2 18.18] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: ServerStats
+[2002/1/2 18.18] 1: parse error on line: 
+[2002/1/2 18.18] Server Ready
+[2002/1/2 18.18] Could not find module s_bsd_poll.so
+[2002/1/2 18.30] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.30] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.30] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.30] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.30] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.30] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.30] 1: parse error on line: 
+[2002/1/2 18.30] Server Ready
+[2002/1/2 18.30] Could not find module s_bsd_poll.so
+[2002/1/2 18.31] Error loading module fdlist.so: modules//fdlist.so: undefined symbol: sendto_one
+[2002/1/2 18.31] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.31] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.31] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.31] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.31] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.31] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.31] 1: parse error on line: 
+[2002/1/2 18.31] Server Ready
+[2002/1/2 18.31] Could not find module s_bsd_poll.so
+[2002/1/2 18.31] Error loading module fdlist.so: modules//fdlist.so: undefined symbol: sendto_one
+[2002/1/2 18.31] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.31] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.31] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.31] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.31] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.31] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.31] 1: parse error on line: 
+[2002/1/2 18.31] Server Ready
+[2002/1/2 18.31] Could not find module s_bsd_poll.so
+[2002/1/2 18.34] Error loading module fdlist.so: modules//fdlist.so: undefined symbol: comm_setselect
+[2002/1/2 18.34] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.34] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.34] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.34] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.34] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.34] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.34] 1: parse error on line: 
+[2002/1/2 18.34] Server Ready
+[2002/1/2 18.34] Could not find module s_bsd_poll.so
+[2002/1/2 18.35] Error loading module fdlist.so: modules//fdlist.so: undefined symbol: comm_setselect
+[2002/1/2 18.35] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.35] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.35] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.35] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.35] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.35] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.35] 1: parse error on line: 
+[2002/1/2 18.35] Server Ready
+[2002/1/2 18.35] Could not find module s_bsd_poll.so
+[2002/1/2 18.45] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.45] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.45] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.45] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.45] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.45] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.45] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.45] 1: parse error on line: 
+[2002/1/2 18.45] Server Ready
+[2002/1/2 18.45] Could not find module s_bsd_poll.so
+[2002/1/2 18.45] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.45] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.45] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: fd_table
+[2002/1/2 18.45] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.45] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.45] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: fd_table
+[2002/1/2 18.45] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.45] 1: parse error on line: 
+[2002/1/2 18.45] Server Ready
+[2002/1/2 18.45] Could not find module s_bsd_poll.so
+[2002/1/2 18.46] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.46] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.46] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.46] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.46] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.46] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: try_connections
+[2002/1/2 18.46] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.46] 1: parse error on line: 
+[2002/1/2 18.46] Server Ready
+[2002/1/2 18.46] Could not find module s_bsd_poll.so
+[2002/1/2 18.48] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.48] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.48] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.48] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.48] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.48] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: try_connections
+[2002/1/2 18.48] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.48] 1: parse error on line: 
+[2002/1/2 18.48] Server Ready
+[2002/1/2 18.48] Could not find module s_bsd_poll.so
+[2002/1/2 18.48] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.48] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: try_connections
+[2002/1/2 18.48] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.48] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.48] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.48] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.48] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.48] 1: parse error on line: 
+[2002/1/2 18.48] Server Ready
+[2002/1/2 18.48] Could not find module s_bsd_poll.so
+[2002/1/2 18.51] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.51] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: det_confs_butmask
+[2002/1/2 18.51] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.51] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.51] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.51] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.51] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.51] 1: parse error on line: 
+[2002/1/2 18.51] Server Ready
+[2002/1/2 18.51] Could not find module s_bsd_poll.so
+[2002/1/2 18.51] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.51] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: det_confs_butmask
+[2002/1/2 18.51] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.51] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.51] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.51] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.51] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.51] 1: parse error on line: 
+[2002/1/2 18.51] Server Ready
+[2002/1/2 18.51] Could not find module s_bsd_poll.so
+[2002/1/2 18.59] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 18.59] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: get_listener_name
+[2002/1/2 18.59] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 18.59] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 18.59] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 18.59] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 18.59] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 18.59] 1: parse error on line: 
+[2002/1/2 18.59] Server Ready
+[2002/1/2 18.59] Could not find module s_bsd_poll.so
+[2002/1/2 19.03] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.03] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: send_queued_write
+[2002/1/2 19.03] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.03] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.03] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.03] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.03] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.03] 1: parse error on line: 
+[2002/1/2 19.03] Server Ready
+[2002/1/2 19.03] Could not find module s_bsd_poll.so
+[2002/1/2 19.04] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.04] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: send_queued_write
+[2002/1/2 19.04] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.04] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.04] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.04] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.04] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.04] 1: parse error on line: 
+[2002/1/2 19.04] Server Ready
+[2002/1/2 19.04] Could not find module s_bsd_poll.so
+[2002/1/2 19.05] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.05] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.05] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: send_queued_write
+[2002/1/2 19.05] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.05] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.05] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.05] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.05] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.05] 1: parse error on line: 
+[2002/1/2 19.05] Server Ready
+[2002/1/2 19.05] Could not find module s_bsd_poll.so
+[2002/1/2 19.30] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.30] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.30] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: send_queued_write
+[2002/1/2 19.30] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.30] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.30] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.30] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.30] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.30] 1: parse error on line: 
+[2002/1/2 19.30] Server Ready
+[2002/1/2 19.30] Could not find module s_bsd_poll.so
+[2002/1/2 19.32] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.32] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.32] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: free_listener
+[2002/1/2 19.32] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.32] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.32] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.32] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.32] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.32] 1: parse error on line: 
+[2002/1/2 19.32] Server Ready
+[2002/1/2 19.32] Could not find module s_bsd_poll.so
+[2002/1/2 19.34] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.34] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.34] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: adns_gethost
+[2002/1/2 19.34] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.34] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.34] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.34] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.34] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.34] 1: parse error on line: 
+[2002/1/2 19.34] Server Ready
+[2002/1/2 19.34] Could not find module s_bsd_poll.so
+[2002/1/2 19.39] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.39] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.39] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: linebuf_donebuf
+[2002/1/2 19.39] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.39] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.39] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.39] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.39] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.39] 1: parse error on line: 
+[2002/1/2 19.39] Server Ready
+[2002/1/2 19.39] Could not find module s_bsd_poll.so
+[2002/1/2 19.39] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.39] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.39] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: linebuf_donebuf
+[2002/1/2 19.39] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.39] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.39] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.39] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.39] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.39] 1: parse error on line: 
+[2002/1/2 19.39] Server Ready
+[2002/1/2 19.39] Could not find module s_bsd_poll.so
+[2002/1/2 19.44] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.44] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.44] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: get_client_name
+[2002/1/2 19.44] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.44] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.44] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.44] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.44] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.44] 1: parse error on line: 
+[2002/1/2 19.44] Server Ready
+[2002/1/2 19.44] Could not find module s_bsd_poll.so
+[2002/1/2 19.47] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.47] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.47] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: start_auth
+[2002/1/2 19.47] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.47] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.47] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.47] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.47] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.47] 1: parse error on line: 
+[2002/1/2 19.47] Server Ready
+[2002/1/2 19.47] Could not find module s_bsd_poll.so
+[2002/1/2 19.48] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.48] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.48] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: start_auth
+[2002/1/2 19.48] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.48] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.48] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.48] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.48] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.48] 1: parse error on line: 
+[2002/1/2 19.48] Server Ready
+[2002/1/2 19.48] Could not find module s_bsd_poll.so
+[2002/1/2 19.53] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.53] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.53] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: init_netio
+[2002/1/2 19.53] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.53] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.53] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.53] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.53] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.53] 1: parse error on line: 
+[2002/1/2 19.53] Server Ready
+[2002/1/2 19.53] Could not find module s_bsd_poll.so
+[2002/1/2 19.55] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 19.55] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 19.55] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: init_netio
+[2002/1/2 19.55] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 19.55] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 19.55] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 19.55] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 19.55] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 19.55] 1: parse error on line: 
+[2002/1/2 19.55] Server Ready
+[2002/1/2 19.55] Could not find module s_bsd_poll.so
+[2002/1/2 21.54] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 21.54] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 21.54] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: make_client
+[2002/1/2 21.54] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 21.54] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 21.54] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 21.54] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 21.54] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 21.54] 1: parse error on line: 
+[2002/1/2 21.54] Server Ready
+[2002/1/2 21.54] Could not find module s_bsd_poll.so
+[2002/1/2 22.24] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/2 22.24] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/2 22.24] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: make_client
+[2002/1/2 22.24] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/2 22.24] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/2 22.24] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/2 22.24] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/2 22.24] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/2 22.24] 1: parse error on line: 
+[2002/1/2 22.24] Server Ready
+[2002/1/2 22.24] Could not find module s_bsd_poll.so
+[2002/1/3 17.59] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 17.59] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 17.59] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: make_client
+[2002/1/3 17.59] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 17.59] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 17.59] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 17.59] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 17.59] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 17.59] 1: parse error on line: 
+[2002/1/3 17.59] Server Ready
+[2002/1/3 17.59] Could not find module s_bsd_poll.so
+[2002/1/3 17.59] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 17.59] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 17.59] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: make_client
+[2002/1/3 17.59] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 17.59] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 17.59] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 17.59] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 17.59] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 17.59] 1: parse error on line: 
+[2002/1/3 17.59] Server Ready
+[2002/1/3 17.59] Could not find module s_bsd_poll.so
+[2002/1/3 18.38] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 18.38] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 18.38] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: comm_setselect
+[2002/1/3 18.38] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 18.38] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 18.38] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 18.38] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 18.38] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 18.38] 1: parse error on line: 
+[2002/1/3 18.38] Server Ready
+[2002/1/3 18.38] Could not find module s_bsd_poll.so
+[2002/1/3 18.38] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 18.38] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 18.38] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: comm_setselect
+[2002/1/3 18.38] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 18.38] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 18.38] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 18.38] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 18.38] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 18.38] 1: parse error on line: 
+[2002/1/3 18.38] Server Ready
+[2002/1/3 18.38] Could not find module s_bsd_poll.so
+[2002/1/3 19.37] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.37] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.37] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: comm_setselect
+[2002/1/3 19.37] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.37] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 19.37] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.37] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.37] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.37] 1: parse error on line: 
+[2002/1/3 19.37] Server Ready
+[2002/1/3 19.37] Could not find module s_bsd_poll.so
+[2002/1/3 19.42] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.42] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.42] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: comm_setselect
+[2002/1/3 19.42] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.42] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 19.42] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.42] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.42] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.42] 1: parse error on line: 
+[2002/1/3 19.42] Server Ready
+[2002/1/3 19.42] Could not find module s_bsd_poll.so
+[2002/1/3 19.42] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.42] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.42] Error loading module s_bsd.so: modules//s_bsd.so: undefined symbol: comm_setselect
+[2002/1/3 19.42] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.42] Error loading module s_bsd_poll.so: modules//s_bsd_poll.so: undefined symbol: ignoreErrno
+[2002/1/3 19.42] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.42] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.42] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.42] 1: parse error on line: 
+[2002/1/3 19.42] Server Ready
+[2002/1/3 19.42] Could not find module s_bsd_poll.so
+[2002/1/3 19.43] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.43] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.43] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 19.43] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.43] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 19.43] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.43] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.43] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.43] 1: parse error on line: 
+[2002/1/3 19.43] Server Ready
+[2002/1/3 19.47] Server killed By SIGTERM
+[2002/1/3 19.48] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.48] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 19.48] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.48] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 19.48] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.48] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.48] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.48] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.48] 1: parse error on line: 
+[2002/1/3 19.48] Server Ready
+[2002/1/3 19.57] Server killed By SIGTERM
+[2002/1/3 19.57] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 19.57] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 19.57] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 19.57] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 19.57] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 19.57] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 19.57] Module linebuf.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 19.57] Error loading module send.so: modules//send.so: undefined symbol: client_burst_if_needed
+[2002/1/3 19.57] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 19.57] 1: parse error on line: 
+[2002/1/3 19.57] Server Ready
+[2002/1/3 19.57] Server exiting on SIGINT
+[2002/1/3 20.04] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.04] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.04] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 20.04] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 20.04] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 20.04] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 20.04] Module linebuf.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.04] Error loading module send.so: modules//send.so: undefined symbol: deprintf
+[2002/1/3 20.04] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.04] 1: parse error on line: 
+[2002/1/3 20.04] Server Ready
+[2002/1/3 20.04] Server exiting on SIGINT
+[2002/1/3 20.04] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.04] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.04] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 20.04] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 20.04] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 20.04] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 20.04] Module linebuf.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.04] Error loading module send.so: modules//send.so: undefined symbol: deprintf
+[2002/1/3 20.04] Module debug.so has no _modinit() function
+[2002/1/3 20.04] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.04] 1: parse error on line: 
+[2002/1/3 20.04] Server Ready
+[2002/1/3 20.05] Server exiting on SIGINT
+[2002/1/3 20.05] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.05] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.05] Module s_bsd_sigio.so has no _modinit() function
+[2002/1/3 20.05] Module s_bsd_poll.so [version: <unknown>] loaded at 0x80770b0
+[2002/1/3 20.05] Module s_bsd_devpoll.so has no _modinit() function
+[2002/1/3 20.05] Module s_bsd_kqueue.so has no _modinit() function
+[2002/1/3 20.05] Module linebuf.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.05] Module debug.so has no _modinit() function
+[2002/1/3 20.05] Error loading module send.so: modules//send.so: undefined symbol: deprintf
+[2002/1/3 20.05] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.05] 1: parse error on line: 
+[2002/1/3 20.05] Server Ready
+[2002/1/3 20.05] Server exiting on SIGINT
+[2002/1/3 20.07] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.07] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.07] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.07] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.07] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.07] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.07] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.07] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.07] Error loading module send.so: modules//send.so: undefined symbol: exit_client
+[2002/1/3 20.07] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.07] 1: parse error on line: 
+[2002/1/3 20.07] Server Ready
+[2002/1/3 20.12] Server exiting on SIGINT
+[2002/1/3 20.12] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.12] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.12] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.12] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.12] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.12] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.12] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.12] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.12] Error loading module send.so: modules//send.so: undefined symbol: form_str
+[2002/1/3 20.12] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.12] 1: parse error on line: 
+[2002/1/3 20.12] Server Ready
+[2002/1/3 20.12] Server exiting on SIGINT
+[2002/1/3 20.13] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.13] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.13] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.13] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.13] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.13] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.13] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.13] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.13] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.13] Error loading module send.so: modules//send.so: undefined symbol: get_client_name
+[2002/1/3 20.13] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.13] 1: parse error on line: 
+[2002/1/3 20.13] Server Ready
+[2002/1/3 20.17] Server exiting on SIGINT
+[2002/1/3 20.17] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.17] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.17] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.17] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.17] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.17] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.17] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.17] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.17] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.17] Error loading module send.so: modules//send.so: undefined symbol: dead_link
+[2002/1/3 20.17] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.17] 1: parse error on line: 
+[2002/1/3 20.17] Server Ready
+[2002/1/3 20.17] Server exiting on SIGINT
+[2002/1/3 20.19] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.19] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.19] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.19] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.19] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.19] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.19] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.19] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.19] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.19] Error loading module send.so: modules//send.so: undefined symbol: get_client_name
+[2002/1/3 20.19] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.19] 1: parse error on line: 
+[2002/1/3 20.19] Server Ready
+[2002/1/3 20.19] Server exiting on SIGINT
+[2002/1/3 20.21] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.21] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.21] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.21] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.21] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.21] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.21] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.21] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.21] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.21] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.21] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.21] 1: parse error on line: 
+[2002/1/3 20.21] Server Ready
+[2002/1/3 20.23] Server exiting on SIGINT
+[2002/1/3 20.24] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.24] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.24] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.24] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.24] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.24] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.24] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.24] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.24] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.24] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.24] Error loading module client.so: modules//client.so: undefined symbol: my_name_for_link
+[2002/1/3 20.24] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.24] 1: parse error on line: 
+[2002/1/3 20.24] Server Ready
+[2002/1/3 20.24] Server exiting on SIGINT
+[2002/1/3 20.24] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.24] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.24] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.24] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.24] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.24] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.24] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.24] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.24] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.24] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.24] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.24] Error loading module client.so: modules//client.so: undefined symbol: my_name_for_link
+[2002/1/3 20.24] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.24] 1: parse error on line: 
+[2002/1/3 20.24] Server Ready
+[2002/1/3 20.24] Server exiting on SIGINT
+[2002/1/3 20.25] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.25] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.25] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.25] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.25] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.25] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.25] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.25] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.25] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.25] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.25] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.25] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.25] Error loading module client.so: modules//client.so: undefined symbol: my_name_for_link
+[2002/1/3 20.25] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.25] 1: parse error on line: 
+[2002/1/3 20.25] Server Ready
+[2002/1/3 20.25] Server exiting on SIGINT
+[2002/1/3 20.30] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.30] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.30] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.30] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.30] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.30] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.30] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.30] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.30] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.30] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.30] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.30] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.30] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.30] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.30] 1: parse error on line: 
+[2002/1/3 20.30] Server Ready
+[2002/1/3 20.30] Server exiting on SIGINT
+[2002/1/3 20.33] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.33] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.33] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.33] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.33] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.33] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.33] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.33] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.33] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.33] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.33] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.33] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.33] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.33] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.33] 1: parse error on line: 
+[2002/1/3 20.33] Server Ready
+[2002/1/3 20.33] Server exiting on SIGINT
+[2002/1/3 20.36] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.36] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.36] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.36] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.36] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.36] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.36] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.36] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.36] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.36] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.36] Error loading module adns.so: modules//adns.so: undefined symbol: adns_finish
+[2002/1/3 20.36] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.36] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.36] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.36] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.36] 1: parse error on line: 
+[2002/1/3 20.36] Server Ready
+[2002/1/3 20.37] Server exiting on SIGINT
+[2002/1/3 20.38] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.38] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.38] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.38] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.38] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.38] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.38] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.38] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.38] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.38] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.38] Error loading module adns.so: modules//adns.so: undefined symbol: adns_finish
+[2002/1/3 20.38] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.38] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.38] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.38] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.38] 1: parse error on line: 
+[2002/1/3 20.38] Server Ready
+[2002/1/3 20.38] Server exiting on SIGINT
+[2002/1/3 20.39] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.39] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.39] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.39] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.39] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.39] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.39] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.39] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.39] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.39] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.39] Error loading module adns.so: modules//adns.so: undefined symbol: adns_finish
+[2002/1/3 20.39] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.39] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.39] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.39] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.39] 1: parse error on line: 
+[2002/1/3 20.39] Server Ready
+[2002/1/3 20.39] Server exiting on SIGINT
+[2002/1/3 20.40] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.40] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.40] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.40] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.40] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.40] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.40] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.40] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.40] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.40] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.40] Error loading module adns.so: modules//adns.so: undefined symbol: adns_finish
+[2002/1/3 20.40] Error loading module client.so: modules//client.so: undefined symbol: delete_adns_queries
+[2002/1/3 20.40] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.40] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.40] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.40] 1: parse error on line: 
+[2002/1/3 20.40] Server Ready
+[2002/1/3 20.41] Server exiting on SIGINT
+[2002/1/3 20.43] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 20.43] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 20.43] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 20.43] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 20.43] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 20.43] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 20.43] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 20.43] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 20.43] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 20.43] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 20.43] Module adns.so [version: <unknown>] loaded at 0x8078fa0
+[2002/1/3 20.43] Error loading module client.so: modules//client.so: undefined symbol: remove_server_from_list
+[2002/1/3 20.43] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 20.43] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 20.43] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 20.43] 1: parse error on line: 
+[2002/1/3 20.43] Server Ready
+[2002/1/3 20.43] Server exiting on SIGINT
+[2002/1/3 21.30] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 21.30] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 21.30] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 21.30] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 21.30] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 21.30] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 21.30] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 21.30] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 21.30] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 21.30] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 21.30] Module adns.so [version: <unknown>] loaded at 0x8078fa0
+[2002/1/3 21.30] Error loading module client.so: modules//client.so: undefined symbol: remove_server_from_list
+[2002/1/3 21.30] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.30] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.30] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.30] 1: parse error on line: 
+[2002/1/3 21.30] Server Ready
+[2002/1/3 21.32] Server killed By SIGTERM
+[2002/1/3 21.32] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 21.32] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 21.32] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 21.32] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 21.32] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 21.32] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 21.32] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 21.32] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 21.32] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 21.32] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 21.32] Module adns.so [version: <unknown>] loaded at 0x8078fa0
+[2002/1/3 21.32] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.32] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.32] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.32] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.32] 1: parse error on line: 
+[2002/1/3 21.32] Server Ready
+[2002/1/3 21.32] Server killed By SIGTERM
+[2002/1/3 21.32] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 21.32] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 21.32] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 21.32] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 21.32] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 21.32] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 21.32] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 21.32] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 21.32] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 21.32] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 21.32] Module adns.so [version: <unknown>] loaded at 0x8078fa0
+[2002/1/3 21.32] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.32] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.32] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.32] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.32] 1: parse error on line: 
+[2002/1/3 21.32] Server Ready
+[2002/1/3 21.32] Server exiting on SIGINT
+[2002/1/3 21.34] Module fdlist.so [version: <unknown>] loaded at 0x80611b8
+[2002/1/3 21.34] Module s_bsd.so [version: <unknown>] loaded at 0x8076d70
+[2002/1/3 21.34] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x80770d0
+[2002/1/3 21.34] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077480
+[2002/1/3 21.34] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x8077848
+[2002/1/3 21.34] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c08
+[2002/1/3 21.34] Module linebuf.so [version: <unknown>] loaded at 0x8077fc8
+[2002/1/3 21.34] Module debug.so [version: <unknown>] loaded at 0x80783b0
+[2002/1/3 21.34] Module numeric.so [version: <unknown>] loaded at 0x8078758
+[2002/1/3 21.34] Module send.so [version: <unknown>] loaded at 0x8078b20
+[2002/1/3 21.34] Module adns.so [version: <unknown>] loaded at 0x8078fa0
+[2002/1/3 21.34] Error loading module s_user.so: modules//s_user.so: undefined symbol: MaxConnectionCount
+[2002/1/3 21.34] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.34] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.34] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.34] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.34] 1: parse error on line: 
+[2002/1/3 21.34] Server Ready
+[2002/1/3 21.34] Server exiting on SIGINT
+[2002/1/3 21.36] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 21.36] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 21.36] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 21.36] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 21.36] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 21.36] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 21.36] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 21.36] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 21.36] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 21.36] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 21.36] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 21.36] Error loading module s_user.so: modules//s_user.so: undefined symbol: get_listener_name
+[2002/1/3 21.36] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.36] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.36] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.36] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.36] 1: parse error on line: 
+[2002/1/3 21.36] Server Ready
+[2002/1/3 21.36] Server exiting on SIGINT
+[2002/1/3 21.36] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 21.36] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 21.36] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 21.36] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 21.36] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 21.36] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 21.36] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 21.36] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 21.36] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 21.36] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 21.36] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 21.36] Error loading module listener.so: modules//listener.so: undefined symbol: conf_connect_allowed
+[2002/1/3 21.36] Error loading module s_user.so: modules//s_user.so: undefined symbol: get_listener_name
+[2002/1/3 21.36] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.36] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.36] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.36] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.36] 1: parse error on line: 
+[2002/1/3 21.36] Server Ready
+[2002/1/3 21.36] Server exiting on SIGINT
+[2002/1/3 21.42] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 21.42] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 21.42] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 21.42] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 21.42] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 21.42] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 21.42] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 21.42] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 21.42] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 21.42] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 21.42] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 21.42] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/3 21.42] Error loading module s_user.so: modules//s_user.so: undefined symbol: oper_privs_as_string
+[2002/1/3 21.42] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 21.42] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 21.42] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 21.42] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 21.42] 1: parse error on line: 
+[2002/1/3 21.42] Server Ready
+[2002/1/3 21.43] Server exiting on SIGINT
+[2002/1/3 22.07] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 22.07] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 22.07] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 22.07] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 22.07] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 22.07] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 22.07] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 22.07] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 22.07] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 22.07] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 22.07] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 22.07] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/3 22.07] Error loading module s_user.so: modules//s_user.so: undefined symbol: oper_privs_as_string
+[2002/1/3 22.07] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 22.07] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 22.07] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 22.07] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 22.07] 1: parse error on line: 
+[2002/1/3 22.07] Server Ready
+[2002/1/3 22.07] Server exiting on SIGINT
+[2002/1/3 22.21] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 22.21] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 22.21] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 22.21] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 22.21] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 22.21] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 22.21] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 22.21] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 22.21] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 22.21] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 22.21] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 22.21] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/3 22.21] Error loading module s_user.so: modules//s_user.so: undefined symbol: oper_privs_as_string
+[2002/1/3 22.21] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 22.21] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 22.21] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 22.21] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 22.21] 1: parse error on line: 
+[2002/1/3 22.21] Server Ready
+[2002/1/3 22.21] Server exiting on SIGINT
+[2002/1/3 22.23] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 22.23] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 22.23] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 22.23] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 22.23] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 22.23] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 22.23] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 22.23] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 22.23] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 22.23] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 22.23] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 22.23] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/3 22.23] Error loading module s_user.so: modules//s_user.so: undefined symbol: find_person
+[2002/1/3 22.23] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 22.23] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 22.23] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 22.23] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 22.23] 1: parse error on line: 
+[2002/1/3 22.23] Server Ready
+[2002/1/3 22.25] Server exiting on SIGINT
+[2002/1/3 22.25] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/3 22.25] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/3 22.25] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/3 22.25] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/3 22.25] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/3 22.25] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/3 22.25] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/3 22.25] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/3 22.25] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/3 22.25] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/3 22.25] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/3 22.25] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/3 22.25] Error loading module s_user.so: modules//s_user.so: undefined symbol: find_person
+[2002/1/3 22.25] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/3 22.25] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/3 22.25] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/3 22.25] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/3 22.25] 1: parse error on line: 
+[2002/1/3 22.25] Server Ready
+[2002/1/3 22.27] Server exiting on SIGINT
+[2002/1/4 19.42] Module fdlist.so [version: <unknown>] loaded at 0x8061238
+[2002/1/4 19.42] Module s_bsd.so [version: <unknown>] loaded at 0x8076df0
+[2002/1/4 19.42] Module s_bsd_sigio.so [version: <unknown>] loaded at 0x8077150
+[2002/1/4 19.42] Module s_bsd_poll.so [version: <unknown>] loaded at 0x8077500
+[2002/1/4 19.42] Module s_bsd_devpoll.so [version: <unknown>] loaded at 0x80778c8
+[2002/1/4 19.42] Module s_bsd_kqueue.so [version: <unknown>] loaded at 0x8077c88
+[2002/1/4 19.42] Module linebuf.so [version: <unknown>] loaded at 0x8078048
+[2002/1/4 19.42] Module debug.so [version: <unknown>] loaded at 0x8078430
+[2002/1/4 19.42] Module numeric.so [version: <unknown>] loaded at 0x80787d8
+[2002/1/4 19.42] Module send.so [version: <unknown>] loaded at 0x8078ba0
+[2002/1/4 19.42] Module adns.so [version: <unknown>] loaded at 0x8079020
+[2002/1/4 19.42] Module listener.so [version: <unknown>] loaded at 0x8079480
+[2002/1/4 19.42] Error loading module client.so: modules//client.so: undefined symbol: register_local_user
+[2002/1/4 19.42] Error loading module s_user.so: modules//s_user.so: undefined symbol: find_person
+[2002/1/4 19.42] Error loading module packet.so: modules//packet.so: undefined symbol: slinkrpltab
+[2002/1/4 19.42] Error loading module s_serv.so: modules//s_serv.so: undefined symbol: read_packet
+[2002/1/4 19.42] Error loading module s_conf_report.so: modules//s_conf_report.so: undefined symbol: check_klines
+[2002/1/4 19.42] 1: parse error on line: 
+[2002/1/4 19.42] Server Ready
+[2002/1/4 19.42] Server killed By SIGTERM

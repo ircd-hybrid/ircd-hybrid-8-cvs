@@ -1,0 +1,2 @@
+# $Id: .depend,v 1.1 2002/01/04 09:15:07 a1kmm Exp $
+ircd_loader.o: ircd_loader.c ../include/setup.h
