@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_set.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $ */
+ *   $Id: m_set.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $ */
 
 /* rewritten by jdc */
 
@@ -45,25 +45,27 @@
 
 static void mo_set(struct Client *, struct Client *, int, char **);
 
-struct Message set_msgtab = {
-  "SET", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_error, mo_set}
+struct Message set_msgtab[] = {
+  {"SET", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"SET", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"SET", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_set},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&set_msgtab);
+  mod_add_cmd(set_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&set_msgtab);
+  mod_del_cmd(set_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /* Structure used for the SET table itself */
 struct SetStruct

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: config.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ * $Id: config.h,v 1.3 2002/01/13 07:15:10 a1kmm Exp $
  */
 
 #ifndef INCLUDED_config_h
@@ -265,6 +265,8 @@
 #define INVARIANTS
 
 #define CONFIG_H_LEVEL_7
+
+#define ENABLE_TS5
 
 #include "defaults.h"
 #endif /* INCLUDED_config_h */

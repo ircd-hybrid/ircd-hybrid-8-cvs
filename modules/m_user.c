@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_user.c,v 1.3 2002/01/06 07:18:29 a1kmm Exp $
+ *   $Id: m_user.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -40,25 +40,28 @@
 
 static void mr_user(struct Client *, struct Client *, int, char **);
 
-struct Message user_msgtab = {
-  "USER", 0, 0, 5, 0, MFLG_SLOW, 0L,
-  {mr_user, m_registered, m_ignore, m_registered}
+struct Message user_msgtab[] = {
+  /* After they register, the command doesn't really exist; put the
+   * unknown handler onto it.
+   */
+  {"USER", 0, 0, 5, 0, MFLG_SLOW, 0, &p_unregistered, &mr_user},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&user_msgtab);
+  mod_add_cmd(user_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&user_msgtab);
+  mod_del_cmd(user_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** mr_user

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_post.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_post.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -35,25 +35,25 @@
 
 static void mr_post(struct Client *, struct Client *, int, char **);
 
-struct Message post_msgtab = {
-  "POST", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_post, m_ignore, m_ignore, m_ignore}
+struct Message post_msgtab[] = {
+  {"POST", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered, &mr_post},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&post_msgtab);
+  mod_add_cmd(post_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&post_msgtab);
+  mod_del_cmd(post_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** mr_post

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_gline.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *  $Id: m_gline.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -100,9 +100,14 @@ static int invalid_gline(struct Client *, char *, char *, char *);
 static void ms_gline(struct Client *, struct Client *, int, char **);
 static void mo_gline(struct Client *, struct Client *, int, char **);
 
-struct Message gline_msgtab = {
-  "GLINE", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, ms_gline, mo_gline}
+struct Message gline_msgtab[] = {
+  {"GLINE", 0, 0, 3, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"GLINE", 0, 0, 3, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"GLINE", 0, 0, 3, 0, MFLG_SLOW, 0, &p_operuser, &mo_gline},
+#ifdef ENABLE_TS5
+  {"GLINE", 0, 0, 3, 0, MFLG_SLOW, 0, &p_ts5, &ms_gline},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -110,16 +115,16 @@ struct Message gline_msgtab = {
 void
 _modinit(void)
 {
-  mod_add_cmd(&gline_msgtab);
+  mod_add_cmd(gline_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&gline_msgtab);
+  mod_del_cmd(gline_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * mo_gline()

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_stats.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *  $Id: m_stats.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "tools.h"              /* dlink_node/dlink_list */
@@ -31,7 +31,6 @@
 #include "ircd.h"               /* me */
 #include "listener.h"           /* show_ports */
 #include "s_gline.h"
-#include "ircd_handler.h"
 #include "msg.h"                /* Message */
 #include "hostmask.h"           /* report_mtrie_conf_links */
 #include "numeric.h"            /* ERR_xxx */
@@ -58,9 +57,14 @@ static void m_stats(struct Client *, struct Client *, int, char **);
 static void mo_stats(struct Client *, struct Client *, int, char **);
 static void ms_stats(struct Client *, struct Client *, int, char **);
 
-struct Message stats_msgtab = {
-  "STATS", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_stats, ms_stats, mo_stats}
+struct Message stats_msgtab[] = {
+  {"STATS", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"STATS", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_stats},
+  {"STATS", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_stats},
+#ifdef ENABLE_TS5
+  {"STATS", 0, 0, 2, 0, MFLG_SLOW, 0, &p_ts5, &ms_stats},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -69,7 +73,7 @@ _modinit(void)
 {
   hook_add_event("doing_stats");
   hook_add_event("doing_stats_p");
-  mod_add_cmd(&stats_msgtab);
+  mod_add_cmd(stats_msgtab);
 }
 
 void
@@ -77,10 +81,10 @@ _moddeinit(void)
 {
   hook_del_event("doing_stats_p");
   hook_del_event("doing_stats");
-  mod_del_cmd(&stats_msgtab);
+  mod_del_cmd(stats_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 const char *Lformat = ":%s %d %s %s %u %u %u %u %u :%u %u %s";

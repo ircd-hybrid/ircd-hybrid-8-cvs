@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_sjoin.c,v 1.3 2002/01/06 07:18:43 a1kmm Exp $
+ *   $Id: m_sjoin.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -47,25 +47,27 @@
 
 static void ms_sjoin(struct Client *, struct Client *, int, char **);
 
-struct Message sjoin_msgtab = {
-  "SJOIN", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_ignore, ms_sjoin, m_ignore}
+struct Message sjoin_msgtab[] = {
+#ifdef ENABLE_TS5
+  {"SJOIN", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_sjoin},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&sjoin_msgtab);
+  mod_add_cmd(sjoin_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&sjoin_msgtab);
+  mod_del_cmd(sjoin_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * ms_sjoin

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: parse.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ *   $Id: parse.c,v 1.4 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -35,12 +35,12 @@
 #include "s_stats.h"
 #include "send.h"
 #include "s_debug.h"
-#include "ircd_handler.h"
 #include "msg.h"
 #include "s_conf.h"
 #include "vchannel.h"
 #include "memory.h"
 #include "s_serv.h"
+#include "s_protocol.h"
 
 /*
  * NOTE: parse() should not be called recursively by other functions!
@@ -58,7 +58,7 @@ static void handle_command(struct Message *, struct Client *,
                            struct Client *, int, char **);
 
 static int hash(char *p);
-static struct Message *hash_parse(char *);
+static struct Message *hash_parse(struct Client *from, char *);
 
 struct MessageHash *msg_hash_table[MAX_MSG_HASH];
 
@@ -240,7 +240,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
     if ((s = strchr(ch, ' ')))
       *s++ = '\0';
 
-    mptr = hash_parse(ch);
+    mptr = hash_parse(client_p, ch);
 
     if (!mptr || !mptr->cmd)
     {
@@ -257,10 +257,8 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
        */
       if (pbuffer[0] != '\0')
       {
-        if (IsPerson(from))
-          sendto_one(from,
-                     ":%s %d %s %s :Unknown command",
-                     me.name, ERR_UNKNOWNCOMMAND, from->name, ch);
+        if (client_p->protocol->illegal_command)
+          client_p->protocol->illegal_command(from, ch);
         Debug((DEBUG_ERROR, "Unknown (%s) from %s",
                ch, get_client_name(client_p, SHOW_IP)));
       }
@@ -324,7 +322,7 @@ handle_command(struct Message *mptr, struct Client *client_p,
       return;
   }
 
-  handler = mptr->handlers[client_p->handler];
+  handler = mptr->handler;
 
   /* check right amount of params is passed... --is */
   if (i < mptr->parameters)
@@ -333,8 +331,9 @@ handle_command(struct Message *mptr, struct Client *client_p,
       sendto_realops_flags(FLAGS_ALL, L_ALL,
                            "Not enough parameters for command %s from servers %s! (%d < %d)",
                            mptr->cmd, client_p->name, i, mptr->parameters);
-    sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-               me.name, BadPtr(hpara[0]) ? "*" : hpara[0], mptr->cmd);
+    
+    if (client_p->protocol->toofew_params)
+      client_p->protocol->toofew_params(client_p, mptr->cmd);
     return;
   }
 
@@ -377,29 +376,32 @@ mod_add_cmd(struct Message *msg)
 
   assert(msg != NULL);
 
-  msgindex = hash(msg->cmd);
-
-  for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+  while (msg->cmd)
   {
-    if (strcasecmp(msg->cmd, ptr->cmd) == 0)
-      return;                   /* Its already added */
-    last_ptr = ptr;
-  }
+    msgindex = hash(msg->cmd);
 
-  new_ptr = (struct MessageHash *)MyMalloc(sizeof(struct MessageHash));
+    for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+    {
+      if (strcasecmp(msg->cmd, ptr->cmd) == 0 &&
+          msg->protocol == ptr->msg->protocol)
+        return;                   /* Its already added */
+      last_ptr = ptr;
+    }
 
-  new_ptr->next = NULL;
-  DupString(new_ptr->cmd, msg->cmd);
-  new_ptr->msg = msg;
+    new_ptr = (struct MessageHash *)MyMalloc(sizeof(struct MessageHash));
 
-  msg->count = 0;
-  msg->rcount = 0;
-  msg->bytes = 0;
+    new_ptr->next = NULL;
+    DupString(new_ptr->cmd, msg->cmd);
+    new_ptr->msg = msg;
 
-  if (last_ptr == NULL)
+    msg->count = 0;
+    msg->rcount = 0;
+    msg->bytes = 0;
+
+    new_ptr->next = msg_hash_table[msgindex];
     msg_hash_table[msgindex] = new_ptr;
-  else
-    last_ptr->next = new_ptr;
+    msg++;
+  }
 }
 
 /* mod_del_cmd
@@ -417,21 +419,25 @@ mod_del_cmd(struct Message *msg)
 
   assert(msg != NULL);
 
-  msgindex = hash(msg->cmd);
-
-  for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
+  while (msg->cmd)
   {
-    if (strcasecmp(msg->cmd, ptr->cmd) == 0)
+    msgindex = hash(msg->cmd);
+
+    for (ptr = msg_hash_table[msgindex]; ptr; ptr = ptr->next)
     {
-      MyFree(ptr->cmd);
-      if (last_ptr != NULL)
-        last_ptr->next = ptr->next;
-      else
-        msg_hash_table[msgindex] = ptr->next;
-      MyFree(ptr);
-      return;
+      if (strcasecmp(msg->cmd, ptr->cmd) == 0)
+      {
+        MyFree(ptr->cmd);
+        if (last_ptr != NULL)
+          last_ptr->next = ptr->next;
+        else
+          msg_hash_table[msgindex] = ptr->next;
+        MyFree(ptr);
+        return;
+      }
+      last_ptr = ptr;
     }
-    last_ptr = ptr;
+    msg++;
   }
 }
 
@@ -442,8 +448,9 @@ mod_del_cmd(struct Message *msg)
  * side effects - 
  */
 struct Message *
-hash_parse(char *cmd)
+hash_parse(struct Client *from, char *cmd)
 {
+  struct Protocol *p;
   struct MessageHash *ptr;
   int msgindex;
 
@@ -453,6 +460,16 @@ hash_parse(char *cmd)
   {
     if (strcasecmp(cmd, ptr->cmd) == 0)
     {
+      /* Check this message is for their protocol. */
+      if (ptr->msg->protocol)
+      {
+        for (p=from->protocol; p; p=p->parent)
+          if (ptr->msg->protocol == p)
+            break;
+        if (p == NULL)
+          continue;
+      }
+      ilog(L_WARN, "Found a command handler for %s.", ptr->cmd);
       return (ptr->msg);
     }
   }
@@ -759,32 +776,24 @@ void
 m_not_oper(struct Client *client_p, struct Client *source_p,
            int parc, char *parv[])
 {
-  sendto_one(source_p, form_str(ERR_NOPRIVILEGES), me.name, parv[0]);
+  if (client_p->protocol->m_not_oper)
+    client_p->protocol->m_not_oper(client_p, source_p, parc, parv);
 }
 
 void
 m_unregistered(struct Client *client_p, struct Client *source_p,
                int parc, char *parv[])
 {
-  /* bit of a hack.
-   * I don't =really= want to waste a bit in a flag
-   * number_of_nick_changes is only really valid after the client
-   * is fully registered..
-   */
-
-  if (client_p->localClient->number_of_nick_changes == 0)
-  {
-    sendto_one(client_p, ":%s %d * %s :Register first.",
-               me.name, ERR_NOTREGISTERED, parv[0]);
-    client_p->localClient->number_of_nick_changes++;
-  }
+  if (client_p->protocol->m_unregistered)
+    client_p->protocol->m_unregistered(client_p, source_p, parc, parv);
 }
 
 void
 m_registered(struct Client *client_p, struct Client *source_p,
              int parc, char *parv[])
 {
-  sendto_one(client_p, form_str(ERR_ALREADYREGISTRED), me.name, parv[0]);
+  if (client_p->protocol->m_registered)
+    client_p->protocol->m_registered(client_p, source_p, parc, parv);
 }
 
 void

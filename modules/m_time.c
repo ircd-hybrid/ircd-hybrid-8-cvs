@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_time.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_time.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -37,25 +37,30 @@
 static void m_time(struct Client *, struct Client *, int, char **);
 static void mo_time(struct Client *, struct Client *, int, char **);
 
-struct Message time_msgtab = {
-  "TIME", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_time, mo_time, mo_time}
+struct Message time_msgtab[] = {
+  {"TIME", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"TIME", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_time},
+  {"TIME", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_time},
+#ifdef ENABLE_TS5
+  {"TIME", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &mo_time},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&time_msgtab);
+  mod_add_cmd(time_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&time_msgtab);
+  mod_del_cmd(time_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_time

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kill.c,v 1.3 2002/01/06 07:18:42 a1kmm Exp $
+ *   $Id: m_kill.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -46,25 +46,29 @@ static void mo_kill(struct Client *, struct Client *, int, char **);
 static void relay_kill(struct Client *, struct Client *, struct Client *,
                        const char *, const char *);
 
-struct Message kill_msgtab = {
-  "KILL", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, ms_kill, mo_kill}
+struct Message kill_msgtab[] = {
+  {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+#ifdef ENABLE_TS5
+  {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_ts5, &ms_kill},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&kill_msgtab);
+  mod_add_cmd(kill_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&kill_msgtab);
+  mod_del_cmd(kill_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** mo_kill

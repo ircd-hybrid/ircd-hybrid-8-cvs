@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_nburst.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ * $Id: m_nburst.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -41,25 +41,27 @@
 
 static void ms_nburst(struct Client *, struct Client *, int, char **);
 
-struct Message nburst_msgtab = {
-  "NBURST", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0L,
-  {m_unregistered, m_ignore, ms_nburst, m_ignore}
+struct Message nburst_msgtab[] = {
+#ifdef ENABLE_TS5
+  {"NBURST", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_ts5, &ms_nburst},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&nburst_msgtab);
+  mod_add_cmd(nburst_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&nburst_msgtab);
+  mod_del_cmd(nburst_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** m_nburst

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_pong.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_pong.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "ircd.h"
@@ -41,25 +41,28 @@
 static void mr_pong(struct Client *, struct Client *, int, char **);
 static void ms_pong(struct Client *, struct Client *, int, char **);
 
-struct Message pong_msgtab = {
-  "PONG", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_pong, m_ignore, ms_pong, m_ignore}
+struct Message pong_msgtab[] = {
+  {"PONG", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered, &mr_pong},
+#ifdef ENABLE_TS5 
+  {"PONG", 0, 0, 1, 0, MFLG_SLOW, 0, &p_ts5, &ms_pong},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&pong_msgtab);
+  mod_add_cmd(pong_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&pong_msgtab);
+  mod_del_cmd(pong_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 static void
 ms_pong(struct Client *client_p,

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_trace.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_trace.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -49,9 +49,14 @@ static void mo_trace(struct Client *, struct Client *, int, char **);
 
 static void trace_spy(struct Client *);
 
-struct Message trace_msgtab = {
-  "TRACE", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_trace, ms_trace, mo_trace}
+struct Message trace_msgtab[] = {
+  {"TRACE", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"TRACE", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_trace},
+  {"TRACE", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_trace},
+#ifdef ENABLE_TS5
+  {"TRACE", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_trace},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -59,17 +64,17 @@ void
 _modinit(void)
 {
   hook_add_event("doing_trace");
-  mod_add_cmd(&trace_msgtab);
+  mod_add_cmd(trace_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_trace");
-  mod_del_cmd(&trace_msgtab);
+  mod_del_cmd(trace_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 static int report_this_status(struct Client *source_p,
                               struct Client *target_p, int dow, int link_u_p,

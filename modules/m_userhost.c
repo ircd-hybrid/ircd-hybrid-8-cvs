@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_userhost.c,v 1.3 2002/01/06 07:18:29 a1kmm Exp $
+ *   $Id: m_userhost.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -39,25 +39,29 @@ static char buf[BUFSIZE];
 
 static void m_userhost(struct Client *, struct Client *, int, char **);
 
-struct Message userhost_msgtab = {
-  "USERHOST", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_userhost, m_userhost, m_userhost}
+struct Message userhost_msgtab[] = {
+  {"USERHOST", 0, 0, 1, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"USERHOST", 0, 0, 1, 0, MFLG_SLOW, 0, &p_user, &m_userhost},
+#ifdef ENABLE_TS5
+  {"USERHOST", 0, 0, 1, 0, MFLG_SLOW, 0, &p_ts5, &m_userhost},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&userhost_msgtab);
+  mod_add_cmd(userhost_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&userhost_msgtab);
+  mod_del_cmd(userhost_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_userhost added by Darren Reed 13/8/91 to aid clients and reduce

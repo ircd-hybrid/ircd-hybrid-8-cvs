@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_challenge.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *   $Id: m_challenge.c,v 1.4 2002/01/13 07:15:16 a1kmm Exp $
  */
 
 #include <stdlib.h>
@@ -56,7 +56,7 @@ _moddeinit(void)
   return;
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 #else
 
@@ -64,24 +64,25 @@ static void m_challenge(struct Client *, struct Client *, int, char **);
 void binary_to_hex(unsigned char *bin, char *hex, int length);
 
 /* We have openssl support, so include /CHALLENGE */
-struct Message challenge_msgtab = {
-  "CHALLENGE", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_challenge, m_ignore, m_challenge}
+struct Message challenge_msgtab[] = {
+  {"CHALLENGE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"CHALLENGE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_challenge},
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&challenge_msgtab);
+  mod_add_cmd(challenge_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&challenge_msgtab);
+  mod_del_cmd(challenge_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_challenge - generate RSA challenge for wouldbe oper

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: s_bsd.c,v 1.4 2002/01/06 07:18:50 a1kmm Exp $
+ *  $Id: s_bsd.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include "config.h"
@@ -42,6 +42,7 @@
 #include "send.h"
 #include "s_debug.h"
 #include "memory.h"
+#include "s_protocol.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -430,6 +431,8 @@ add_connection(struct Listener *listener, int fd)
 
   strcpy(new_client->host, new_client->localClient->sockhost);
   new_client->fd = fd;
+
+  new_client->protocol = &p_unregistered;
 
   new_client->localClient->listener = listener;
   ++listener->ref_count;

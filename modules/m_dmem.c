@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_dmem.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *   $Id: m_dmem.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -41,24 +41,25 @@
 
 static void mo_dmem(struct Client *, struct Client *, int, char **);
 
-struct Message dmem_msgtab = {
-  "DMEM", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_dmem}
+struct Message dmem_msgtab[] = {
+  /* Don't even let other users know we support this command... */
+  {"DMEM", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_dmem},
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&dmem_msgtab);
+  mod_add_cmd(dmem_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&dmem_msgtab);
+  mod_del_cmd(dmem_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 #ifdef MEMDEBUG
 void ReportAllocated(struct Client *);

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: modules.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ * $Id: modules.h,v 1.3 2002/01/13 07:15:11 a1kmm Exp $
  */
 
 #ifndef INCLUDED_modules_h
@@ -26,9 +26,9 @@
 #include <sys/param.h>
 #endif
 
-#include "ircd_handler.h"
 #include "msg.h"
 #include "memory.h"
+#include "s_protocol.h"
 
 #ifndef STATIC_MODULES
 struct module {

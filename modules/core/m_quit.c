@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_quit.c,v 1.3 2002/01/06 07:18:43 a1kmm Exp $
+ *   $Id: m_quit.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -36,25 +36,29 @@
 static void m_quit(struct Client *, struct Client *, int, char **);
 static void ms_quit(struct Client *, struct Client *, int, char **);
 
-struct Message quit_msgtab = {
-  "QUIT", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {m_quit, m_quit, ms_quit, m_quit}
+struct Message quit_msgtab[] = {
+  {"QUIT", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered, &m_quit},
+  {"QUIT", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_quit},
+#ifdef ENABLE_TS5
+  {"QUIT", 0, 0, 0, 0, MFLG_SLOW, 0, ms_quit},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&quit_msgtab);
+  mod_add_cmd(quit_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&quit_msgtab);
+  mod_del_cmd(quit_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** m_quit

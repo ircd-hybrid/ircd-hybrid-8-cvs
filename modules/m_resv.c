@@ -2,7 +2,7 @@
  *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
  *  m_resv.c: Reserves(jupes) a nickname or channel.
  *
- * $Id: m_resv.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ * $Id: m_resv.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -22,32 +22,32 @@
 static void mo_resv(struct Client *, struct Client *, int, char **);
 static void mo_unresv(struct Client *, struct Client *, int, char **);
 
-struct Message resv_msgtab = {
-  "RESV", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {m_ignore, m_not_oper, m_ignore, mo_resv}
-};
-
-struct Message unresv_msgtab = {
-  "UNRESV", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {m_ignore, m_not_oper, m_ignore, mo_unresv}
+struct Message resv_msgtab[] = {
+  {"RESV", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered,
+   &m_unregistered},
+  {"UNRESV", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered,
+   &m_unregistered},
+  {"RESV", 0, 0, 3, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"UNRESV", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"RESV", 0, 0, 3, 0, MFLG_SLOW, 0, &p_operuser, &mo_resv},
+  {"UNRESV", 0, 0, 3, 0, MFLG_SLOW, 0, &p_operuser, &mo_unresv},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&resv_msgtab);
-  mod_add_cmd(&unresv_msgtab);
+  mod_add_cmd(resv_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&resv_msgtab);
-  mod_del_cmd(&unresv_msgtab);
+  mod_del_cmd(resv_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*

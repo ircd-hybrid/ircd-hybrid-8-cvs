@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: client.h,v 1.3 2002/01/06 07:18:11 a1kmm Exp $
+ * $Id: client.h,v 1.4 2002/01/13 07:15:10 a1kmm Exp $
  */
 
 #ifndef INCLUDED_client_h
@@ -42,10 +42,10 @@
 #endif
 
 #include "ircd_defs.h"
-#include "ircd_handler.h"
 #include "linebuf.h"
 #include "channel.h"
 #include "res.h"
+
 #ifdef IPV6
 #define HOSTIPLEN	53 /* sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255.ipv6") */
 #else
@@ -165,7 +165,7 @@ struct Client
   int               hopcount;   /* number of servers to this 0 = local */
   int		    hidden_server;
   unsigned short    status;     /* Client type */
-  unsigned char     handler;    /* Handler index */
+  struct Protocol *protocol;  /* Protocol handler to use. */
   char              eob;	/* server eob has been received */
   unsigned long     serial;	/* used to enforce 1 send per nick */
   unsigned long     lazyLinkClientExists; /* This client exists on the
@@ -348,23 +348,23 @@ struct LocalUser
 #define IsAdmin(x)		((x)->umodes & FLAGS_ADMIN)
 
 #define SetConnecting(x)        {(x)->status = STAT_CONNECTING; \
-				 (x)->handler = UNREGISTERED_HANDLER; }
+				 (x)->protocol = &p_unregistered; }
 
 #define SetHandshake(x)         {(x)->status = STAT_HANDSHAKE; \
-				 (x)->handler = UNREGISTERED_HANDLER; }
+				 (x)->protocol = &p_unregistered; }
 
 #define SetMe(x)                {(x)->status = STAT_ME; \
-				 (x)->handler = UNREGISTERED_HANDLER; }
+				 (x)->protocol = &p_unregistered; }
 
 #define SetUnknown(x)           {(x)->status = STAT_UNKNOWN; \
-				 (x)->handler = UNREGISTERED_HANDLER; }
+				 (x)->protocol = &p_unregistered; }
 
 #define SetServer(x)            {(x)->status = STAT_SERVER; \
-				 (x)->handler = SERVER_HANDLER; }
+				 (x)->protocol = &p_ts5; }
 
 #define SetClient(x)            {(x)->status = STAT_CLIENT; \
-				 (x)->handler = IsOper((x)) ? \
-					OPER_HANDLER : CLIENT_HANDLER; }
+				 (x)->protocol = IsOper((x)) ? \
+					&p_operuser : &p_user; }
 
 #define STAT_CLIENT_PARSE (STAT_UNKNOWN | STAT_CLIENT)
 #define STAT_SERVER_PARSE (STAT_CONNECTING | STAT_HANDSHAKE | STAT_SERVER)
@@ -500,11 +500,11 @@ struct LocalUser
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
 
 #define SetOper(x)              {(x)->umodes |= FLAGS_OPER; \
-				 if (!IsServer((x))) (x)->handler = OPER_HANDLER;}
+				 if (!IsServer((x))) (x)->protocol = &p_operuser;}
 
 #define ClearOper(x)            {(x)->umodes &= ~(FLAGS_OPER|FLAGS_ADMIN); \
 				 if (!IsOper((x)) && !IsServer((x))) \
-				  (x)->handler = CLIENT_HANDLER; }
+				  (x)->protocol = &p_user; }
 
 #define IsPrivileged(x)         (IsOper(x) || IsServer(x))
 

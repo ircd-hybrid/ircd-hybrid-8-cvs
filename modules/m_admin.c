@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_admin.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *   $Id: m_admin.c,v 1.4 2002/01/13 07:15:16 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -41,26 +41,32 @@ static void do_admin(struct Client *source_p);
 
 static void admin_spy(struct Client *);
 
-struct Message admin_msgtab = {
-  "ADMIN", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_admin, m_admin, ms_admin, ms_admin}
+struct Message admin_msgtab[] = {
+  {"ADMIN", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered, &mr_admin},
+  {"ADMIN", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_admin},
+  /* This ms_admin is intentional(but yuck). */
+  {"ADMIN", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &ms_admin},
+#ifdef ENABLE_TS5
+  {"ADMIN", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_admin},
+#endif  
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
   hook_add_event("doing_admin");
-  mod_add_cmd(&admin_msgtab);
+  mod_add_cmd(admin_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_admin");
-  mod_del_cmd(&admin_msgtab);
+  mod_del_cmd(admin_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * mr_admin - ADMIN command handler

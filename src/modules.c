@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: modules.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ * $Id: modules.c,v 1.4 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include "config.h"
@@ -47,6 +47,7 @@
 #include "memory.h"
 #include "tools.h"
 #include "list.h"
+#include "s_protocol.h"
 
 #ifndef STATIC_MODULES
 
@@ -85,29 +86,13 @@ static void mo_modreload(struct Client *, struct Client *, int, char **);
 static void mo_modunload(struct Client *, struct Client *, int, char **);
 static void mo_modrestart(struct Client *, struct Client *, int, char **);
 
-struct Message modload_msgtab = {
-  "MODLOAD", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_modload}
-};
-
-struct Message modunload_msgtab = {
-  "MODUNLOAD", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_modunload}
-};
-
-struct Message modreload_msgtab = {
-  "MODRELOAD", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_modreload}
-};
-
-struct Message modlist_msgtab = {
-  "MODLIST", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_modlist}
-};
-
-struct Message modrestart_msgtab = {
-  "MODRESTART", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_ignore, mo_modrestart}
+struct Message modules_msgtab[] = {
+  {"MODLOAD", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_modload},
+  {"MODUNLOAD", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_modunload},
+  {"MODRELOAD", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_modreload},
+  {"MODLIST", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_modlist},
+  {"MODRESTART", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_modrestart},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 extern struct Message error_msgtab;
@@ -115,12 +100,7 @@ extern struct Message error_msgtab;
 void
 modules_init(void)
 {
-  mod_add_cmd(&modload_msgtab);
-  mod_add_cmd(&modunload_msgtab);
-  mod_add_cmd(&modreload_msgtab);
-  mod_add_cmd(&modlist_msgtab);
-  mod_add_cmd(&modrestart_msgtab);
-  mod_add_cmd(&error_msgtab);
+  mod_add_cmd(modules_msgtab);
 }
 
 /* mod_find_path()

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel.c,v 1.4 2002/01/06 07:18:47 a1kmm Exp $
+ * $Id: channel.c,v 1.5 2002/01/13 07:15:38 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -174,7 +174,7 @@ remove_user_from_channel(struct Channel *chptr, struct Client *who, int perm)
     dlinkDelete(ptr, &chptr->chanops);
 #ifdef REQUIRE_OANDV
   else if ((ptr = find_user_link(&chptr->chanops_voiced, who)))
-    dlinkDelete(ptr, &chptr->chanops);
+    dlinkDelete(ptr, &chptr->chanops_voiced);
 #endif
   else if ((ptr = find_user_link(&chptr->voiced, who)))
     dlinkDelete(ptr, &chptr->voiced);

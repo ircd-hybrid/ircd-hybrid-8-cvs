@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_oper.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_oper.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -57,25 +57,30 @@ static void ms_oper(struct Client *, struct Client *, int, char **);
 static void mo_oper(struct Client *, struct Client *, int, char **);
 
 
-struct Message oper_msgtab = {
-  "OPER", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_oper, ms_oper, mo_oper}
+struct Message oper_msgtab[] = {
+  {"OPER", 0, 0, 3, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"OPER", 0, 0, 3, 0, MFLG_SLOW, 0, &p_user, &m_oper},
+  {"OPER", 0, 0, 3, 0, MFLG_SLOW, 0, &p_operuser, &mo_oper},
+#ifdef ENABLE_TS5
+  {"OPER", 0, 0, 3, 0, MFLG_SLOW, 0, &p_ts5, &ms_oper},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&oper_msgtab);
+  mod_add_cmd(oper_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&oper_msgtab);
+  mod_del_cmd(oper_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*
@@ -199,7 +204,7 @@ ms_oper(struct Client *client_p, struct Client *source_p,
   if (!IsOper(source_p))
   {
     if (source_p->status == STAT_CLIENT)
-      source_p->handler = OPER_HANDLER;
+      source_p->protocol = &p_operuser;
 
     source_p->flags |= FLAGS_OPER;
     Count.oper++;

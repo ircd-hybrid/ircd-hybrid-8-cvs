@@ -37,7 +37,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- *   $Id: m_unkline.c,v 1.3 2002/01/06 07:18:29 a1kmm Exp $
+ *   $Id: m_unkline.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -69,33 +69,33 @@ static void mo_unkline(struct Client *, struct Client *, int, char **);
 static void mo_undline(struct Client *, struct Client *, int, char **);
 static void mo_ungline(struct Client *, struct Client *, int, char **);
 
-struct Message msgtabs[] = {
-  {"UNKLINE", 0, 0, 2, 0, MFLG_SLOW, 0,
-   {m_unregistered, m_not_oper, m_error, mo_unkline}},
-  {"UNDLINE", 0, 0, 2, 0, MFLG_SLOW, 0,
-   {m_unregistered, m_not_oper, m_error, mo_undline}},
-  {"UNGLINE", 0, 0, 2, 0, MFLG_SLOW, 0,
-   {m_unregistered, m_not_oper, m_error, mo_ungline}}
+struct Message unkline_msgtab[] = {
+  {"UNKLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"UNDLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"UNGLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"UNKLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"UNDLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"UNGLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"UNKLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_unkline},
+  {"UNDLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_undline},
+  {"UNGLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_ungline},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&msgtabs[0]);
-  mod_add_cmd(&msgtabs[1]);
-  mod_add_cmd(&msgtabs[2]);
+  mod_add_cmd(unkline_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&msgtabs[0]);
-  mod_del_cmd(&msgtabs[1]);
-  mod_del_cmd(&msgtabs[2]);
+  mod_del_cmd(unkline_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 static int flush_write(struct Client *, FBFILE *, char *, char *);

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_info.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ * $Id: m_info.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include <time.h>
@@ -48,9 +48,14 @@ static void m_info(struct Client *, struct Client *, int, char **);
 static void ms_info(struct Client *, struct Client *, int, char **);
 static void mo_info(struct Client *, struct Client *, int, char **);
 
-struct Message info_msgtab = {
-  "INFO", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_info, ms_info, mo_info}
+struct Message info_msgtab[] = {
+  {"INFO", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"INFO", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_info},
+  {"INFO", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_info},
+#ifdef ENABLE_TS5
+  {"INFO", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_info},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
@@ -58,17 +63,17 @@ void
 _modinit(void)
 {
   hook_add_event("doing_info");
-  mod_add_cmd(&info_msgtab);
+  mod_add_cmd(info_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_info");
-  mod_del_cmd(&info_msgtab);
+  mod_del_cmd(info_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 void send_info_text(struct Client *source_p);

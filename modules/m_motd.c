@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_motd.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_motd.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "client.h"
@@ -46,26 +46,31 @@ static void mo_motd(struct Client *, struct Client *, int, char **);
 
 static void motd_spy(struct Client *);
 
-struct Message motd_msgtab = {
-  "MOTD", 0, 0, 0, 1, MFLG_SLOW, 0,
-  {mr_motd, m_motd, mo_motd, mo_motd}
+struct Message motd_msgtab[] = {
+  {"MOTD", 0, 0, 0, 1, MFLG_SLOW, 0, &p_unregistered, &mr_motd},
+  {"MOTD", 0, 0, 0, 1, MFLG_SLOW, 0, &p_user, &m_motd},
+  {"MOTD", 0, 0, 0, 1, MFLG_SLOW, 0, &p_operuser, &mo_motd},
+#ifdef ENABLE_TS5
+  {"MOTD", 0, 0, 0, 1, MFLG_SLOW, 0, &p_ts5, &mo_motd},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
   hook_add_event("doing_motd");
-  mod_add_cmd(&motd_msgtab);
+  mod_add_cmd(motd_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_motd");
-  mod_del_cmd(&motd_msgtab);
+  mod_del_cmd(motd_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /* mr_motd()

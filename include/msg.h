@@ -14,21 +14,25 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: msg.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ * $Id: msg.h,v 1.3 2002/01/13 07:15:11 a1kmm Exp $
  */
 
 #ifndef INCLUDED_msg_h
 #define INCLUDED_msg_h
-#ifndef INCLUDED_config_h
-#include "config.h"
-#endif
-
-#ifndef INCLUDED_ircd_handler_h
-#define INCLUDED_ircd_handler_h
-#include "ircd_handler.h"
-#endif
 
 struct Client;
+
+/*
+ * MessageHandler function
+ * Params:
+ * struct Client* client_p   - connection message originated from
+ * struct Client* source_p   - source of message, may be different from client_p
+ * int            parc   - parameter count
+ * char*          parv[] - parameter vector
+ */
+typedef void (*MessageHandler)(struct Client*, struct Client*, int,
+                               char*[]);
+struct Protocol;
 
 /* 
  * Message table structure 
@@ -48,16 +52,15 @@ struct Message
 			     * seconds -SRB
 			     */
   unsigned long bytes;  /* bytes received for this message */
+  /* Protocol type this message applies to. */
+  struct Protocol *protocol;
   /*
    * client_p = Connected client ptr
    * source_p = Source client ptr
    * parc = parameter count
    * parv = parameter variable array
    */
-  /* handlers:
-   * UNREGISTERED, CLIENT, SERVER, OPER, LAST
-   */
-  MessageHandler handlers[LAST_HANDLER_TYPE];
+  MessageHandler handler;
 };
 
 /*

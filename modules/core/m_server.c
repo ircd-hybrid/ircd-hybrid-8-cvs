@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_server.c,v 1.3 2002/01/06 07:18:43 a1kmm Exp $
+ *   $Id: m_server.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -51,25 +51,29 @@ static void ms_server(struct Client *, struct Client *, int, char **);
 
 static int set_server_gecos(struct Client *, char *);
 
-struct Message server_msgtab = {
-  "SERVER", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_server, m_registered, ms_server, m_registered}
+struct Message server_msgtab[] = {
+  {"SERVER", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered,
+   &mr_server},
+#ifdef ENABLE_TS5
+  {"SERVER", 0, 0, 3, 0, MFLG_SLOW, 0, &p_ts5, &ms_server},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&server_msgtab);
+  mod_add_cmd(server_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&server_msgtab);
+  mod_del_cmd(server_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 int bogus_host(char *host);

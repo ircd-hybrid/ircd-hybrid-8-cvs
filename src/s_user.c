@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_user.c,v 1.4 2002/01/06 07:18:52 a1kmm Exp $
+ *  $Id: s_user.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -48,7 +48,6 @@
 #include "list.h"
 #include "listener.h"
 #include "motd.h"
-#include "ircd_handler.h"
 #include "msg.h"
 #include "numeric.h"
 #include "s_bsd.h"
@@ -63,6 +62,7 @@
 #include "md5.h"
 #include "memory.h"
 #include "packet.h"
+#include "s_protocol.h"
 
 static int valid_hostname(const char *hostname);
 static int valid_username(const char *username);

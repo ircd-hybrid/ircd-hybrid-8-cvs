@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: m_list.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *  $Id: m_list.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -45,25 +45,29 @@ static void mo_list(struct Client *, struct Client *, int, char **);
 static int list_all_channels(struct Client *);
 static void list_one_channel(struct Client *, struct Channel *);
 
-struct Message list_msgtab = {
-  "LIST", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_list, ms_list, mo_list}
+struct Message list_msgtab[] = {
+  {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_list},
+#ifdef ENABLE_TS5
+  {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_list},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&list_msgtab);
+  mod_add_cmd(list_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&list_msgtab);
+  mod_del_cmd(list_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 static int list_all_channels(struct Client *source_p);
 static int list_named_channel(struct Client *source_p, char *name);

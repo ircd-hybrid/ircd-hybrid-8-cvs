@@ -1,7 +1,7 @@
 #
 # Makefile.in for ircd/src
 #
-# $Id: Makefile.in,v 1.1 2002/01/04 09:13:41 a1kmm Exp $
+# $Id: Makefile.in,v 1.2 2002/01/13 07:15:38 a1kmm Exp $
 #
 CC		= @CC@
 INSTALL		= @INSTALL@
@@ -81,7 +81,6 @@ BASE_SRCS =                     \
   linebuf.c                     \
   list.c                        \
   listener.c                    \
-  m_error.c                     \
   match.c                       \
   md5.c                         \
   memory.c                      \
@@ -90,6 +89,8 @@ BASE_SRCS =                     \
   numeric.c                     \
   packet.c                      \
   parse.c                       \
+  p_irc.c			\
+  p_ts.c			\
   rsa.c                         \
   restart.c                     \
   resv.c			\
@@ -108,6 +109,7 @@ BASE_SRCS =                     \
   s_serv.c                      \
   s_stats.c                     \
   s_user.c                      \
+  s_protocol.c			\
   scache.c                      \
   send.c                        \
   sprintf_irc.c                 \

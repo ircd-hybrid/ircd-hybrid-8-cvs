@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_names.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *   $Id: m_names.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -51,25 +51,29 @@ static void names_non_public_non_secret(struct Client *source_p);
 static void m_names(struct Client *, struct Client *, int, char **);
 static void ms_names(struct Client *, struct Client *, int, char **);
 
-struct Message names_msgtab = {
-  "NAMES", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_names, ms_names, m_names}
+struct Message names_msgtab[] = {
+  {"NAMES", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"NAMES", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_names},
+#ifdef ENABLE_TS5
+  {"NAMES", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_names},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&names_msgtab);
+  mod_add_cmd(names_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&names_msgtab);
+  mod_del_cmd(names_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_lljoin.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ * $Id: m_lljoin.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -43,25 +43,27 @@
 
 static void ms_lljoin(struct Client *, struct Client *, int, char **);
 
-struct Message lljoin_msgtab = {
-  "LLJOIN", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0L,
-  {m_unregistered, m_ignore, ms_lljoin, m_ignore}
+struct Message lljoin_msgtab[] = {
+#ifdef ENABLE_TS5
+  {"LLJOIN", 0, 0, 3, 0, MFLG_SLOW, 0, &p_ts5, &ms_lljoin},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&lljoin_msgtab);
+  mod_add_cmd(lljoin_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&lljoin_msgtab);
+  mod_del_cmd(lljoin_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_lljoin

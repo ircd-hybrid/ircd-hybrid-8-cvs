@@ -1,6 +1,6 @@
 /*
  *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
- *  m_eob.c: Signifies the end of a server burst.
+ *  m_error.c: Handles error messages from the other end.
  *
  *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
@@ -19,57 +19,42 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_eob.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
+ *   $Id: m_error.c,v 1.1 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include "handlers.h"
 #include "client.h"
+#include "common.h"             /* FALSE */
 #include "ircd.h"
 #include "numeric.h"
-#include "s_conf.h"
-#include "s_serv.h"
 #include "send.h"
+#include "s_debug.h"
 #include "msg.h"
-#include "parse.h"
+#include "memory.h"
+#include "debug.h"
+#include "s_protocol.h"
 #include "modules.h"
-#include <stdlib.h>
 
-static void ms_eob(struct Client *, struct Client *, int, char **);
+void m_error(struct Client*, struct Client*, int, char **);
 
-struct Message eob_msgtab[] = {
-#ifdef ENABLE_TS5
-  {"EOB", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_ts5, &ms_eob},
-#endif
-  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
+void
+m_error(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
+{
+  client_p->protocol->m_error(client_p, source_p, parc, parv);
+}
+
+struct Message error_msgtab[] =
+{
+   {"ERROR", 0, 0, 1, 0, MFLG_SLOW|MFLG_UNREG, 0, &p_unregistered,
+    &m_error},
+   {"ERROR", 0, 0, 1, 0, MFLG_SLOW|MFLG_UNREG, 0, &p_ts5,
+    &m_error},
+   {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
-#ifndef STATIC_MODULES
+
 void
 _modinit(void)
 {
-  mod_add_cmd(eob_msgtab);
-}
-
-void
-_moddeinit(void)
-{
-  mod_del_cmd(eob_msgtab);
-}
-
-char *_version = "$Revision: 1.4 $";
-#endif
-/*
- * ms_eob - EOB command handler
- *      parv[0] = sender prefix   
- *      parv[1] = servername   
- */
-static void
-ms_eob(struct Client *client_p, struct Client *source_p,
-       int parc, char *parv[])
-{
-  sendto_realops_flags(FLAGS_ALL, L_ALL,
-                       "End of burst from %s (%d seconds)",
-                       source_p->name,
-                       (signed int)(CurrentTime - source_p->firsttime));
-
-  SetEob(client_p);
+  mod_add_cmd(error_msgtab);
 }

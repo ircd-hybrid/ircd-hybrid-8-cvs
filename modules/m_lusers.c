@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_lusers.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *   $Id: m_lusers.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -39,25 +39,31 @@
 static void m_lusers(struct Client *, struct Client *, int, char **);
 static void ms_lusers(struct Client *, struct Client *, int, char **);
 
-struct Message lusers_msgtab = {
-  "LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_lusers, ms_lusers, ms_lusers}
+struct Message lusers_msgtab[] = {
+  {"LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_lusers},
+  /* ms_ intentional. */
+  {"LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &ms_lusers},
+#ifdef ENABLE_TS5
+  {"LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_lusers},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&lusers_msgtab);
+  mod_add_cmd(lusers_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&lusers_msgtab);
+  mod_del_cmd(lusers_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_lusers - LUSERS message handler

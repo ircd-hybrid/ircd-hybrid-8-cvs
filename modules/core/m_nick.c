@@ -1,8 +1,25 @@
 /*
  *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
- *  m_nick.c: Sets a users nick.
+ *  m_nick.c: Sets/changes a user's nickname.
  *
- * $Id: m_nick.c,v 1.4 2002/01/06 07:18:43 a1kmm Exp $
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *  USA
+ *
+ *   $Id: m_nick.c,v 1.5 2002/01/13 07:15:34 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -37,9 +54,9 @@
 
 static void mr_nick(struct Client *, struct Client *, int, char **);
 static void m_nick(struct Client *, struct Client *, int, char **);
-static void ms_nick(struct Client *, struct Client *, int, char **);
+static void tsm_nick(struct Client *, struct Client *, int, char **);
 
-static void ms_client(struct Client *, struct Client *, int, char **);
+static void tsm_client(struct Client *, struct Client *, int, char **);
 static void m_client(struct Client*, struct Client*, int, char**);
 
 static int nick_from_server(struct Client *, struct Client *, int, char **,
@@ -62,37 +79,33 @@ static int perform_nick_collides(struct Client *, struct Client *,
 void user_welcome(struct Client *source_p);
 extern BlockHeap *lclient_heap;
 
-struct Message nick_msgtab = {
-  "NICK", 0, 0, 1, 0, MFLG_SLOW, 0,
-  {mr_nick, m_nick, ms_nick, m_nick}
-};
-
-struct Message client_msgtab = {
-#ifdef PERSISTANT_CLIENTS
-  "CLIENT", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_client, m_ignore, ms_client, m_ignore}
-#else
-  "CLIENT", 0, 0, 10, 0, MFLG_SLOW, 0,
-  {m_client, m_ignore, ms_client, m_ignore}
+struct Message nick_msgtab[] = {
+  {"NICK", 0, 0, 1, 0, MFLG_SLOW, 0, &p_unregistered, &mr_nick},
+  {"NICK", 0, 0, 1, 0, MFLG_SLOW, 0, &p_user, &m_nick},
+#ifdef ENABLE_TS5
+  {"NICK", 0, 0, 1, 0, MFLG_SLOW, 0, &p_ts5, &tsm_nick},
+  {"CLIENT", 0, 0, 3, 0, MFLG_SLOW, 0, &p_ts5, &tsm_client},
 #endif
+#ifdef PERSISTANT_CLIENTS
+  {"CLIENT", 0, 0, 3, 0, MFLG_SLOW, 0, &p_unregistered, &m_client},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&nick_msgtab);
-  mod_add_cmd(&client_msgtab);
+  mod_add_cmd(nick_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&nick_msgtab);
-  mod_del_cmd(&client_msgtab);
+  mod_del_cmd(nick_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 /*
@@ -302,7 +315,7 @@ m_nick(struct Client *client_p, struct Client *source_p,
  *    parv[8] = ircname
  */
 static void
-ms_nick(struct Client *client_p, struct Client *source_p,
+tsm_nick(struct Client *client_p, struct Client *source_p,
         int parc, char *parv[])
 {
   struct Client *target_p;
@@ -388,7 +401,7 @@ ms_nick(struct Client *client_p, struct Client *source_p,
  * ms_client()
  */
 static void
-ms_client(struct Client *client_p, struct Client *source_p,
+tsm_client(struct Client *client_p, struct Client *source_p,
           int parc, char *parv[])
 {
   struct Client *target_p;

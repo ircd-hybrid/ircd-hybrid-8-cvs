@@ -2,14 +2,13 @@
  *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
  *  m_help.c: Provides help information to a user/operator.
  *
- *   $Id: m_help.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *   $Id: m_help.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include "handlers.h"
 #include "client.h"
 #include "ircd.h"
 #include "motd.h"
-#include "ircd_handler.h"
 #include "msg.h"
 #include "numeric.h"
 #include "send.h"
@@ -23,32 +22,30 @@ static void mo_uhelp(struct Client *, struct Client *, int, char **);
 static void dohelp(struct Client *, char *, char *, char *);
 static void sendhelpfile(struct Client *, char *, char *, char *);
 
-struct Message help_msgtab = {
-  "HELP", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_help, m_ignore, mo_help}
-};
-
-struct Message uhelp_msgtab = {
-  "UHELP", 0, 0, 0, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_help, m_ignore, mo_uhelp}
+struct Message help_msgtab[] = {
+  {"HELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"UHELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"HELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_help},
+  {"UHELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_help},
+  {"HELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_help},
+  {"HELP", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_uhelp},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&help_msgtab);
-  mod_add_cmd(&uhelp_msgtab);
+  mod_add_cmd(help_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&help_msgtab);
-  mod_del_cmd(&uhelp_msgtab);
+  mod_del_cmd(help_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_help - HELP message handler

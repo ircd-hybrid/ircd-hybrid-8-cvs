@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: s_serv.c,v 1.3 2002/01/06 07:18:51 a1kmm Exp $
+ *   $Id: s_serv.c,v 1.4 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -70,6 +70,7 @@
 #include "memory.h"
 #include "channel.h"            /* chcap_usage_counts stuff... */
 #include "hook.h"
+#include "s_protocol.h"
 
 extern char *crypt();
 

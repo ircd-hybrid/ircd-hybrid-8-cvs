@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_drop.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ * $Id: m_drop.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -39,24 +39,26 @@
 
 static void ms_drop(struct Client *, struct Client *, int, char **);
 
-struct Message drop_msgtab = {
-  "DROP", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0L,
-  {m_unregistered, m_ignore, ms_drop, m_ignore}
+struct Message drop_msgtab[] = {
+#ifdef ENABLE_TS5
+  {"DROP", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_ts5, &ms_drop},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&drop_msgtab);
+  mod_add_cmd(drop_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&drop_msgtab);
+  mod_del_cmd(drop_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** ms_drop

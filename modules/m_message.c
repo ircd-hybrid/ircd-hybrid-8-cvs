@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_message.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *   $Id: m_message.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -96,14 +96,16 @@ static void handle_opers(int p_or_n, char *command,
                          struct Client *client_p,
                          struct Client *source_p, char *nick, char *text);
 
-struct Message privmsg_msgtab = {
-  "PRIVMSG", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0L,
-  {m_unregistered, m_privmsg, m_privmsg, m_privmsg}
-};
-
-struct Message notice_msgtab = {
-  "NOTICE", 0, 0, 1, 0, MFLG_SLOW, 0L,
-  {m_unregistered, m_notice, m_notice, m_notice}
+struct Message privmsg_msgtab[] = {
+  {"PRIVMSG", 0, 0, 1, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"NOTICE", 0, 0, 1, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"PRIVMSG", 0, 0, 1, 0, MFLG_SLOW, 0, &p_user, &m_privmsg},
+  {"NOTICE", 0, 0, 1, 0, MFLG_SLOW, 0, &p_user, &m_notice},
+#ifdef ENABLE_TS5
+  {"PRIVMSG", 0, 0, 1, 0, MFLG_SLOW, 0, &p_ts5, &m_privmsg},
+  {"NOTICE", 0, 0, 1, 0, MFLG_SLOW, 0, &p_ts5, &m_notice},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -111,18 +113,16 @@ struct Message notice_msgtab = {
 void
 _modinit(void)
 {
-  mod_add_cmd(&privmsg_msgtab);
-  mod_add_cmd(&notice_msgtab);
+  mod_add_cmd(privmsg_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&privmsg_msgtab);
-  mod_del_cmd(&notice_msgtab);
+  mod_del_cmd(privmsg_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*

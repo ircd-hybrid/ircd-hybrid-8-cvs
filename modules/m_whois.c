@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_whois.c,v 1.3 2002/01/06 07:18:29 a1kmm Exp $
+ *   $Id: m_whois.c,v 1.4 2002/01/13 07:15:20 a1kmm Exp $
  */
 
 #include <string.h>
@@ -61,9 +61,14 @@ static void m_whois(struct Client *, struct Client *, int, char **);
 static void ms_whois(struct Client *, struct Client *, int, char **);
 static void mo_whois(struct Client *, struct Client *, int, char **);
 
-struct Message whois_msgtab = {
-  "WHOIS", 0, 0, 0, 0, MFLG_SLOW, 0L,
-  {m_unregistered, m_whois, ms_whois, mo_whois}
+struct Message whois_msgtab[] = {
+  {"WHOIS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"WHOIS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_whois},
+  {"WHOIS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_whois},
+#ifdef ENABLE_TS5
+  {"WHOIS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_whois},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -71,17 +76,17 @@ void
 _modinit(void)
 {
   hook_add_event("doing_whois");
-  mod_add_cmd(&whois_msgtab);
+  mod_add_cmd(whois_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_whois");
-  mod_del_cmd(&whois_msgtab);
+  mod_del_cmd(whois_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
 ** m_whois

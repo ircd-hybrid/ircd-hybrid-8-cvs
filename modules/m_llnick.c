@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: m_llnick.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ * $Id: m_llnick.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -39,25 +39,27 @@
 
 static void ms_llnick(struct Client *, struct Client *, int, char **);
 
-struct Message llnick_msgtab = {
-  "LLNICK", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0L,
-  {m_unregistered, m_ignore, ms_llnick, m_ignore}
+struct Message llnick_msgtab[] = {
+#ifdef ENABLE_TS5
+  {"LLNICK", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_ts5, &ms_llnick},
+#endif
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 #ifndef STATIC_MODULES
 
 void
 _modinit(void)
 {
-  mod_add_cmd(&llnick_msgtab);
+  mod_add_cmd(llnick_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&llnick_msgtab);
+  mod_del_cmd(llnick_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_llnick

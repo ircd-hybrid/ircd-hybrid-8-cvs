@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_pass.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
+ *  $Id: m_pass.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
  */
 
 #include "handlers.h"           /* m_pass prototype */
@@ -34,25 +34,27 @@
 
 static void mr_pass(struct Client *, struct Client *, int, char **);
 
-struct Message pass_msgtab = {
-  "PASS", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_pass, m_registered, m_ignore, m_registered}
+struct Message pass_msgtab[] = {
+  {"PASS", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered,
+   &mr_pass},
+  {"PASS", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_registered},
+  {NULL, 0, 0, 0, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&pass_msgtab);
+  mod_add_cmd(pass_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&pass_msgtab);
+  mod_del_cmd(pass_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_pass() - Added Sat, 4 March 1989

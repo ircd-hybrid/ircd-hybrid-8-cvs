@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -57,14 +57,17 @@ static void mo_kline(struct Client *, struct Client *, int, char **);
 static void ms_kline(struct Client *, struct Client *, int, char **);
 static void mo_dline(struct Client *, struct Client *, int, char **);
 
-struct Message kline_msgtab = {
-  "KLINE", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, ms_kline, mo_kline}
-};
-
-struct Message dline_msgtab = {
-  "DLINE", 0, 0, 2, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_not_oper, m_error, mo_dline}
+struct Message kline_msgtab[] = {
+  {"KLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"DLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"KLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"DLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"KLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_kline},
+  {"DLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_dline},
+#ifdef ENABLE_TS5
+  {"KLINE", 0, 0, 2, 0, MFLG_SLOW, 0, &p_ts5, &ms_kline},
+#endif
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
@@ -72,18 +75,16 @@ struct Message dline_msgtab = {
 void
 _modinit(void)
 {
-  mod_add_cmd(&kline_msgtab);
-  mod_add_cmd(&dline_msgtab);
+  mod_add_cmd(kline_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&kline_msgtab);
-  mod_del_cmd(&dline_msgtab);
+  mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /* Local function prototypes */

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_cryptlink.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *   $Id: m_cryptlink.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ _moddeinit(void)
 {
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 #else
 
@@ -91,9 +91,10 @@ static void mr_cryptlink(struct Client *, struct Client *, int, char **);
 static void cryptlink_serv(struct Client *, struct Client *, int, char **);
 static void cryptlink_auth(struct Client *, struct Client *, int, char **);
 
-struct Message cryptlink_msgtab = {
-  "CRYPTLINK", 0, 0, 4, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {mr_cryptlink, m_ignore, m_error, m_ignore}
+struct Message cryptlink_msgtab[] = {
+  {"CRYPTLINK", 0, 0, 4, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered,
+   &mr_cryptlink},
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 struct CryptLinkStruct
@@ -114,16 +115,16 @@ static struct CryptLinkStruct cryptlink_cmd_table[] = {
 void
 _modinit(void)
 {
-  mod_add_cmd(&cryptlink_msgtab);
+  mod_add_cmd(cryptlink_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&cryptlink_msgtab);
+  mod_del_cmd(cryptlink_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 

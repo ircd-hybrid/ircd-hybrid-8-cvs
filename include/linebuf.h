@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: linebuf.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ *  $Id: linebuf.h,v 1.3 2002/01/13 07:15:10 a1kmm Exp $
  */
 
 #ifndef __LINEBUF_H__
@@ -28,6 +28,8 @@
 /* as much as I hate includes in header files .. */
 #include <stdarg.h>
 #include "tools.h"
+
+struct Client;
 
 /* How big we want a buffer - 510 data bytes, plus space for a '\0' */
 #define BUF_DATA_SIZE		511
@@ -75,7 +77,7 @@ extern void linebuf_free(buf_line_t *);
 /* extern int linebuf_skip_crlf(char *, int); */
 /* extern void linebuf_terminate_crlf(buf_head_t *, buf_line_t *); */
 extern void linebuf_newbuf(buf_head_t *);
-extern void client_flush_input(struct Client *);
+extern void client_flush_input(struct Client*);
 extern void linebuf_donebuf(buf_head_t *);
 extern int linebuf_parse(buf_head_t *, char *, int, int);
 extern int linebuf_get(buf_head_t *, char *, int, int, int);

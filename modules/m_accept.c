@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_accept.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
+ *   $Id: m_accept.c,v 1.4 2002/01/13 07:15:16 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -41,25 +41,26 @@ static void build_nicklist(struct Client *, char *, char *, char *);
 static void add_accept(struct Client *, struct Client *);
 static void list_accepts(struct Client *);
 
-struct Message accept_msgtab = {
-  "ACCEPT", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0,
-  {m_unregistered, m_accept, m_ignore, m_accept}
+struct Message accept_msgtab[] = {
+  {"ACCEPT", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
+  {"ACCEPT", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_accept},
+  {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
 
 #ifndef STATIC_MODULES
 void
 _modinit(void)
 {
-  mod_add_cmd(&accept_msgtab);
+  mod_add_cmd(accept_msgtab);
 }
 
 void
 _moddeinit(void)
 {
-  mod_del_cmd(&accept_msgtab);
+  mod_del_cmd(accept_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 /*
  * m_accept - ACCEPT command handler

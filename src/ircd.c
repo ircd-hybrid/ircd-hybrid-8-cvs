@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd.c,v 1.4 2002/01/06 07:18:49 a1kmm Exp $
+ * $Id: ircd.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -66,7 +66,6 @@
 #include "list.h"
 #include "s_gline.h"
 #include "motd.h"
-#include "ircd_handler.h"
 #include "md5.h"
 #include "msg.h"                /* msgtab */
 #include "hostmask.h"
@@ -91,6 +90,7 @@
 #include "debug.h"
 #include "ircd_getopt.h"
 #include "balloc.h"
+#include "s_protocol.h"
 /*
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
@@ -747,7 +747,7 @@ ircd_main(int argc, char *argv[])
     me.serv->up = me.name;
     me.lasttime = me.since = me.firsttime = CurrentTime;
     add_to_client_hash_table(me.name, &me);
-
+ 
     add_server_to_list(&me);    /* add ourselves to global_serv_list */
 
     check_class();
