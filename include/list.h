@@ -20,7 +20,7 @@
  * "list.h". - Headers file.
  *
  *
- * $Id: list.h,v 1.1 2002/01/04 09:12:56 a1kmm Exp $
+ * $Id: list.h,v 1.2 2002/01/06 06:19:36 a1kmm Exp $
  *
  */
 
@@ -43,10 +43,10 @@ extern void outofmemory(void);
 extern void _free_user (struct User *, struct Client *);
 #ifdef MEMDEBUG
 extern dlink_node* _make_dlink_node(const char*, int);
-#define make_dlink_node() _make_dlink_node(__FILE__, __LINE__);
+#define make_dlink_node() _make_dlink_node(__FILE__, __LINE__)
 #else
 extern dlink_node *_make_dlink_node (void);
-#define make_dlink_node() _make_dlink_node();
+#define make_dlink_node() _make_dlink_node()
 #endif
 extern void _free_dlink_node(dlink_node *lp);
 extern void init_dlink_nodes();

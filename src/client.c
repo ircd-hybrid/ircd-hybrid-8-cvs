@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: client.c,v 1.2 2002/01/04 11:06:39 a1kmm Exp $
+ *  $Id: client.c,v 1.3 2002/01/06 06:19:42 a1kmm Exp $
  */
 #include "tools.h"
 #include "client.h"
@@ -70,7 +70,7 @@ static int remote_client_count = 0;
 static int local_client_count = 0;
 
 static BlockHeap *client_heap = NULL;
-static BlockHeap *lclient_heap = NULL;
+BlockHeap *lclient_heap = NULL;
 
 /*
  * client_heap_gc
@@ -278,7 +278,7 @@ check_pings_list(dlink_list * list)
         exit_client(client_p, client_p, &me, "SendQ exceeded");
         continue;
       }
-      exit_client(client_p, client_p, &me, "Dead socket");
+      detach_client(client_p, "Dead socket");
       continue;
     }
     if (IsPerson(client_p))
@@ -315,6 +315,16 @@ check_pings_list(dlink_list * list)
     else
       ping = get_client_ping(client_p);
 
+#ifdef PERSISTANT_CLIENTS
+    if (IsPersisting(client_p))
+    {
+      if ((CurrentTime - client_p->user->last_detach_time)
+           > ConfigFileEntry.persist_expire_time)
+        exit_client(client_p, client_p, client_p, "Client Expired");
+      continue;
+    }
+    else
+#endif
     if (ping < (CurrentTime - client_p->lasttime))
     {
       /*
@@ -336,11 +346,10 @@ check_pings_list(dlink_list * list)
           ilog(L_NOTICE, "No response from %s, closing link",
                get_client_name(client_p, HIDE_IP));
         }
-        (void)ircsprintf(scratch,
-                         "Ping timeout: %d seconds",
-                         (int)(CurrentTime - client_p->lasttime));
+        ircsprintf(scratch, "Ping timeout: %d seconds",
+                   (int)(CurrentTime - client_p->lasttime));
 
-        (void)exit_client(client_p, client_p, &me, scratch);
+        detach_client(client_p, scratch);
         continue;
       }
       else if ((client_p->flags & FLAGS_PINGSENT) == 0)
@@ -355,9 +364,7 @@ check_pings_list(dlink_list * list)
         client_p->lasttime = CurrentTime - ping;
         sendto_one(client_p, "PING :%s", me.name);
       }
-    }
-    /* ping_timeout: */
-
+    } /* ping timeout */
   }
 }
 
@@ -967,6 +974,41 @@ free_exited_clients(void *unused)
     dlinkDelete(ptr, &dead_list);
     free_dlink_node(ptr);
   }
+}
+
+/* int detach_client(struct Client *cptr, const char *reason);
+ * Input: The pointer to the client, and the reason for the detach.
+ * Output: 0 on success.
+ * Side-effects: Exits the client if they cannot be made to persist,
+ *               otherwises closes the fd and makes it persist.
+ */
+int
+detach_client(struct Client *client_p, const char *reason)
+{
+#ifdef PERSISTANT_CLIENTS
+  if (client_p->user==NULL || !MyConnect(client_p) ||
+      !IsPersistant(client_p))
+    return exit_client(NULL, client_p, &me, reason);
+  if (IsPersisting(client_p))
+    return 0;
+  client_p->flags2 |= FLAGS2_PERSISTING;
+  if (client_p->fd >= 0)
+    fd_close(client_p->fd);
+  client_p->fd = -1;
+  dlinkAdd((void*)client_p, make_dlink_node(), &persist_list);
+  client_p->user->last_detach_time = CurrentTime;
+
+  if (client_p->user->away == NULL)
+  {
+    DupString(client_p->user->away, reason);
+    client_p->user->last_away = CurrentTime;
+    sendto_server(NULL, client_p, NULL, 0, 0, 0, ":%s AWAY :%s",
+                  client_p->name, client_p->user->away);
+  }
+  return 0;
+#else
+  return exit_client(NULL, client_p, &me, reason);
+#endif
 }
 
 /*

@@ -19,7 +19,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: s_conf.h,v 1.1 2002/01/04 09:12:58 a1kmm Exp $
+ * $Id: s_conf.h,v 1.2 2002/01/06 06:19:36 a1kmm Exp $
  */
 
 #include "setup.h"
@@ -126,13 +126,14 @@ struct ConfItem
 #define CONF_FLAGS_REDIR                0x00000800
 #define CONF_FLAGS_EXEMPTGLINE          0x00001000
 #define CONF_FLAGS_RESTRICTED           0x00002000
+#define CONF_FLAGS_PERSISTANT           0x00004000
 /* server flags */
-#define CONF_FLAGS_ALLOW_AUTO_CONN      0x00004000
-#define CONF_FLAGS_LAZY_LINK            0x00008000
-#define CONF_FLAGS_ENCRYPTED            0x00010000
-#define CONF_FLAGS_COMPRESSED           0x00020000
-#define CONF_FLAGS_TEMPORARY            0x00040000
-#define CONF_FLAGS_CRYPTLINK            0x00080000
+#define CONF_FLAGS_ALLOW_AUTO_CONN      0x00008000
+#define CONF_FLAGS_LAZY_LINK            0x00010000
+#define CONF_FLAGS_ENCRYPTED            0x00020000
+#define CONF_FLAGS_COMPRESSED           0x00040000
+#define CONF_FLAGS_TEMPORARY            0x00080000
+#define CONF_FLAGS_CRYPTLINK            0x00100000
 /* Macros for struct ConfItem */
 
 #define IsLimitIp(x)            ((x)->flags & CONF_FLAGS_LIMIT_IP)
@@ -234,7 +235,10 @@ struct config_file_entry
   /* 0 == don't use throttle... */
   int           throttle_time;
   int           use_egd;
-  int		ping_cookie;
+  int           ping_cookie;
+#ifdef PERSISTANT_CLIENTS
+  int           persist_expire_time;
+#endif
 #ifdef HAVE_LIBCRYPTO
   struct EncCapability *default_cipher_preference;
 #endif

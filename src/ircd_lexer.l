@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: ircd_lexer.l,v 1.1 2002/01/04 09:14:05 a1kmm Exp $
+ * $Id: ircd_lexer.l,v 1.2 2002/01/06 06:19:43 a1kmm Exp $
  */
 
 %option case-insensitive
@@ -200,7 +200,8 @@ oper_log        { return OPER_LOG; }
 operator	{ return OPERATOR; }
 passwd		{ return PASSWORD; }
 password	{ return PASSWORD; }
-persist_time    { return PERSIST_TIME; }
+persistant  { return PERSISTANT; }
+persist_time { return PERSIST_TIME; }
 ping_cookie	{ return PING_COOKIE; }
 ping_time	{ return PING_TIME; }
 port		{ return PORT; }

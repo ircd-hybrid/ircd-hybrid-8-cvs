@@ -2,7 +2,7 @@
  * modules/m_nick.c
  * Copyright (C) 2001 Hybrid Development Team
  *
- * $Id: m_nick.c,v 1.2 2002/01/04 11:06:34 a1kmm Exp $
+ * $Id: m_nick.c,v 1.3 2002/01/06 06:19:40 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -27,6 +27,9 @@
 #include "parse.h"
 #include "modules.h"
 #include "common.h"
+#include "tools.h"
+#include "s_bsd.h"
+#include "packet.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -37,6 +40,7 @@ static void m_nick(struct Client *, struct Client *, int, char **);
 static void ms_nick(struct Client *, struct Client *, int, char **);
 
 static void ms_client(struct Client *, struct Client *, int, char **);
+static void m_client(struct Client*, struct Client*, int, char**);
 
 static int nick_from_server(struct Client *, struct Client *, int, char **,
                             time_t, char *);
@@ -55,7 +59,8 @@ static int clean_host_name(char *);
 static int perform_nick_collides(struct Client *, struct Client *,
                                  struct Client *, int, char **, time_t,
                                  char *);
-
+void user_welcome(struct Client *source_p);
+extern BlockHeap *lclient_heap;
 
 struct Message nick_msgtab = {
   "NICK", 0, 0, 1, 0, MFLG_SLOW, 0,
@@ -63,8 +68,13 @@ struct Message nick_msgtab = {
 };
 
 struct Message client_msgtab = {
+#ifdef PERSISTANT_CLIENTS
+  "CLIENT", 0, 0, 3, 0, MFLG_SLOW, 0,
+  {m_client, m_ignore, ms_client, m_ignore}
+#else
   "CLIENT", 0, 0, 10, 0, MFLG_SLOW, 0,
-  {m_ignore, m_ignore, ms_client, m_ignore}
+  {m_client, m_ignore, ms_client, m_ignore}
+#endif
 };
 
 #ifndef STATIC_MODULES
@@ -82,7 +92,7 @@ _moddeinit(void)
   mod_del_cmd(&client_msgtab);
 }
 
-char *_version = "$Revision: 1.2 $";
+char *_version = "$Revision: 1.3 $";
 #endif
 
 /*
@@ -386,6 +396,12 @@ ms_client(struct Client *client_p, struct Client *source_p,
   time_t newts = 0;
   char *id;
   char *name;
+
+#ifdef PERSISTANT_CLIENTS
+  if (parc < 10)
+    return;
+#endif
+
 
   id = parv[8];
   name = parv[9];
@@ -927,3 +943,92 @@ perform_nick_collides(struct Client *source_p, struct Client *client_p,
 
   return 0;
 }
+
+#ifdef PERSISTANT_CLIENTS
+static void
+m_client(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
+{
+  struct Client *target_p;
+  dlink_node *m;
+  target_p = find_id(parv[1]);
+  if (target_p == NULL || !MyConnect(target_p) ||
+      !(target_p->user && !strcmp(target_p->user->id_key, parv[2]))
+     )
+  {
+    /* This is intentionally _one_ message for both wrong id &
+     * wrong key for security reasons... */
+    exit_client(NULL, client_p, &me, "Bad ID or ID-key.");
+    return;
+  }
+  /* Now do a quick k-line check etc... */
+  if (check_client(client_p, source_p,
+                   (client_p->username[0]==0) ? target_p->username :
+                                                client_p->username
+                   ) < 0)
+    return;
+  if (!IsPersisting(target_p) && target_p->fd >= 0)
+  {
+    sendto_one(target_p, "ERROR :Your ID has been reclaimed.");
+    if (!IsDead(target_p))
+      send_queued_write(target_p->fd, target_p);
+    fd_close(target_p->fd);
+    target_p->fd = -1;
+  }
+  /* Now we can detach target_p's I-lines... */
+  remove_one_ip(&target_p->localClient->ip);
+  det_confs_butmask(target_p, ~CONF_CLIENT);
+  BlockHeapFree(lclient_heap, target_p->localClient);
+  /* And attach target_p's localclient to the new one... */
+  target_p->localClient = client_p->localClient;
+  /* Bring back target_p from the dead... */
+  target_p->flags &= ~FLAGS_DEADSOCKET;
+  target_p->flags2 &= ~FLAGS2_PERSISTING;
+  target_p->fd = client_p->fd;
+  client_p->fd = -1;
+  if (IsPersisting(source_p))
+  {
+    m = dlinkFind(&persist_list,source_p);
+    if ( m != NULL )
+    {
+      dlinkDelete(m, &persist_list);
+      free_dlink_node(m);
+    }
+  }
+  /* And kill the old client_p... */
+  SetDead(client_p);
+  m = dlinkFind(&unknown_list, source_p);
+  if (m != NULL)
+  {
+    dlinkDelete(m, &unknown_list);
+    free_dlink_node(m);
+  }
+  fd_table[target_p->fd].read_data = target_p;
+  fd_table[target_p->fd].write_data = target_p;
+  fd_table[target_p->fd].flush_data = target_p; 
+  if (client_p->name[0] != 0)
+    del_from_client_hash_table(client_p->name, client_p);
+  remove_client_from_list(client_p);
+  dlinkAdd(client_p, make_dlink_node(), &dead_list);
+  client_p->localClient = NULL;
+  /* Re-register for io... */
+  comm_setselect(target_p->fd, FDLIST_IDLECLIENT,
+                 COMM_SELECT_READ | COMM_SELECT_WRITE,
+                 read_packet, target_p, 0);
+  /* And client_p now has moved over to target_p...
+   * Welcome them in... */
+  user_welcome(target_p);
+  send_umode_out(target_p, target_p, 0);
+  /* Just for the sake of away scripts etc... */
+  sendto_one(target_p, form_str(RPL_NOWAWAY), me.name, target_p->name);
+  /* Now we have to send out stuff for every channel they are on... */
+  for (m=target_p->user->channel.head; m; m=m->next)
+  {
+    struct Channel *root_chptr, *chptr = m->data;
+    root_chptr = chptr->root_chptr ? chptr->root_chptr : chptr;
+    sendto_one(target_p, ":%s!%s@%s JOIN %s", target_p->name,
+               target_p->username, target_p->host, root_chptr->chname);
+    channel_member_names(target_p, chptr, root_chptr->chname, 1);
+   }
+}
+#endif

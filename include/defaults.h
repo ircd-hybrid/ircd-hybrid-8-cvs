@@ -16,7 +16,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: defaults.h,v 1.1 2002/01/04 09:12:54 a1kmm Exp $
+ * $Id: defaults.h,v 1.2 2002/01/06 06:19:36 a1kmm Exp $
  */
 
 #ifndef INCLUDED_defaults_h
@@ -88,6 +88,11 @@ error HARD_FDLIMIT_ undefined
 #undef USE_GETTEXT
 #define _(a)       (a)
 #endif
+
+/* Enable compile-time here by default, it is now also runtime
+ * configurable
+ */
+#define PERSISTANT_CLIENTS
 
 #define CONFIG_H_LEVEL_7
 

@@ -18,7 +18,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- *   $Id: packet.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
+ *   $Id: packet.c,v 1.3 2002/01/06 06:19:43 a1kmm Exp $
  */
 
 #include <stdio.h>
@@ -52,6 +52,9 @@ parse_client_queued(struct Client *client_p)
   int dolen = 0, checkflood = 1;
   struct LocalUser *lclient_p = client_p->localClient;
 
+  if (IsDead(client_p))
+    return;
+
   if (IsServer(client_p))
   {
     while ((dolen = linebuf_get(&client_p->localClient->buf_recvq,
@@ -81,7 +84,7 @@ parse_client_queued(struct Client *client_p)
      * messages in this loop, we simply drop out of the loop prematurely.
      *   -- adrian
      */
-    for (;;)
+    while (!IsDead(client_p))
     {
       if (checkflood && (lclient_p->sent_parsed > lclient_p->allow_read))
         break;

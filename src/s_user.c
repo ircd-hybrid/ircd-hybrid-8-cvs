@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: s_user.c,v 1.2 2002/01/04 11:06:43 a1kmm Exp $
+ *  $Id: s_user.c,v 1.3 2002/01/06 06:19:43 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -95,6 +95,9 @@ static struct flag_item user_modes[] = {
   {FLAGS_LOCOPS, 'l'},
   {FLAGS_NCHANGE, 'n'},
   {FLAGS_OPER, 'o'},
+#ifdef PERSISTANT_CLIENTS
+  {FLAGS_PERSISTANT, 'p'},
+#endif
   {FLAGS_REJ, 'r'},
   {FLAGS_SERVNOTICE, 's'},
   {FLAGS_UNAUTH, 'u'},
@@ -160,7 +163,11 @@ int user_modes_from_c_to_bitmask[] = {
   0,                            /* m */
   FLAGS_NCHANGE,                /* n */
   FLAGS_OPER,                   /* o */
+#ifdef PERSISTANT_CLIENTS
+  FLAGS_PERSISTANT,             /* p */
+#else
   0,                            /* p */
+#endif
   0,                            /* q */
   FLAGS_REJ,                    /* r */
   FLAGS_SERVNOTICE,             /* s */
@@ -439,8 +446,10 @@ register_local_user(struct Client *client_p, struct Client *source_p,
       ;
     strcpy(source_p->user->id, id);
     add_to_id_hash_table(id, source_p);
+#ifdef PERSISTANT_CLIENTS
     id = id_get();
     strcpy(user->id_key, id);
+#endif
   }
 
   inetntop(source_p->localClient->aftype, &IN_ADDR(source_p->localClient->ip),
@@ -1066,6 +1075,28 @@ user_mode(struct Client *client_p, struct Client *source_p, int parc,
     source_p->umodes &= ~FLAGS_NCHANGE; /* only tcm's really need this */
   }
 
+#ifdef PERSISTANT_CLIENTS
+  if (MyConnect(source_p) && (source_p->umodes & ~setflags &
+      FLAGS_PERSISTANT))
+  {
+    for (ptr=source_p->localClient->confs.head; ptr; ptr=ptr->next)
+    {
+      aconf = (struct ConfItem*)ptr->data;
+      if ((aconf->status & CONF_CLIENT))
+      {
+        if (!(aconf->flags & CONF_FLAGS_PERSISTANT))
+        {
+          sendto_one(source_p,
+                     ":%s NOTICE %s :Your auth block does not allow +p",
+                     me.name, source_p->name);
+          source_p->umodes &= ~FLAGS_PERSISTANT;
+        }
+        break;
+      }
+    }
+  }
+#endif
+
   if (MyConnect(source_p) && (source_p->umodes & FLAGS_ADMIN)
       && !IsOperAdmin(source_p))
   {
@@ -1207,6 +1238,11 @@ user_welcome(struct Client *source_p)
              creation);
   sendto_one(source_p, form_str(RPL_MYINFO), me.name, source_p->name, me.name,
              ircd_version);
+
+#ifdef PERSISTANT_CLIENTS
+  sendto_one(source_p, form_str(RPL_YOURID), me.name, source_p->name,
+             source_p->user->id, source_p->user->id_key);
+#endif
 
   show_isupport(source_p);
 

@@ -19,7 +19,7 @@
  *
  *  (C) 1988 University of Oulu,Computing Center and Jarkko Oikarinen"
  *
- *  $Id: s_conf.c,v 1.2 2002/01/04 11:06:42 a1kmm Exp $
+ *  $Id: s_conf.c,v 1.3 2002/01/06 06:19:43 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -1532,6 +1532,10 @@ set_default_conf(void)
   ConfigFileEntry.dots_in_ident = 0;
   ConfigFileEntry.maximum_links = MAXIMUM_LINKS_DEFAULT;
   ConfigFileEntry.max_targets = MAX_TARGETS_DEFAULT;
+#ifdef PERSISTANT_CLIENTS
+  /* Default to 2 days. */
+  ConfigFileEntry.persist_expire_time = 60 * 60 * 24 * 2;
+#endif
   DupString(ConfigFileEntry.servlink_path, SLPATH);
   ConfigFileEntry.egdpool_path = NULL;
 

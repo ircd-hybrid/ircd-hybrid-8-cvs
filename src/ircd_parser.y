@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: ircd_parser.y,v 1.1 2002/01/04 09:14:10 a1kmm Exp $
+ * $Id: ircd_parser.y,v 1.2 2002/01/06 06:19:43 a1kmm Exp $
  */
 
 %{
@@ -200,6 +200,7 @@ int   class_redirport_var;
 %token  PACE_WAIT
 %token  PASSWORD
 %token  PATH
+%token  PERSISTANT
 %token  PERSIST_TIME
 %token  PING_COOKIE
 %token  PING_TIME
@@ -1065,7 +1066,7 @@ auth_item:      auth_user | auth_passwd | auth_class |
                 auth_kline_exempt | auth_have_ident | auth_is_restricted |
                 auth_exceed_limit | auth_no_tilde | auth_gline_exempt |
                 auth_spoof | auth_spoof_notice |
-                auth_redir_serv | auth_redir_port |
+                auth_redir_serv | auth_redir_port | auth_persistant |
                 error
 
 auth_user:   USER '=' QSTRING ';'
@@ -1213,6 +1214,13 @@ auth_class:   CLASS '=' QSTRING ';'
     DupString(yy_achead->className, yylval.string);
   };
 
+auth_persistant: PERSISTANT '=' TYES ';'
+{
+  yy_achead->flags |= CONF_FLAGS_PERSISTANT;
+} | PERSISTANT '=' TNO ';'
+{
+  yy_achead->flags &= ~CONF_FLAGS_PERSISTANT;
+};
 
 /***************************************************************************
  *  section resv
@@ -1942,6 +1950,7 @@ general_item:       general_failed_oper_notice |
                     general_compression_level | general_client_flood |
                     general_throttle_time | general_havent_read_conf |
                     general_dot_in_ip6_addr | general_ping_cookie |
+                    general_persist_expire_time |
                     error
 
 general_failed_oper_notice:   FAILED_OPER_NOTICE '=' TYES ';'
@@ -2308,6 +2317,13 @@ general_oper_umodes: OPER_UMODES
     ConfigFileEntry.oper_umodes = 0;
   }
   '='  umode_oitems ';' ;
+
+general_persist_expire_time: PERSIST_TIME '=' timespec ';'
+{
+#ifdef PERSISTANT_CLIENTS
+  ConfigFileEntry.persist_expire_time = $3;
+#endif
+};
 
 umode_oitems:    umode_oitems ',' umode_oitem |
   umode_oitem

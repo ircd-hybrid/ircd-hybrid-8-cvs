@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- * $Id: client.h,v 1.1 2002/01/04 09:12:54 a1kmm Exp $
+ * $Id: client.h,v 1.2 2002/01/06 06:19:36 a1kmm Exp $
  */
 #ifndef INCLUDED_client_h
 #define INCLUDED_client_h
@@ -85,9 +85,11 @@ struct User
   char*          auth_oper; /* Operator to become if they supply the response.*/
 	/* client ID, unique ID per client */
   char id[IDLEN + 1];
+#ifdef PERSISTANT_CLIENTS
   char id_key[IDLEN + 1];
   /* When did we detach from them, if they are detached... */
   time_t            last_detach_time;
+#endif
 };
 
 struct Server
@@ -414,10 +416,11 @@ struct LocalUser
 #define FLAGS_CALLERID     0x4000 /* block unless caller id's */
 #define FLAGS_UNAUTH       0x8000 /* show unauth connects here */
 #define FLAGS_LOCOPS       0x10000 /* show locops */
+#define FLAGS_PERSISTANT   0x20000 /* Persistant. */
 
 /* user information flags, only settable by remote mode or local oper */
-#define FLAGS_OPER         0x20000 /* Operator */
-#define FLAGS_ADMIN        0x40000 /* Admin on server */
+#define FLAGS_OPER         0x40000 /* Operator */
+#define FLAGS_ADMIN        0x80000 /* Admin on server */
 
 #define FLAGS_ALL	   FLAGS_SERVNOTICE
 
@@ -448,15 +451,16 @@ struct LocalUser
                                  FLAGS2_OPER_REHASH| \
                                  FLAGS2_OPER_ADMIN)
 
-#define FLAGS2_CBURST		0x10000  /* connection burst being sent */
-#define FLAGS2_PING_COOKIE	0x20000		/* PING Cookie */
-#define FLAGS2_IDLE_LINED       0x40000
-#define FLAGS2_IP_SPOOFING      0x80000        /* client IP is spoofed */
-#define FLAGS2_FLOODDONE        0x200000      /* Flood grace period has
-                                               * been ended. */
+#define FLAGS2_CBURST        0x910000  /* connection burst being sent */
+#define FLAGS2_PING_COOKIE   0x020000  /* PING Cookie */
+#define FLAGS2_IDLE_LINED    0x040000  /* Allowed to be idle. */
+#define FLAGS2_IP_SPOOFING   0x080000  /* client IP is spoofed */
+#define FLAGS2_FLOODDONE     0x200000  /* Flood grace period has
+                                        * been ended. */
+#define FLAGS2_PERSISTING    0x400000  /* Exited, but persistant. */
 
 #define SEND_UMODES  (FLAGS_INVISIBLE | FLAGS_OPER | FLAGS_WALLOP | \
-                      FLAGS_ADMIN)
+                      FLAGS_ADMIN | FLAGS_PERSISTANT)
 #define ALL_UMODES   (SEND_UMODES | FLAGS_SERVNOTICE | FLAGS_CCONN | \
                       FLAGS_REJ | FLAGS_SKILL | FLAGS_FULL | FLAGS_SPY | \
                       FLAGS_NCHANGE | FLAGS_OPERWALL | FLAGS_DEBUG | \
@@ -572,6 +576,9 @@ struct LocalUser
 #define SetFloodDone(x)         ((x)->flags2 |= FLAGS2_FLOODDONE)
 #define CBurst(x)               ((x)->flags2 & FLAGS2_CBURST)
 
+#define IsPersistant(x)         ((x)->umodes & FLAGS_PERSISTANT)
+#define IsPersisting(x)         ((x)->flags2 & FLAGS2_PERSISTING)
+
 /*
  * definitions for get_client_name
  */
@@ -592,6 +599,7 @@ extern void           del_client_from_llist(struct Client** list,
                                             struct Client* client);
 extern int            exit_client(struct Client*, struct Client*, 
                                   struct Client*, const char* comment);
+extern int            detach_client(struct Client*, const char *comment);
 
 
 extern void     count_local_client_memory(int *count, int *memory);
