@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_gline.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
+ *  $Id: m_gline.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -47,7 +47,6 @@
 #include "s_bsd.h"
 #include "s_conf.h"
 #include "s_misc.h"
-#include "scache.h"
 #include "send.h"
 #include "msg.h"
 #include "fileio.h"
@@ -124,7 +123,7 @@ _moddeinit(void)
   mod_del_cmd(gline_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
  * mo_gline()
@@ -226,11 +225,11 @@ mo_gline(struct Client *client_p,
     sendto_server(NULL, NULL, NULL, CAP_UID, CAP_GLN, NOFLAGS,
                   ":%s GLINE %s %s %s %s %s %s :%s",
                   me.name, ID(source_p), source_p->username,
-                  source_p->host, source_p->user->server, user, host, reason);
+                  source_p->host, source_p->servptr->name, user, host, reason);
     sendto_server(NULL, NULL, NULL, NOCAPS, CAP_GLN | CAP_UID, NOFLAGS,
                   ":%s GLINE %s %s %s %s %s %s :%s",
                   me.name, source_p->name, source_p->username,
-                  source_p->host, source_p->user->server, user, host, reason);
+                  source_p->host, source_p->servptr->name, user, host, reason);
 
 
     sendto_realops_flags(FLAGS_ALL, L_ALL,
@@ -284,7 +283,7 @@ ms_gline(struct Client *client_p,
     oper_nick = parv[0];
     oper_user = source_p->username;
     oper_host = source_p->host;
-    oper_server = source_p->user->server;
+    oper_server = source_p->servptr->name;
     user = parv[1];
     host = parv[2];
     reason = parv[3];
@@ -684,8 +683,7 @@ add_new_majority_gline(const char *oper_nick,
   strncpy_irc(pending->oper_nick1, oper_nick, NICKLEN);
   strncpy_irc(pending->oper_user1, oper_user, USERLEN);
   strncpy_irc(pending->oper_host1, oper_host, HOSTLEN);
-
-  pending->oper_server1 = find_or_add(oper_server);
+  strncpy_irc(pending->oper_server1, oper_server, HOSTLEN);
 
   strncpy_irc(pending->user, user, USERLEN);
   strncpy_irc(pending->host, host, HOSTLEN);
@@ -778,8 +776,8 @@ majority_gline(struct Client *source_p,
         strncpy_irc(gline_pending_ptr->oper_nick2, oper_nick, NICKLEN);
         strncpy_irc(gline_pending_ptr->oper_user2, oper_user, USERLEN);
         strncpy_irc(gline_pending_ptr->oper_host2, oper_host, HOSTLEN);
+        strncpy_irc(gline_pending_ptr->oper_server2, oper_server, HOSTLEN);
         DupString(gline_pending_ptr->reason2, reason);
-        gline_pending_ptr->oper_server2 = find_or_add(oper_server);
         gline_pending_ptr->last_gline_time = CurrentTime;
         gline_pending_ptr->time_request2 = CurrentTime;
         return NO;

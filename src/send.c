@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: send.c,v 1.3 2002/01/06 07:18:52 a1kmm Exp $
+ *   $Id: send.c,v 1.4 2002/02/26 04:55:57 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -83,74 +83,57 @@ send_format(char *lsendbuf, const char *pattern, va_list args);
 static inline int send_trim(char *lsendbuf, int len);
 
 /*
- ** dead_link
- **      An error has been detected. The link *must* be closed,
- **      but *cannot* call ExitClient (m_bye) from here.
- **      Instead, mark it with FLAGS_DEADSOCKET. This should
- **      generate ExitClient from the main loop.
- **
- **      If 'notice' is not NULL, it is assumed to be a format
- **      for a message to local opers. I can contain only one
- **      '%s', which will be replaced by the sockhost field of
- **      the failing link.
- **
- **      Also, the notice is skipped for "uninteresting" cases,
- **      like Persons and yet unknown connections...
+ * dead_link()
+ * Input: to: The client we were sending to when this happened.
+ *        notice: The reason for the dead link.
+ * Output: Always returns -1.
+ * Side-effects: Exits the client and if it is a server, sends a message to the
+ *               IRC operators.
+ * Note: Called when an error occurs during a send function indicating that an
+ *       error has occurred or the link has been closed.
  */
-/*
- * Can't call exit_client right away. This client might be in the middle
- * of a /list and sendq's out. exiting the client during that list
- * would thoroughly confuse things (and did). Best we can do, is mark
- * the client as known to be thoroughly dead, treat it like a pariah
- * and exit in the main loop at the earliest opportunity. ugh.
- * - Dianora
- * 
- */
-
 static int
 dead_link(struct Client *to, char *notice)
 {
-  SetDead(to);
-
+  if (IsDead(to))
+    return -1;
   /*
    * If because of buffer problem then clean linebuf's now so that
    * notices don't hurt operators below.
    */
   linebuf_donebuf(&to->localClient->buf_recvq);
   linebuf_donebuf(&to->localClient->buf_sendq);
-  if (!IsPerson(to) && !IsUnknown(to) && !(to->flags & FLAGS_CLOSING))
+  if (!IsPerson(to) && !IsUnknown(to))
   {
-    sendto_realops_flags(FLAGS_ALL, L_ADMIN,
-                         notice, get_client_name(to, HIDE_IP));
-    sendto_realops_flags(FLAGS_ALL, L_OPER,
-                         notice, get_client_name(to, MASK_IP));
+    sendto_realops_flags(FLAGS_ALL, L_ADMIN, notice,
+                         get_client_name(to, HIDE_IP));
+    sendto_realops_flags(FLAGS_ALL, L_OPER, notice,
+                         get_client_name(to, MASK_IP));
   }
+  exit_client(to, to, &me, notice);
   Debug((DEBUG_ERROR, notice, get_client_name(to, HIDE_IP)));
-  return (-1);
-}                               /* dead_link() */
+  return -1;
+}
 
 
 /*
- ** send_linebuf
- **      Internal utility which attaches one linebuf to the sockets
- **      sendq.
+ * send_linebuf
+ * Input: to: The client to send to.
+ *        linebuf: The linebuf to send.
+ * Output: Returns 0.
+ * Side-effects: Adds a linebuf to the client's sendq.
  */
 static int
 _send_linebuf(struct Client *to, buf_head_t * linebuf)
 {
-#ifdef INVARIANTS
-  if (IsMe(to))
-  {
-    sendto_realops_flags(FLAGS_ALL, L_ALL,
-                         "Trying to send message to myself!");
+  assert(!IsMe(to));
+  /* Thou shalt not write to closed descriptors */
+  if (to->localClient->fd < 0)
     return 0;
-  }
-#endif
-  if (to->fd < 0)
-    return 0;                   /* Thou shalt not write to closed descriptors */
 
+  /* This socket has already been marked as dead */
   if (IsDead(to))
-    return 0;                   /* This socket has already been marked as dead */
+    return 0;
 
   if (linebuf_len(&to->localClient->buf_sendq) > get_sendq(to))
   {
@@ -171,20 +154,25 @@ _send_linebuf(struct Client *to, buf_head_t * linebuf)
     linebuf_attach(&to->localClient->buf_sendq, linebuf);
   }
   /*
-   ** Update statistics. The following is slightly incorrect
-   ** because it counts messages even if queued, but bytes
-   ** only really sent. Queued bytes get updated in SendQueued.
+   * Update statistics. The following is slightly incorrect
+   * because it counts messages even if queued, but bytes
+   * only really sent. Queued bytes get updated in SendQueued.
    */
   to->localClient->sendM += 1;
   me.localClient->sendM += 1;
 
-  send_queued_write(to->fd, to);
+  send_queued_write(to->localClient->fd, to);
   return 0;
-}                               /* send_linebuf() */
+}
 
 /*
  * send_linebuf_remote
- * 
+ * Input: to: The client to send to.
+ *        from: The client originating this.
+ *        linebuf: The linebuf to send.
+ * Output: None
+ * Side-effects: Checks that the direction is valid, and adds the linebuf to
+ *               the sendq.
  */
 static void
 send_linebuf_remote(struct Client *to, struct Client *from,
@@ -281,7 +269,8 @@ send_queued_write(int fd, void *data)
 
   if (linebuf_len(&to->localClient->buf_sendq))
   {
-    while ((retlen = linebuf_flush(to->fd, &to->localClient->buf_sendq)) > 0)
+    while ((retlen = linebuf_flush(to->localClient->fd,
+                                    &to->localClient->buf_sendq)) > 0)
     {
       /* We have some data written .. update counters */
 #ifndef NDEBUG
@@ -420,7 +409,7 @@ sendto_one(struct Client *to, const char *pattern, ...)
     to = to->from;
 
 #ifdef INVARIANTS
-  if (to->fd < 0)
+  if (to->localClient->fd < 0)
   {
     Debug((DEBUG_ERROR,
            "Local socket %s with negative fd... AARGH!", to->name));
@@ -469,7 +458,7 @@ sendto_one_prefix(struct Client *to, struct Client *prefix,
     to_sendto = to;
 
 #ifdef INVARIANTS
-  if (to->fd < 0)
+  if (to->localClient->fd < 0)
   {
     Debug((DEBUG_ERROR,
            "Local socket %s with negative fd... AARGH!", to->name));
@@ -871,7 +860,7 @@ sendto_list_local(dlink_list * list, buf_head_t * linebuf_ptr)
     if ((target_p = ptr->data) == NULL)
       continue;
 
-    if (!MyConnect(target_p) || (target_p->fd < 0))
+    if (!MyConnect(target_p) || (target_p->localClient->fd < 0))
       continue;
 
     if (target_p->serial == current_serial)
@@ -951,7 +940,7 @@ match_it(const struct Client *one, const char *mask, int what)
   if (what == MATCH_HOST)
     return match(mask, one->host);
 
-  return match(mask, one->user->server);
+  return match(mask, one->servptr->name);
 }                               /* match_it() */
 
 /*

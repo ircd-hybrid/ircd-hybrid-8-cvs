@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_user.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
+ *  $Id: s_user.c,v 1.6 2002/02/26 04:55:56 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -55,7 +55,6 @@
 #include "s_log.h"
 #include "s_serv.h"
 #include "s_stats.h"
-#include "scache.h"
 #include "send.h"
 #include "supported.h"
 #include "whowas.h"
@@ -275,30 +274,6 @@ show_isupport(struct Client *source_p)
 }
 
 
-/*
-** register_local_user
-**      This function is called when both NICK and USER messages
-**      have been accepted for the client, in whatever order. Only
-**      after this, is the USER message propagated.
-**
-**      NICK's must be propagated at once when received, although
-**      it would be better to delay them too until full info is
-**      available. Doing it is not so simple though, would have
-**      to implement the following:
-**
-**      (actually it has been implemented already for a while) -orabidoo
-**
-**      1) user telnets in and gives only "NICK foobar" and waits
-**      2) another user far away logs in normally with the nick
-**         "foobar" (quite legal, as this server didn't propagate
-**         it).
-**      3) now this server gets nick "foobar" from outside, but
-**         has already the same defined locally. Current server
-**         would just issue "KILL foobar" to clean out dups. But,
-**         this is not fair. It should actually request another
-**         nick from local user or kill him/her...
-*/
-
 int
 register_local_user(struct Client *client_p, struct Client *source_p,
                     char *nick, char *username)
@@ -466,10 +441,12 @@ register_local_user(struct Client *client_p, struct Client *source_p,
                            "New Max Local Clients: %d", Count.max_loc);
   }
 
+  if (IsDead(source_p))
+    return -1;
+
   SetClient(source_p);
 
-  /* XXX source_p->servptr is &me, since local client */
-  source_p->servptr = find_server(user->server);
+  source_p->servptr = &me;
   add_client_to_llist(&(source_p->servptr->serv->users), source_p);
 
   /* Increment our total user count here */
@@ -501,13 +478,10 @@ int
 register_remote_user(struct Client *client_p, struct Client *source_p,
                      char *nick, char *username)
 {
-  struct User *user = source_p->user;
-  struct Client *target_p;
-
   assert(0 != source_p);
   assert(source_p->username != username);
 
-  user->last = CurrentTime;
+  source_p->user->last = CurrentTime;
 
   /* pointed out by Mortiis, never be too careful */
   if (strlen(username) > USERLEN)
@@ -515,19 +489,15 @@ register_remote_user(struct Client *client_p, struct Client *source_p,
 
   strncpy_irc(source_p->username, username, USERLEN);
 
-  SetClient(source_p);
-
   /* Increment our total user count here */
   if (++Count.total > Count.max_tot)
     Count.max_tot = Count.total;
 
-  source_p->servptr = find_server(user->server);
-
-  if (source_p->servptr == NULL)
+  if (source_p->servptr == NULL || !IsServer(source_p->servptr))
   {
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "Ghost killed: %s on invalid server %s",
-                         source_p->name, source_p->user->server);
+                         source_p->name, source_p->servptr->name);
 
     kill_client(client_p, source_p, "%s (Server doesn't exist)", me.name);
 
@@ -535,46 +505,33 @@ register_remote_user(struct Client *client_p, struct Client *source_p,
     return exit_client(NULL, source_p, &me, "Ghost");
   }
 
-  add_client_to_llist(&(source_p->servptr->serv->users), source_p);
-
-  if ((target_p = find_server(user->server))
-      && target_p->from != source_p->from)
+  if (source_p->servptr->from != client_p)
   {
     sendto_realops_flags(FLAGS_DEBUG, L_ALL,
-                         "Bad User [%s] :%s USER %s@%s %s, != %s[%s]",
-                         client_p->name, nick, source_p->username,
-                         source_p->host, user->server,
-                         target_p->name, target_p->from->name);
+                         "User %s!%s@%s introduced onto server %s which is not "
+                         "behind introducing server %s.",
+                         source_p->name, source_p->username, source_p->host,
+                         source_p->servptr->name, client_p->name);
     kill_client(client_p, source_p,
-                "%s (NICK from wrong direction (%s != %s))",
-                me.name, user->server, target_p->from->name);
+                "%s (NICK from wrong direction)", me.name);
 
     source_p->flags |= FLAGS_KILLED;
     return exit_client(source_p, source_p, &me,
                        "USER server wrong direction");
 
   }
-  /*
-   * Super GhostDetect:
-   * If we can't find the server the user is supposed to be on,
-   * then simply blow the user away.        -Taner
-   */
-  if (!target_p)
-  {
-    kill_client(client_p, source_p, "%s GHOST (no server found)", me.name);
-    sendto_realops_flags(FLAGS_ALL, L_ALL,
-                         "No server %s for user %s[%s@%s] from %s",
-                         user->server, source_p->name, source_p->username,
-                         source_p->host, source_p->from->name);
-    source_p->flags |= FLAGS_KILLED;
-    return exit_client(source_p, source_p, &me, "Ghosted Client");
-  }
 
-  return (introduce_client(client_p, source_p, user, nick));
+  if (IsDead(client_p))
+    return -1;
+
+  SetClient(source_p);
+  add_client_to_llist(&(source_p->servptr->serv->users), source_p);
+
+  return (introduce_client(client_p, source_p, source_p->user, nick));
 }
 
 /*
- * introduce_clients
+ * introduce_client
  *
  * inputs	-
  * output	-
@@ -598,18 +555,7 @@ introduce_client(struct Client *client_p, struct Client *source_p,
     ubuf[1] = '\0';
   }
 
-
-  /* arghhh one could try not introducing new nicks to ll leafs
-   * but then you have to introduce them "on the fly" in SJOIN
-   * not fun.
-   * Its not going to cost much more bandwidth to simply let new
-   * nicks just ride on through.
-   */
-
   /*
-   * We now introduce nicks "on the fly" in SJOIN anyway --
-   * you _need_ to if you aren't going to burst everyone initially.
-   *
    * Only send to non CAP_LL servers, unless we're a lazylink leaf,
    * in that case just send it to the uplink.
    * -davidt
@@ -626,7 +572,7 @@ introduce_client(struct Client *client_p, struct Client *source_p,
                  source_p->hopcount + 1,
                  (unsigned long)source_p->tsinfo,
                  ubuf,
-                 source_p->username, source_p->host, user->server,
+                 source_p->username, source_p->host, source_p->servptr->name,
                  user->id, source_p->info);
     }
     else
@@ -636,7 +582,7 @@ introduce_client(struct Client *client_p, struct Client *source_p,
                  source_p->hopcount + 1,
                  (unsigned long)source_p->tsinfo,
                  ubuf,
-                 source_p->username, source_p->host, user->server,
+                 source_p->username, source_p->host, source_p->servptr->name,
                  source_p->info);
     }
   }
@@ -656,7 +602,7 @@ introduce_client(struct Client *client_p, struct Client *source_p,
                    source_p->hopcount + 1,
                    (unsigned long)source_p->tsinfo,
                    ubuf,
-                   source_p->username, source_p->host, user->server,
+                   source_p->username, source_p->host, source_p->servptr->name,
                    user->id, source_p->info);
       else
         sendto_one(server, "NICK %s %d %lu %s %s %s %s :%s",
@@ -664,7 +610,7 @@ introduce_client(struct Client *client_p, struct Client *source_p,
                    source_p->hopcount + 1,
                    (unsigned long)source_p->tsinfo,
                    ubuf,
-                   source_p->username, source_p->host, user->server,
+                   source_p->username, source_p->host, source_p->servptr->name,
                    source_p->info);
     }
   }
@@ -828,11 +774,8 @@ do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
 
   if (!(oflags & FLAGS_INVISIBLE) && IsInvisible(source_p))
     Count.invisi++;
-  /*
-   * don't take the clients word for it, ever
-   *  strncpy_irc(user->host, host, HOSTLEN); 
-   */
-  user->server = me.name;
+
+  source_p->servptr = &me;
 
   strncpy_irc(source_p->info, realname, REALLEN);
 
@@ -879,13 +822,15 @@ do_remote_user(char *nick, struct Client *client_p, struct Client *source_p,
   /*
    * coming from another server, take the servers word for it
    */
-  user->server = find_or_add(server);
   strncpy_irc(source_p->host, host, HOSTLEN);
   strncpy_irc(source_p->info, realname, REALLEN);
   if (id)
     strcpy(source_p->user->id, id);
 
-  return register_remote_user(client_p, source_p, source_p->name, username);
+  /* If this is NULL, it gets handled later. */
+  source_p->servptr = find_client(server);
+
+  register_remote_user(client_p, source_p, nick, username);
 }
 
 /*

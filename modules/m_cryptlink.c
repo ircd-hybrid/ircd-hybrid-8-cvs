@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_cryptlink.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
+ *   $Id: m_cryptlink.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 /*
@@ -61,7 +61,6 @@
 #include "s_log.h"              /* log level defines */
 #include "s_serv.h"             /* server_estab, check_server, my_name_for_link */
 #include "s_stats.h"            /* ServerStats */
-#include "scache.h"             /* find_or_add */
 #include "motd.h"
 
 #ifndef HAVE_LIBCRYPTO
@@ -78,7 +77,7 @@ _moddeinit(void)
 {
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 #else
 
@@ -124,7 +123,7 @@ _moddeinit(void)
   mod_del_cmd(cryptlink_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: s_debug.c,v 1.3 2002/01/06 07:18:51 a1kmm Exp $
+ *   $Id: s_debug.c,v 1.4 2002/02/26 04:55:56 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -49,7 +49,6 @@
 #include "res.h"
 #include "s_conf.h"
 #include "s_log.h"
-#include "scache.h"
 #include "send.h"
 #include "whowas.h"
 #include "linebuf.h"
@@ -187,7 +186,6 @@ count_memory(struct Client *source_p)
   int user_channels = 0;        /* users in channels */
   int aways_counted = 0;
   int number_ips_stored;        /* number of ip addresses hashed */
-  int number_servers_cached;    /* number of servers cached by scache */
 
   u_long channel_memory = 0;
   u_long channel_ban_memory = 0;
@@ -197,7 +195,6 @@ count_memory(struct Client *source_p)
   u_long away_memory = 0;       /* memory used by aways */
   u_long wwm = 0;               /* whowas array memory used */
   u_long conf_memory = 0;       /* memory used by conf lines */
-  u_long mem_servers_cached;    /* memory used by scache */
   u_long mem_ips_stored;        /* memory used by ip address hash */
 
   int linebuf_count = 0;
@@ -398,12 +395,6 @@ count_memory(struct Client *source_p)
              me.name, RPL_STATSDEBUG, source_p->name,
              linebuf_count, (int)linebuf_memory_used);
 
-  count_scache(&number_servers_cached, &mem_servers_cached);
-
-  sendto_one(source_p, ":%s %d %s :scache %u(%d)",
-             me.name, RPL_STATSDEBUG, source_p->name,
-             number_servers_cached, (int)mem_servers_cached);
-
   count_ip_hash(&number_ips_stored, &mem_ips_stored);
   sendto_one(source_p, ":%s %d %s :iphash %u(%d)",
              me.name, RPL_STATSDEBUG, source_p->name,
@@ -414,7 +405,6 @@ count_memory(struct Client *source_p)
   total_memory += client_hash_table_size;
   total_memory += channel_hash_table_size;
 
-  total_memory += mem_servers_cached;
   sendto_one(source_p, ":%s %d %s :Total: whowas %d channel %d conf %d",
              me.name, RPL_STATSDEBUG, source_p->name,
              (int)totww, (int)total_channel_memory, (int)conf_memory);

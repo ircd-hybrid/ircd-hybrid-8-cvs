@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: client.h,v 1.4 2002/01/13 07:15:10 a1kmm Exp $
+ * $Id: client.h,v 1.5 2002/02/26 04:55:41 a1kmm Exp $
  */
 
 #ifndef INCLUDED_client_h
@@ -83,7 +83,6 @@ struct User
   time_t         last;
   int            refcnt;        /* Number of times this block is referenced */
   int            joined;        /* number of channels joined */
-  const char*    server;        /* pointer to scached server name */
   char*          response;  /* expected response from client */
   char*          auth_oper; /* Operator to become if they supply the response.*/
 	/* client ID, unique ID per client */
@@ -97,12 +96,10 @@ struct User
 
 struct Server
 {
-  struct User*     user;        /* who activated this connection */
-  const char*      up;          /* Pointer to scache name */
-  char             by[NICKLEN + 1];
-  struct ConfItem* sconf;       /* connect{} pointer for this server */
-  struct Client*   servers;     /* Servers on this server */
-  struct Client*   users;       /* Users on this server */
+  char by[HOSTLEN + 1]; /* who activated this connection */
+  struct ConfItem *sconf; /* connect{} pointer for this server */
+  struct Client *servers; /* Servers on this server */
+  struct Client *users; /* Users on this server */
 };
 
 struct SlinkRpl
@@ -156,10 +153,6 @@ struct Client
   unsigned int      umodes;     /* opers, normal users subset */
   unsigned int      flags;      /* client flags */
   unsigned int      flags2;     /* ugh. overflow */
-  int               fd;         /* >= 0, for local clients */
-#ifndef HAVE_SOCKETPAIR
-  int               fd_r;       /* fd for reading */
-#endif
 
   int               slink_pid;  /* pid of servlink process if any */
   int               hopcount;   /* number of servers to this 0 = local */
@@ -294,6 +287,10 @@ struct LocalUser
   char              out_key[CIPHERKEYLEN];
 #endif
 
+  int               fd;         /* >= 0, for local clients */
+#ifndef HAVE_SOCKETPAIR
+  int               fd_r;       /* fd for reading */
+#endif
   int               ctrlfd;     /* For servers:
                                    control fd used for sending commands
                                    to servlink */
@@ -385,24 +382,22 @@ struct LocalUser
 
 
 /* housekeeping flags */
-
 #define FLAGS_PINGSENT     0x0001 /* Unreplied ping sent */
 #define FLAGS_DEADSOCKET   0x0002 /* Local socket is dead--Exiting soon */
 #define FLAGS_KILLED       0x0004 /* Prevents "QUIT" from being sent for this*/
-#define FLAGS_CLOSING      0x0020 /* set when closing to suppress errors */
-#define FLAGS_CHKACCESS    0x0040 /* ok to check clients access if set */
-#define FLAGS_GOTID        0x0080 /* successful ident lookup achieved */
-#define FLAGS_NEEDID       0x0100 /* I-lines say must use ident return */
-#define FLAGS_NORMALEX     0x0400 /* Client exited normally */
-#define FLAGS_SENDQEX      0x0800 /* Sendq exceeded */
-#define FLAGS_IPHASH       0x1000 /* iphashed this client */
-#define FLAGS_CRYPTIN      0x2000 /* incoming data must be decrypted */
-#define FLAGS_CRYPTOUT     0x4000 /* outgoing data must be encrypted */
-#define FLAGS_WAITAUTH     0x8000 /* waiting for CRYPTLINK AUTH command */
-#define FLAGS_SERVLINK     0x10000 /* servlink has servlink process */
-#define FLAGS_MARK	   0x20000 /* marked client */
-/* umodes, settable flags */
+#define FLAGS_CHKACCESS    0x0008 /* ok to check clients access if set */
+#define FLAGS_GOTID        0x0010 /* successful ident lookup achieved */
+#define FLAGS_NEEDID       0x0020 /* I-lines say must use ident return */
+#define FLAGS_NORMALEX     0x0040 /* Client exited normally */
+#define FLAGS_SENDQEX      0x0080 /* Sendq exceeded */
+#define FLAGS_IPHASH       0x0100 /* iphashed this client */
+#define FLAGS_CRYPTIN      0x0200 /* incoming data must be decrypted */
+#define FLAGS_CRYPTOUT     0x0400 /* outgoing data must be encrypted */
+#define FLAGS_WAITAUTH     0x0800 /* waiting for CRYPTLINK AUTH command */
+#define FLAGS_SERVLINK     0x1000 /* servlink has servlink process */
+#define FLAGS_MARK	   0x2000 /* marked client */
 
+/* umodes, settable flags */
 #define FLAGS_SERVNOTICE   0x0001 /* server notices such as kill */
 #define FLAGS_CCONN        0x0002 /* Client Connections */
 #define FLAGS_REJ          0x0004 /* Bot Rejections */

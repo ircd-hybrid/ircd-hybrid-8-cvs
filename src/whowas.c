@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: whowas.c,v 1.3 2002/01/06 07:18:53 a1kmm Exp $
+ * $Id: whowas.c,v 1.4 2002/02/26 04:55:57 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -91,7 +91,7 @@ add_history(struct Client *client_p, int online)
   strcpy(who->hostname, client_p->host);
   strcpy(who->realname, client_p->info);
 
-  who->servername = client_p->user->server;
+  who->servername = client_p->servptr->name;
 
   if (online)
   {

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: s_gline.h,v 1.2 2002/01/06 07:18:13 a1kmm Exp $
+ * $Id: s_gline.h,v 1.3 2002/02/26 04:55:41 a1kmm Exp $
  */
 
 #ifndef INCLUDED_s_gline_h
@@ -45,14 +45,14 @@ typedef struct gline_pending
   char oper_nick1[NICKLEN + 1];
   char oper_user1[USERLEN + 1];
   char oper_host1[HOSTLEN + 1];
-  const char* oper_server1;     /* point to scache */
+  char oper_server1[HOSTLEN + 1];
   char *reason1;
   time_t time_request1;
 
   char oper_nick2[NICKLEN + 1];
   char oper_user2[USERLEN + 1];
   char oper_host2[HOSTLEN + 1];
-  const char* oper_server2;     /* point to scache */
+  char oper_server2[HOSTLEN + 1];     /* point to scache */
   char *reason2;
   time_t time_request2;
   

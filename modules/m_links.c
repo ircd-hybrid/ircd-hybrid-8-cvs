@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_links.c,v 1.5 2002/01/30 08:10:24 a1kmm Exp $
+ *   $Id: m_links.c,v 1.6 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -68,7 +68,7 @@ _moddeinit(void)
   mod_del_cmd(links_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 /*
  * m_links - LINKS message handler
@@ -162,7 +162,7 @@ mo_links(struct Client *client_p, struct Client *source_p,
      * or theyre an oper..  
      */
     sendto_one(source_p, form_str(RPL_LINKS),
-               me.name, parv[0], target_p->name, target_p->serv->up,
+               me.name, parv[0], target_p->name, target_p->servptr->name,
                target_p->hopcount, p);
   }
 

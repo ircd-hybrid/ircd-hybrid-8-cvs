@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_who.c,v 1.6 2002/02/14 08:05:24 a1kmm Exp $
+ *   $Id: m_who.c,v 1.7 2002/02/26 04:55:47 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -66,7 +66,7 @@ _moddeinit(void)
   mod_del_cmd(who_msgtab);
 }
 
-char *_version = "$Revision: 1.6 $";
+char *_version = "$Revision: 1.7 $";
 #endif
 static void do_who_on_channel(struct Client *source_p,
                               struct Channel *chptr, char *real_name,
@@ -291,7 +291,7 @@ who_common_channel(struct Client *source_p, dlink_list chain,
 
     if (mask == NULL ||
         match(mask, target_p->name) || match(mask, target_p->username) ||
-        match(mask, target_p->host) || match(mask, target_p->user->server) ||
+        match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
         match(mask, target_p->info))
     {
 
@@ -360,7 +360,7 @@ who_global(struct Client *source_p, char *mask, int server_oper)
 
     if (!mask ||
         match(mask, target_p->name) || match(mask, target_p->username) ||
-        match(mask, target_p->host) || match(mask, target_p->user->server) ||
+        match(mask, target_p->host) || match(mask, target_p->servptr->name) ||
         match(mask, target_p->info))
     {
 
@@ -528,7 +528,7 @@ do_who(struct Client *source_p,
                (chname) ? (chname) : "*",
                target_p->username,
                target_p->host,
-               IsOper(source_p) ? target_p->user->server : "*",
+               IsOper(source_p) ? target_p->servptr->name : "*",
                target_p->name, status, 0, target_p->info);
   }
   else
@@ -536,7 +536,7 @@ do_who(struct Client *source_p,
     sendto_one(source_p, form_str(RPL_WHOREPLY), me.name, source_p->name,
                (chname) ? (chname) : "*",
                target_p->username,
-               target_p->host, target_p->user->server, target_p->name,
+               target_p->host, target_p->servptr->name, target_p->name,
                status, target_p->hopcount, target_p->info);
   }
 }

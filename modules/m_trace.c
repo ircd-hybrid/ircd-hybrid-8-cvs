@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_trace.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *   $Id: m_trace.c,v 1.5 2002/02/26 04:55:47 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -74,7 +74,7 @@ _moddeinit(void)
   mod_del_cmd(trace_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 static int report_this_status(struct Client *source_p,
                               struct Client *target_p, int dow, int link_u_p,
@@ -213,11 +213,11 @@ mo_trace(struct Client *client_p, struct Client *source_p,
     {
       if (IsPerson(target_p))
       {
-        link_u[target_p->from->fd]++;
+        link_u[target_p->from->localClient->fd]++;
       }
       else if (IsServer(target_p))
       {
-        link_s[target_p->from->fd]++;
+        link_s[target_p->from->localClient->fd]++;
       }
     }
   }
@@ -249,7 +249,8 @@ mo_trace(struct Client *client_p, struct Client *source_p,
       continue;
 
     cnt = report_this_status(source_p, target_p, dow,
-                             link_u[target_p->fd], link_s[target_p->fd]);
+                             link_u[target_p->localClient->fd],
+                             link_s[target_p->localClient->fd]);
   }
 
   /* This section is to report the unknowns */
@@ -275,10 +276,8 @@ mo_trace(struct Client *client_p, struct Client *source_p,
      * left here in case that should ever change --fl
      */
     if (!cnt)
-      sendto_one(source_p, form_str(RPL_TRACESERVER),
-                 me.name, parv[0], 0, link_s[me.fd],
-                 link_u[me.fd], me.name, "*", "*", me.name);
-
+      sendto_one(source_p, form_str(RPL_TRACESERVER), me.name, parv[0], 0, 0,
+                 0, me.name, "*", "*", me.name);
     /* let the user have some idea that its at the end of the
      * trace
      */

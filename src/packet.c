@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: packet.c,v 1.5 2002/02/17 05:28:56 a1kmm Exp $
+ *   $Id: packet.c,v 1.6 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 #include <stdio.h>
@@ -292,7 +292,7 @@ read_packet(int fd, void *data)
   struct LocalUser *lclient_p = client_p->localClient;
   int length = 0;
   int lbuf_len;
-  int fd_r = client_p->fd;
+  int fd_r = lclient_p->fd;
   int binary = 0;
 #ifndef NDEBUG
   struct hook_io_data hdata;
@@ -303,8 +303,8 @@ read_packet(int fd, void *data)
 #ifndef HAVE_SOCKETPAIR
   if (HasServlink(client_p))
   {
-    assert(client_p->fd_r > -1);
-    fd_r = client_p->fd_r;
+    assert(lclient_p->fd_r > -1);
+    fd_r = lclient_p->fd_r;
   }
 #endif
   assert(lclient_p != NULL);
@@ -376,12 +376,12 @@ read_packet(int fd, void *data)
   parse_client_queued(client_p);
 
   /* server fd may have changed */
-  fd_r = client_p->fd;
+  fd_r = lclient_p->fd;
 #ifndef HAVE_SOCKETPAIR
   if (HasServlink(client_p))
   {
-    assert(client_p->fd_r > -1);
-    fd_r = client_p->fd_r;
+    assert(lclient_p->fd_r > -1);
+    fd_r = lclient_p->fd_r;
   }
 #endif
 

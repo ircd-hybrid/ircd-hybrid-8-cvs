@@ -1,7 +1,7 @@
 #
 # Makefile.in for ircd/src
 #
-# $Id: Makefile.in,v 1.2 2002/01/13 07:15:38 a1kmm Exp $
+# $Id: Makefile.in,v 1.3 2002/02/26 04:55:54 a1kmm Exp $
 #
 CC		= @CC@
 INSTALL		= @INSTALL@
@@ -110,7 +110,6 @@ BASE_SRCS =                     \
   s_stats.c                     \
   s_user.c                      \
   s_protocol.c			\
-  scache.c                      \
   send.c                        \
   sprintf_irc.c                 \
   snprintf.c			\

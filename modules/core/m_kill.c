@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kill.c,v 1.5 2002/01/30 08:10:27 a1kmm Exp $
+ *   $Id: m_kill.c,v 1.6 2002/02/26 04:55:51 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -69,7 +69,7 @@ _moddeinit(void)
   mod_del_cmd(kill_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 /*
 ** mo_kill
@@ -201,7 +201,7 @@ ms_kill(struct Client *client_p, struct Client *source_p,
   if (IsServer(source_p))
     ircsprintf(buf, "%s", source_p->name);
   else
-    ircsprintf(buf, "%s!%s!%s!%s", source_p->user->server, source_p->host,
+    ircsprintf(buf, "%s!%s!%s!%s", source_p->servptr->name, source_p->host,
                source_p->username, source_p->name);
 
   if ((target_p = find_client(user)) == NULL)
@@ -270,7 +270,7 @@ ms_kill(struct Client *client_p, struct Client *source_p,
   {
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "Received KILL message for %s. From %s Path: %s %s",
-                         target_p->name, parv[0], source_p->user->server,
+                         target_p->name, parv[0], source_p->servptr->name,
                          reason);
   }
   else
@@ -354,7 +354,7 @@ relay_kill(struct Client *one, struct Client *source_p,
     }
     /* force introduction of killed client but check that
      * its not on the server we're bursting too.. */
-    else if (strcmp(target_p->user->server, client_p->name))
+    else if (strcmp(target_p->servptr->name, client_p->name))
       client_burst_if_needed(client_p, target_p);
 
     /* introduce source of kill */

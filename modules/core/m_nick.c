@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_nick.c,v 1.5 2002/01/13 07:15:34 a1kmm Exp $
+ *   $Id: m_nick.c,v 1.6 2002/02/26 04:55:51 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -105,7 +105,7 @@ _moddeinit(void)
   mod_del_cmd(nick_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 
 /*
@@ -980,13 +980,13 @@ m_client(struct Client *client_p, struct Client *source_p,
                                                 client_p->username
                    ) < 0)
     return;
-  if (!IsPersisting(target_p) && target_p->fd >= 0)
+  if (!IsPersisting(target_p) && target_p->localClient->fd >= 0)
   {
     sendto_one(target_p, "ERROR :Your ID has been reclaimed.");
     if (!IsDead(target_p))
-      send_queued_write(target_p->fd, target_p);
-    fd_close(target_p->fd);
-    target_p->fd = -1;
+      send_queued_write(target_p->localClient->fd, target_p);
+    fd_close(target_p->localClient->fd);
+    target_p->localClient->fd = -1;
   }
   /* Now we can detach target_p's I-lines... */
   remove_one_ip(&target_p->localClient->ip);
@@ -997,8 +997,8 @@ m_client(struct Client *client_p, struct Client *source_p,
   /* Bring back target_p from the dead... */
   target_p->flags &= ~FLAGS_DEADSOCKET;
   target_p->flags2 &= ~FLAGS2_PERSISTING;
-  target_p->fd = client_p->fd;
-  client_p->fd = -1;
+  target_p->localClient->fd = client_p->localClient->fd;
+  client_p->localClient->fd = -1;
   if (IsPersisting(source_p))
   {
     m = dlinkFind(&persist_list,source_p);
@@ -1016,16 +1016,16 @@ m_client(struct Client *client_p, struct Client *source_p,
     dlinkDelete(m, &unknown_list);
     free_dlink_node(m);
   }
-  fd_table[target_p->fd].read_data = target_p;
-  fd_table[target_p->fd].write_data = target_p;
-  fd_table[target_p->fd].flush_data = target_p; 
+  fd_table[target_p->localClient->fd].read_data = target_p;
+  fd_table[target_p->localClient->fd].write_data = target_p;
+  fd_table[target_p->localClient->fd].flush_data = target_p; 
   if (client_p->name[0] != 0)
     del_from_client_hash_table(client_p->name, client_p);
   remove_client_from_list(client_p);
   dlinkAdd(client_p, make_dlink_node(), &dead_list);
   client_p->localClient = NULL;
   /* Re-register for io... */
-  comm_setselect(target_p->fd, FDLIST_IDLECLIENT,
+  comm_setselect(target_p->localClient->fd, FDLIST_IDLECLIENT,
                  COMM_SELECT_READ | COMM_SELECT_WRITE,
                  read_packet, target_p, 0);
   /* And client_p now has moved over to target_p...

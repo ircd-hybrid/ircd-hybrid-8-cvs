@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_irc.c,v 1.1 2002/01/13 07:15:39 a1kmm Exp $
+ *   $Id: p_irc.c,v 1.2 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 #include "client.h"
@@ -27,6 +27,7 @@
 #include "channel.h"
 #include "s_protocol.h"
 #include "send.h"
+#include "debug.h"
 
 static void irc_unregistered(struct Client*, struct Client*, int, char**);
 static void irc_registered(struct Client*, struct Client*, int, char**);

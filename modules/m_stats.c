@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_stats.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *  $Id: m_stats.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 #include "tools.h"              /* dlink_node/dlink_list */
@@ -34,7 +34,6 @@
 #include "msg.h"                /* Message */
 #include "hostmask.h"           /* report_mtrie_conf_links */
 #include "numeric.h"            /* ERR_xxx */
-#include "scache.h"             /* list_scache */
 #include "send.h"               /* sendto_one */
 #include "fdlist.h"             /* PF and friends */
 #include "s_bsd.h"              /* highest_fd */
@@ -84,7 +83,7 @@ _moddeinit(void)
   mod_del_cmd(stats_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 const char *Lformat = ":%s %d %s %s %u %u %u %u %u :%u %u %s";

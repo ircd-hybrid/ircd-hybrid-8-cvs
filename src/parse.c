@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: parse.c,v 1.5 2002/01/30 08:10:29 a1kmm Exp $
+ *   $Id: parse.c,v 1.6 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -131,7 +131,7 @@ parse(struct Client *client_p, char *pbuffer, char *bufend)
   Debug((DEBUG_DEBUG, "Parsing %s:", pbuffer));
 
   assert(!IsDead(client_p));
-  assert(client_p->fd >= 0);
+  assert(client_p->localClient->fd >= 0);
 
   assert((bufend - pbuffer) < 512);
 
@@ -582,7 +582,7 @@ cancel_clients(struct Client *client_p, struct Client *source_p, char *cmd)
       sendto_realops_flags(FLAGS_DEBUG, L_ALL,
                            "Would have dropped client %s (%s@%s) [%s from %s]",
                            client_p->name, client_p->username, client_p->host,
-                           client_p->user->server, client_p->from->name);
+                           client_p->servptr->name, client_p->from->name);
     return -1;
 
     /*

@@ -14,9 +14,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: s_auth.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ *   $Id: s_auth.c,v 1.4 2002/02/26 04:55:55 a1kmm Exp $
  *
- *  $Id: s_auth.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ *  $Id: s_auth.c,v 1.4 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ typedef enum
 ReportType;
 
 #define sendheader(c, r) \
-   send((c)->fd, HeaderMessages[(r)].message, HeaderMessages[(r)].length, 0)
+   send((c)->localClient->fd, HeaderMessages[(r)].message, HeaderMessages[(r)].length, 0)
 
 /*
  */
@@ -209,8 +209,8 @@ link_auth_request(struct AuthRequest *request, dlink_list * list)
 static void
 release_auth_client(struct Client *client)
 {
-  if (client->fd > highest_fd)
-    highest_fd = client->fd;
+  if (client->localClient->fd > highest_fd)
+    highest_fd = client->localClient->fd;
 
   /*
    * When a client has auth'ed, we want to start reading what it sends
@@ -218,10 +218,9 @@ release_auth_client(struct Client *client)
    *     -- adrian
    */
   client->localClient->allow_read = MAX_FLOOD_PER_SEC;
-  comm_setflush(client->fd, 1000, flood_recalc, client);
+  comm_setflush(client->localClient->fd, 1000, flood_recalc, client);
   add_client_to_list(client);
-  comm_setselect(client->fd, FDLIST_IDLECLIENT, COMM_SELECT_READ, read_packet,
-                 client, 0);
+  read_packet(client->localClient->fd, client);
 }
 
 /*
@@ -380,7 +379,7 @@ start_auth_query(struct AuthRequest *auth)
    * and machines with multiple IP addresses are common now
    */
   memset(&localaddr, 0, locallen);
-  getsockname(auth->client->fd, (struct sockaddr *)&SOCKADDR(localaddr),
+  getsockname(auth->client->localClient->fd, (struct sockaddr *)&SOCKADDR(localaddr),
               (unsigned int *)&locallen);
   S_PORT(localaddr) = htons(0);
 
@@ -556,8 +555,8 @@ auth_connect_callback(int fd, int error, void *data)
   }
 
   if (getsockname
-      (auth->client->fd, (struct sockaddr *)&us, (unsigned int *)&ulen)
-      || getpeername(auth->client->fd, (struct sockaddr *)&them,
+      (auth->client->localClient->fd, (struct sockaddr *)&us, (unsigned int *)&ulen)
+      || getpeername(auth->client->localClient->fd, (struct sockaddr *)&them,
                      (unsigned int *)&tlen))
   {
     ilog(L_INFO, "auth get{sock,peer}name error for %s:%m",

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_gline.c,v 1.3 2002/01/06 07:18:51 a1kmm Exp $
+ *  $Id: s_gline.c,v 1.4 2002/02/26 04:55:56 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -37,7 +37,6 @@
 #include "s_bsd.h"
 #include "s_conf.h"
 #include "s_misc.h"
-#include "scache.h"
 #include "send.h"
 #include "msg.h"
 #include "fileio.h"

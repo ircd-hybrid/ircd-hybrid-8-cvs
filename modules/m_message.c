@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_message.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
+ *   $Id: m_message.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -122,7 +122,7 @@ _moddeinit(void)
   mod_del_cmd(privmsg_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 /*
@@ -688,7 +688,7 @@ flood_attack_client(int p_or_n, struct Client *source_p,
                              "Possible Flooder %s [%s@%s] on %s target: %s",
                              source_p->name, source_p->username,
                              source_p->host,
-                             source_p->user->server, target_p->name);
+                             source_p->servptr->name, target_p->name);
         target_p->localClient->flood_noticed = 1;
         /* add a bit of penalty */
         target_p->localClient->received_number_of_privmsgs += 2;
@@ -744,7 +744,7 @@ flood_attack_channel(int p_or_n, struct Client *source_p,
                              "Possible Flooder %s [%s@%s] on %s target: %s",
                              source_p->name, source_p->username,
                              source_p->host,
-                             source_p->user->server, chptr->chname);
+                             source_p->servptr->name, chptr->chname);
         chptr->flood_noticed = 1;
 
         /* Add a bit of penalty */

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.4 2002/01/13 07:15:17 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -84,7 +84,7 @@ _moddeinit(void)
   mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 /* Local function prototypes */
@@ -298,7 +298,7 @@ ms_kline(struct Client *client_p,
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "*** %s!%s@%s on %s is requesting an Invalid K-Line for [%s@%s] [%s]",
                          source_p->name, source_p->username, source_p->host,
-                         source_p->user->server, kuser, khost, kreason);
+                         source_p->servptr->name, kuser, khost, kreason);
     return;
   }
 
@@ -307,7 +307,7 @@ ms_kline(struct Client *client_p,
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "*** %s!%s@%s on %s is requesting a K-Line without %d wildcard chars for [%s@%s] [%s]",
                          source_p->name, source_p->username, source_p->host,
-                         source_p->user->server,
+                         source_p->servptr->name,
                          ConfigFileEntry.min_nonwildcard, kuser, khost,
                          kreason);
     return;
@@ -319,7 +319,7 @@ ms_kline(struct Client *client_p,
   tkline_time = atoi(parv[2]);
 
   if (find_u_conf
-      ((char *)source_p->user->server, source_p->username, source_p->host))
+      ((char *)source_p->servptr->name, source_p->username, source_p->host))
   {
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "*** Received K-Line for [%s@%s] [%s], from %s!%s@%s on %s",
@@ -328,7 +328,7 @@ ms_kline(struct Client *client_p,
                          kreason,
                          source_p->name,
                          source_p->username,
-                         source_p->host, source_p->user->server);
+                         source_p->host, source_p->servptr->name);
 
     /* We check if the kline already exists after we've announced its 
      * arrived, to avoid confusing opers - fl

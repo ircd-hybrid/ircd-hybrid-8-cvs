@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: s_bsd.c,v 1.6 2002/02/17 05:28:56 a1kmm Exp $
+ *  $Id: s_bsd.c,v 1.7 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 #include "config.h"
@@ -336,13 +336,13 @@ close_connection(struct Client *client_p)
     client_p->localClient->dns_reply = 0;
   }
 #endif
-  if (-1 < client_p->fd)
+  if (-1 < client_p->localClient->fd)
   {
     /* attempt to flush any pending dbufs. Evil, but .. -- adrian */
     if (!IsDead(client_p))
-      send_queued_write(client_p->fd, client_p);
-    fd_close(client_p->fd);
-    client_p->fd = -1;
+      send_queued_write(client_p->localClient->fd, client_p);
+    fd_close(client_p->localClient->fd);
+    client_p->localClient->fd = -1;
   }
 
   if (HasServlink(client_p))
@@ -350,9 +350,9 @@ close_connection(struct Client *client_p)
     fd_close(client_p->localClient->ctrlfd);
 #ifndef HAVE_SOCKETPAIR
     fd_close(client_p->localClient->ctrlfd_r);
-    fd_close(client_p->fd_r);
+    fd_close(client_p->localClient->fd_r);
     client_p->localClient->ctrlfd_r = -1;
-    client_p->fd_r = -1;
+    client_p->localClient->fd_r = -1;
 #endif
     client_p->localClient->ctrlfd = -1;
   } 
@@ -442,17 +442,17 @@ add_connection(struct Listener *listener, int fd)
 #endif
 
   strcpy(new_client->host, new_client->localClient->sockhost);
-  new_client->fd = fd;
+  new_client->localClient->fd = fd;
 
   new_client->protocol = &p_unregistered;
 
   new_client->localClient->listener = listener;
   ++listener->ref_count;
 
-  if (!set_non_blocking(new_client->fd))
+  if (!set_non_blocking(new_client->localClient->fd))
     report_error(L_ALL, NONB_ERROR_MSG, get_client_name(new_client, SHOW_IP),
                  errno);
-  if (!disable_sock_options(new_client->fd))
+  if (!disable_sock_options(new_client->localClient->fd))
     report_error(L_ALL, OPT_ERROR_MSG, get_client_name(new_client, SHOW_IP),
                  errno);
   start_auth(new_client);
@@ -472,10 +472,10 @@ error_exit_client(struct Client *client_p, int error)
    * for reading even though it ends up being an EOF. -avalon
    */
   char errmsg[255];
-  int current_error = get_sockerr(client_p->fd);
+  int current_error = get_sockerr(client_p->localClient->fd);
 
   Debug((DEBUG_ERROR, "READ ERROR: fd = %d %d %d",
-         client_p->fd, current_error, error));
+         client_p->locaClient->fd, current_error, error));
   if (IsServer(client_p) || IsHandshake(client_p))
   {
     int connected = CurrentTime - client_p->firsttime;
@@ -520,8 +520,8 @@ error_exit_client(struct Client *client_p, int error)
     ircsprintf(errmsg, "Read error: %d (%s)",
                current_error, strerror(current_error));
   }
-  fd_close(client_p->fd);
-  client_p->fd = -1;
+  fd_close(client_p->localClient->fd);
+  client_p->localClient->fd = -1;
 
   detach_client(client_p, errmsg);
 }

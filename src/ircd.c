@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
+ * $Id: ircd.c,v 1.6 2002/02/26 04:55:55 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -81,7 +81,6 @@
 #include "s_misc.h"
 #include "s_serv.h"             /* try_connections */
 #include "s_stats.h"
-#include "scache.h"
 #include "send.h"
 #include "whowas.h"
 #include "modules.h"
@@ -666,7 +665,6 @@ ircd_main(int argc, char *argv[])
     linebuf_init();             /* set up some linebuf stuff to control paging */
     init_hash();
     id_init();
-    clear_scache_hash_table();  /* server cache name table */
     clear_ip_hash_table();      /* client host ip hash table */
     init_host_hash();           /* Host-hashtable. */
     clear_hash_parse();
@@ -739,12 +737,10 @@ ircd_main(int argc, char *argv[])
     }
 #endif
 
-    me.fd = -1;
     me.from = &me;
     me.servptr = &me;
     SetMe(&me);
     make_server(&me);
-    me.serv->up = me.name;
     me.lasttime = me.since = me.firsttime = CurrentTime;
     add_to_client_hash_table(me.name, &me);
  
