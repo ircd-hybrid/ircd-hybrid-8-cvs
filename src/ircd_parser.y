@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd_parser.y,v 1.4 2002/04/27 02:49:08 a1kmm Exp $
+ * $Id: ircd_parser.y,v 1.5 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 %{
@@ -2150,7 +2150,7 @@ general_no_oper_flood: NO_OPER_FLOOD '=' TYES ';'
 general_iauth_server: IAUTH_SERVER '=' QSTRING ';'
 {
 #if 0
-    strncpy(iAuth.hostname, yylval.string, HOSTLEN)[HOSTLEN] = 0;
+    strlcpy(iAuth.hostname, yylval.string, sizeof(iAuth.hostname));
 #endif
 } ;
 
@@ -2163,20 +2163,20 @@ general_iauth_port: IAUTH_PORT '=' NUMBER ';'
 
 general_fname_userlog: FNAME_USERLOG '=' QSTRING ';'
 {
-  strncpy_irc(ConfigFileEntry.fname_userlog, yylval.string,
-	      MAXPATHLEN-1)[MAXPATHLEN-1] = 0;
+  strlcpy(ConfigFileEntry.fname_userlog, yylval.string,
+          sizeof(ConfigFileEntry.fname_userlog));
 } ;
 
 general_fname_foperlog: FNAME_FOPERLOG '=' QSTRING ';'
 {
-  strncpy_irc(ConfigFileEntry.fname_foperlog, yylval.string,
-	      MAXPATHLEN-1)[MAXPATHLEN-1] = 0;
+  strlcpy(ConfigFileEntry.fname_foperlog, yylval.string,
+          sizeof(ConfigFileEntry.fname_foperlog));
 };
 
 general_fname_operlog: FNAME_OPERLOG '=' QSTRING ';'
 {
-  strncpy_irc(ConfigFileEntry.fname_operlog, yylval.string,
-	      MAXPATHLEN-1)[MAXPATHLEN-1] = 0;
+  strlcpy(ConfigFileEntry.fname_operlog, yylval.string,
+          sizeof(ConfigFileEntry.fname_operlog));
 };
 
 general_glines: GLINES '=' TYES ';'

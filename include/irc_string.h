@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: irc_string.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ *   $Id: irc_string.h,v 1.3 2002/04/27 05:30:14 a1kmm Exp $
  */
 
 #ifndef INCLUDED_irc_string_h
@@ -68,12 +68,6 @@ const char* inetntoa(const char* in_addr);
  */
 const char *inetntop(int af, const void *src, char *dst, unsigned int size);
 int inetpton(int af, const char *src, void *dst);
-                                
-/*
- * strncpy_irc - optimized strncpy
- */
-char* strncpy_irc(char* s1, const char* s2, size_t n);
-
 
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz);

@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * $Id: hostmask.c,v 1.4 2002/04/19 10:56:20 a1kmm Exp $ 
+ * $Id: hostmask.c,v 1.5 2002/04/27 05:30:25 a1kmm Exp $ 
  */
 
 #include <stdlib.h>
@@ -797,7 +797,7 @@ show_iline_prefix(struct Client *sptr, struct ConfItem *aconf, char *name)
   if (IsOper(sptr) && IsConfIdlelined(aconf))
     *prefix_ptr++ = '<';
   *prefix_ptr = '\0';
-  strncpy(prefix_ptr, name, USERLEN);
+  strlcpy(prefix_ptr, name, USERLEN + 1);
   return (prefix_of_host);
 }
 

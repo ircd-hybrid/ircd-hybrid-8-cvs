@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd.c,v 1.8 2002/04/27 02:49:08 a1kmm Exp $
+ * $Id: ircd.c,v 1.9 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -329,6 +329,8 @@ io_loop(void)
     delay = eventNextTime();
     if (delay <= CurrentTime)
       eventRun();
+
+    comm_select(0);
 
     /* Check on the last activity, sleep for up to 1/2s if we are idle... */
     if (callbacks_called > 0)
@@ -700,8 +702,7 @@ ircd_main(int argc, char *argv[])
       ilog(L_CRIT, "No server name specified in serverinfo block.");
       exit(EXIT_FAILURE);
     }
-    /* Can't use strncpy_irc here because we didn't malloc enough... -A1kmm */
-    strncpy(me.name, ServerInfo.name, HOSTLEN);
+    strlcpy(me.name, ServerInfo.name, sizeof(me.name));
 
     /* serverinfo{} description must exist.  If not, error out. */
     if (ServerInfo.description == NULL)
@@ -712,7 +713,7 @@ ircd_main(int argc, char *argv[])
            "ERROR: No server description specified in serverinfo block.");
       exit(EXIT_FAILURE);
     }
-    strncpy(me.info, ServerInfo.description, REALLEN);
+    strlcpy(me.info, ServerInfo.description, sizeof(me.info));
 
 #ifdef USE_GETTEXT
     /*

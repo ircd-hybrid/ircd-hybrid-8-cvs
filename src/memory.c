@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: memory.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
+ * $Id: memory.c,v 1.4 2002/04/27 05:30:26 a1kmm Exp $
  */
 
 #include <stdlib.h>
@@ -63,7 +63,7 @@ memlog(void *d, int s, char *f, int l)
   else
     *mme->file = 0;
   if (f != NULL)
-    strncpy(mme->file, f, sizeof(mme->file) - 1)[sizeof(mme->file) - 1] = 0;
+    strlcpy(mme->file, f, sizeof(mme->file));
   else
     *mme->file = 0;
   mme->ts = CurrentTime;

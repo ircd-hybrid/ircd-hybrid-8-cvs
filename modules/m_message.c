@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_message.c,v 1.6 2002/04/27 02:49:01 a1kmm Exp $
+ *   $Id: m_message.c,v 1.7 2002/04/27 05:30:16 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -122,7 +122,7 @@ _moddeinit(void)
   mod_del_cmd(privmsg_msgtab);
 }
 
-char *_version = "$Revision: 1.6 $";
+char *_version = "$Revision: 1.7 $";
 #endif
 
 /*
@@ -266,7 +266,7 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
   /* Sigh, we can't mutilate parv[1] incase we need it to send to a hub */
   if (!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL))
   {
-    strncpy(ncbuf, nicks_channels, BUFSIZE);
+    strlcpy(ncbuf, nicks_channels, sizeof(ncbuf));
     target_list = ncbuf;
   }
   else

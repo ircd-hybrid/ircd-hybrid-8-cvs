@@ -9,7 +9,7 @@
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
- * $Id: fdlist.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ * $Id: fdlist.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include "fdlist.h"
@@ -107,7 +107,7 @@ fd_open(int fd, unsigned int type, const char *desc)
   F->comm_index = -1;
   F->list = FDLIST_NONE;
   if (desc)
-    strncpy(F->desc, desc, FD_DESC_SZ);
+    strlcpy(F->desc, desc, sizeof(F->desc));
   number_fd++;
 }
 

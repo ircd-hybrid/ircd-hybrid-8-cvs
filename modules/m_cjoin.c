@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_cjoin.c,v 1.4 2002/01/13 07:15:16 a1kmm Exp $
+ *   $Id: m_cjoin.c,v 1.5 2002/04/27 05:30:16 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -64,7 +64,7 @@ _moddeinit(void)
   mod_del_cmd(cjoin_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
 ** m_cjoin
@@ -139,7 +139,7 @@ m_cjoin(struct Client *client_p,
     return;
   }
 
-  (void)strncpy(jbuf, name, sizeof(jbuf) - 1);
+  strlcpy(jbuf, name, sizeof(jbuf));
 
   if ((chptr = hash_find_channel(name)) == NULL)
   {

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: ircdauth.c,v 1.3 2002/01/06 07:18:49 a1kmm Exp $
+ *   $Id: ircdauth.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include <stdio.h>
@@ -527,12 +527,12 @@ GoodAuth(int parc, char **parv)
        * if ident failed, but the client's I: line specified
        * no tilde character
        */
-      strncpy_irc(auth->client->username, parv[2], USERLEN);
+      strlcpy(auth->client->username, parv[2], sizeof(auth->client->username));
 
       /*
        * Also use IAuth's hostname in case of SPOOF_FREEFORM
        */
-      strncpy_irc(auth->client->host, parv[3], HOSTLEN);
+      strlcpy(auth->client->host, parv[3], sizeof(auth->client->host));
 
       /*
        * Register them

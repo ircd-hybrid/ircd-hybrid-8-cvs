@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_nick.c,v 1.7 2002/04/27 02:49:05 a1kmm Exp $
+ *   $Id: m_nick.c,v 1.8 2002/04/27 05:30:21 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -105,7 +105,7 @@ _moddeinit(void)
   mod_del_cmd(nick_msgtab);
 }
 
-char *_version = "$Revision: 1.7 $";
+char *_version = "$Revision: 1.8 $";
 #endif
 
 /*
@@ -135,7 +135,7 @@ mr_nick(struct Client *client_p, struct Client *source_p,
     *s = '\0';
 
   /* copy the nick and terminate it */
-  strncpy_irc(nick, parv[1], NICKLEN);
+  strlcpy(nick, parv[1], sizeof(nick));
   nick[NICKLEN] = '\0';
 
   /* check the nickname is ok */
@@ -216,7 +216,7 @@ m_nick(struct Client *client_p, struct Client *source_p,
   }
 
   /* terminate nick to NICKLEN */
-  strncpy_irc(nick, parv[1], NICKLEN);
+  strlcpy(nick, parv[1], sizeof(nick));
   nick[NICKLEN] = '\0';
 
   /* check the nickname is ok */
@@ -333,8 +333,7 @@ tsm_nick(struct Client *client_p, struct Client *source_p,
     return;
 
   /* fix the length of the nick */
-  strncpy_irc(nick, parv[1], NICKLEN);
-  nick[NICKLEN] = '\0';
+  strlcpy(nick, parv[1], sizeof(nick));
 
   if (check_clean_nick(client_p, source_p, nick, parv[1], parv[7]))
     return;
@@ -420,8 +419,7 @@ tsm_client(struct Client *client_p, struct Client *source_p,
   name = parv[9];
 
   /* parse the nickname */
-  strncpy_irc(nick, parv[1], NICKLEN);
-  nick[NICKLEN] = '\0';
+  strlcpy(nick, parv[1], sizeof(nick));
 
   /* check the nicknames, usernames and hostnames are ok */
   if (check_clean_nick(client_p, source_p, nick, parv[1], parv[7]) ||

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: list.c,v 1.3 2002/01/06 07:18:49 a1kmm Exp $
+ * $Id: list.c,v 1.4 2002/04/27 05:30:26 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -210,8 +210,8 @@ _make_dlink_node(const char *file, int line)
   dlink_node *lp;
 #define DLINK_DBG_PREFIX "DLINK:"
   strcpy(nambuf, DLINK_DBG_PREFIX);
-  strncpy_irc(nambuf + sizeof(DLINK_DBG_PREFIX) - 1, file,
-              sizeof(nambuf) - sizeof(DLINK_DBG_PREFIX));
+  strlcpy(nambuf + sizeof(DLINK_DBG_PREFIX) - 1, file,
+          sizeof(nambuf) - sizeof(DLINK_DBG_PREFIX));
 #ifdef NOBALLOC
   lp = _MyMalloc(sizeof(*lp), nambuf, line);
 #else

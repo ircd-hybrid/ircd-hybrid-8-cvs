@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: irc_string.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ *  $Id: irc_string.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include "config.h"
@@ -751,24 +751,3 @@ strlcpy(char *dst, const char *src, size_t siz)
 }
 #endif
 
-
-/*
- * strncpy_irc - optimized strncpy
- * This may not look like it would be the fastest possible way to do it,
- * but it generally outperforms everything else on many platforms, 
- * including asm library versions and memcpy, if compiled with the 
- * optimizer on. (-O2 for gcc) --Bleep
- */
-#ifdef strncpy_irc
-#undef strncpy_irc
-#endif
-
-char *
-strncpy_irc(char *s1, const char *s2, size_t n)
-{
-  char *endp = s1 + n;
-  char *s = s1;
-  while (s < endp && (*s++ = *s2++))
-    ;
-  return s1;
-}

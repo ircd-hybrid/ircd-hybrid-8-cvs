@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_gline.c,v 1.6 2002/04/19 10:56:16 a1kmm Exp $
+ *  $Id: m_gline.c,v 1.7 2002/04/27 05:30:16 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -116,7 +116,7 @@ _moddeinit(void)
   mod_del_cmd(gline_msgtab);
 }
 
-char *_version = "$Revision: 1.6 $";
+char *_version = "$Revision: 1.7 $";
 #endif
 /*
  * mo_gline()
@@ -667,13 +667,13 @@ add_new_majority_gline(const char *oper_nick,
   struct gline_pending *pending = (struct gline_pending *)
     MyMalloc(sizeof(struct gline_pending));
 
-  strncpy_irc(pending->oper_nick1, oper_nick, NICKLEN);
-  strncpy_irc(pending->oper_user1, oper_user, USERLEN);
-  strncpy_irc(pending->oper_host1, oper_host, HOSTLEN);
-  strncpy_irc(pending->oper_server1, oper_server, HOSTLEN);
+  strlcpy(pending->oper_nick1, oper_nick, NICKLEN + 1);
+  strlcpy(pending->oper_user1, oper_user, USERLEN + 1);
+  strlcpy(pending->oper_host1, oper_host, HOSTLEN + 1);
+  strlcpy(pending->oper_server1, oper_server, HOSTLEN + 1);
 
-  strncpy_irc(pending->user, user, USERLEN);
-  strncpy_irc(pending->host, host, HOSTLEN);
+  strlcpy(pending->user, user, USERLEN + 1);
+  strlcpy(pending->host, host, HOSTLEN + 1);
   DupString(pending->reason1, reason);
   pending->reason2 = NULL;
 
@@ -760,10 +760,10 @@ majority_gline(struct Client *source_p,
       }
       else
       {
-        strncpy_irc(gline_pending_ptr->oper_nick2, oper_nick, NICKLEN);
-        strncpy_irc(gline_pending_ptr->oper_user2, oper_user, USERLEN);
-        strncpy_irc(gline_pending_ptr->oper_host2, oper_host, HOSTLEN);
-        strncpy_irc(gline_pending_ptr->oper_server2, oper_server, HOSTLEN);
+        strlcpy(gline_pending_ptr->oper_nick2, oper_nick, NICKLEN + 1);
+        strlcpy(gline_pending_ptr->oper_user2, oper_user, USERLEN + 1);
+        strlcpy(gline_pending_ptr->oper_host2, oper_host, HOSTLEN + 1);
+        strlcpy(gline_pending_ptr->oper_server2, oper_server, HOSTLEN + 1);
         DupString(gline_pending_ptr->reason2, reason);
         gline_pending_ptr->last_gline_time = CurrentTime;
         gline_pending_ptr->time_request2 = CurrentTime;

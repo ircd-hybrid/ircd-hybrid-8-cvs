@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: hash.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ *  $Id: hash.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -591,7 +591,7 @@ hash_find_masked_server(const char *name)
   /*
    * copy the damn thing and be done with it
    */
-  strncpy_irc(buf, name, HOSTLEN);
+  strlcpy(buf, name, sizeof(buf));
   buf[HOSTLEN] = '\0';
 
   while ((s = strchr(p, '.')) != 0)

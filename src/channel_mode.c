@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel_mode.c,v 1.5 2002/04/19 11:25:35 a1kmm Exp $
+ * $Id: channel_mode.c,v 1.6 2002/04/27 05:30:24 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -2014,7 +2014,7 @@ chm_key(struct Client *client_p, struct Client *source_p,
       fix_key_old(key);
 
     assert(key[0] != ' ');
-    strncpy_irc(chptr->mode.key, key, KEYLEN - 1)[KEYLEN - 1] = 0;
+    strlcpy(chptr->mode.key, key, sizeof(chptr->mode.key));
 
     for (i = 0; i < mode_count_minus; i++)
     {

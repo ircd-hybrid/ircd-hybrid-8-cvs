@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_topic.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *   $Id: m_topic.c,v 1.5 2002/04/27 05:30:17 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -67,7 +67,7 @@ _moddeinit(void)
   mod_del_cmd(topic_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
  * m_topic
@@ -137,7 +137,7 @@ m_topic(struct Client *client_p,
         /*
          * chptr zeroed
          */
-        strncpy_irc(chptr->topic, parv[2], TOPICLEN);
+        strlcpy(chptr->topic, parv[2], sizeof(chptr->topic));
 
 
         ircsprintf(chptr->topic_info, "%s!%s@%s",
@@ -255,9 +255,9 @@ ms_topic(struct Client *client_p,
     if ((chptr = hash_find_channel(parv[1])) == NULL)
       return;
 
-    strncpy_irc(chptr->topic, parv[4], TOPICLEN);
+    strlcpy(chptr->topic, parv[4], sizeof(chptr->topic));
 
-    strncpy_irc(chptr->topic_info, parv[2], USERHOST_REPLYLEN);
+    strlcpy(chptr->topic_info, parv[2], sizeof(chptr->topic_info));
 
     chptr->topic_time = atoi(parv[3]);
 

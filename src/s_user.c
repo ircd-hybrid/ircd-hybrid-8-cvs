@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_user.c,v 1.8 2002/04/27 02:49:09 a1kmm Exp $
+ *  $Id: s_user.c,v 1.9 2002/04/27 05:30:27 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -321,7 +321,7 @@ register_local_user(struct Client *client_p, struct Client *source_p,
                ":%s NOTICE %s :*** Notice -- You have an illegal character in your hostname",
                me.name, source_p->name);
 
-    strncpy(source_p->host, source_p->localClient->sockhost, HOSTIPLEN + 1);
+    strlcpy(source_p->host, source_p->localClient->sockhost, sizeof(source_p->host));
   }
 
   ptr = source_p->localClient->confs.head;
@@ -344,16 +344,16 @@ register_local_user(struct Client *client_p, struct Client *source_p,
       return;
     }
     else
-      strncpy_irc(source_p->username, username, USERLEN);
+      strlcpy(source_p->username, username, sizeof(source_p->username));
     
     if (IsNoTilde(aconf))
     {
-      strncpy_irc(source_p->username, username, USERLEN);
+      strlcpy(source_p->username, username, sizeof(source_p->username));
     }
     else
     {
       *source_p->username = '~';
-      strncpy_irc(&source_p->username[1], username, USERLEN - 1);
+      strlcpy(source_p->username + 1, username, sizeof(source_p->username) - 1);
     }
     source_p->username[USERLEN] = '\0';
   }
@@ -493,7 +493,7 @@ register_remote_user(struct Client *client_p, struct Client *source_p,
   if (strlen(username) > USERLEN)
     username[USERLEN] = '\0';
 
-  strncpy_irc(source_p->username, username, USERLEN);
+  strlcpy(source_p->username, username, sizeof(source_p->username));
 
   /* Increment our total user count here */
   if (++Count.total > Count.max_tot)
@@ -754,7 +754,7 @@ do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
 
   source_p->servptr = &me;
 
-  strncpy_irc(source_p->info, realname, REALLEN);
+  strlcpy(source_p->info, realname, sizeof(source_p->info));
 
   if (source_p->name[0])
   {
@@ -768,7 +768,7 @@ do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
       /*
        * save the username in the client
        */
-      strncpy_irc(source_p->username, username, USERLEN);
+      strlcpy(source_p->username, username, sizeof(source_p->username));
     }
   }
   return;
@@ -796,8 +796,8 @@ do_remote_user(char *nick, struct Client *client_p, struct Client *source_p,
   /*
    * coming from another server, take the servers word for it
    */
-  strncpy_irc(source_p->host, host, HOSTLEN);
-  strncpy_irc(source_p->info, realname, REALLEN);
+  strlcpy(source_p->host, host, sizeof(source_p->host));
+  strlcpy(source_p->info, realname, sizeof(source_p->info));
   if (id)
     strcpy(source_p->user->id, id);
 

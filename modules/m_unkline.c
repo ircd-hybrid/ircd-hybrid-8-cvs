@@ -37,7 +37,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- *   $Id: m_unkline.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *   $Id: m_unkline.c,v 1.5 2002/04/27 05:30:17 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -95,7 +95,7 @@ _moddeinit(void)
   mod_del_cmd(unkline_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 static int flush_write(struct Client *, FBFILE *, char *, char *);
@@ -195,7 +195,7 @@ mo_unkline(struct Client *client_p, struct Client *source_p,
   {
     char *found_host, *found_user;
 
-    strncpy_irc(buff, buf, BUFSIZE - 1)[BUFSIZE - 1] = 0;
+    strlcpy(buff, buf, sizeof(buff));
 
     if ((p = strchr(buff, '\n')) != NULL)
       *p = '\0';
@@ -403,7 +403,7 @@ mo_undline(struct Client *client_p, struct Client *source_p,
 
   while (fbgets(buf, sizeof(buf), in))
   {
-    strncpy_irc(buff, buf, BUFSIZE - 1)[BUFSIZE - 1] = 0;
+    strlcpy(buff, buf, sizeof(buff));
 
     if ((p = strchr(buff, '\n')) != NULL)
       *p = '\0';

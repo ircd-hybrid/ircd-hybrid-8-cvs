@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_cryptlink.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
+ *   $Id: m_cryptlink.c,v 1.6 2002/04/27 05:30:16 a1kmm Exp $
  */
 
 /*
@@ -47,7 +47,7 @@
 
 #include "msg.h"
 #include "parse.h"
-#include "irc_string.h"         /* strncpy_irc */
+#include "irc_string.h"         /* strlcpy */
 
 #include "tools.h"
 #include "memory.h"
@@ -77,7 +77,7 @@ _moddeinit(void)
 {
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 #else
 
@@ -123,7 +123,7 @@ _moddeinit(void)
   mod_del_cmd(cryptlink_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 
 
@@ -418,7 +418,7 @@ cryptlink_serv(struct Client *client_p, struct Client *source_p,
    * if we are connecting (Handshake), we already have the name from the
    * C:line in client_p->name
    */
-  strncpy_irc(client_p->name, name, HOSTLEN);
+  strlcpy(client_p->name, name, sizeof(client_p->name));
 
   p = info;
 
@@ -436,7 +436,7 @@ cryptlink_serv(struct Client *client_p, struct Client *source_p,
       p = "(Unknown Location)";
   }
 
-  strncpy_irc(client_p->info, p, REALLEN);
+  strlcpy(client_p->info, p, sizeof(client_p->info));
   client_p->hopcount = 0;
 
   if (!(client_p->localClient->out_cipher ||
@@ -542,7 +542,7 @@ parse_cryptserv_args(struct Client *client_p,
   memcpy(key, out, CIPHERKEYLEN);
   MyFree(out);
 
-  strncpy_irc(info, parv[4], REALLEN);
+  strlcpy(info, parv[4], sizeof(info));
   info[REALLEN] = '\0';
 
   if (strlen(name) > HOSTLEN)

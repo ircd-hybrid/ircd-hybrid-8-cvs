@@ -2,7 +2,7 @@
  *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
  *  fileio.c: Provides a file input-output interface to ircd.
  *
- * $Id: fileio.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ * $Id: fileio.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: fileio.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ *  $Id: fileio.c,v 1.4 2002/04/27 05:30:25 a1kmm Exp $
  */
 
 #include "fileio.h"
@@ -209,7 +209,7 @@ fbgets(char *buf, size_t len, FBFILE * fb)
 
   if (fb->pbptr)
   {
-    strncpy_irc(buf, fb->pbptr, len);
+    strlcpy(buf, fb->pbptr, len);
     fb->pbptr = NULL;
     return (buf);
   }

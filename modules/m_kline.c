@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.8 2002/04/27 02:49:01 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.9 2002/04/27 05:30:16 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -84,7 +84,7 @@ _moddeinit(void)
   mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.8 $";
+char *_version = "$Revision: 1.9 $";
 #endif
 
 /* Local function prototypes */
@@ -472,12 +472,12 @@ cluster(char *hostname)
 
   if (strchr(hostname, '@'))
   {
-    strncpy_irc(result, hostname, HOSTLEN);
+    strlcpy(result, hostname, sizeof(result));
     result[HOSTLEN] = '\0';
     return (result);
   }
 
-  strncpy_irc(temphost, hostname, HOSTLEN);
+  strlcpy(temphost, hostname, sizeof(temphost));
   temphost[HOSTLEN] = '\0';
 
   is_ip_number = YES;           /* assume its an IP# */
@@ -507,7 +507,7 @@ cluster(char *hostname)
     zap_point++;
     *zap_point++ = '*';         /* turn 111.222.333.444 into */
     *zap_point = '\0';          /*      111.222.333.*        */
-    strncpy_irc(result, temphost, HOSTLEN);
+    strlcpy(result, temphost, sizeof(result));
     result[HOSTLEN] = '\0';
     return (result);
   }
@@ -536,19 +536,19 @@ cluster(char *hostname)
         if (number_of_dots == 0)
         {
           result[0] = '*';
-          strncpy_irc(result + 1, host_mask, HOSTLEN - 1);
+          strlcpy(result + 1, host_mask, sizeof(result) - 1);
           result[HOSTLEN] = '\0';
           return (result);
         }
         host_mask--;
       }
       result[0] = '*';          /* foo.com => *foo.com */
-      strncpy_irc(result + 1, temphost, HOSTLEN - 1);
+      strlcpy(result + 1, temphost, sizeof(result) - 1);
       result[HOSTLEN] = '\0';
     }
     else                        /* no tld found oops. just return it as is */
     {
-      strncpy_irc(result, temphost, HOSTLEN);
+      strlcpy(result, temphost, sizeof(result));
       result[HOSTLEN] = '\0';
       return (result);
     }
@@ -743,14 +743,14 @@ find_user_host(struct Client *source_p,
     if (hostp)                  /* I'm a little user@host */
     {
       *(hostp++) = '\0';        /* short and squat */
-      strncpy(luser, user_host_or_nick, USERLEN);       /* here is my user */
-      strncpy(lhost, hostp, HOSTLEN);   /* here is my host */
+      strlcpy(luser, user_host_or_nick, sizeof(luser)); /* here is my user */
+      strlcpy(lhost, hostp, sizeof(lhost)); /* here is my host */
     }
     else
     {
       luser[0] = '*';           /* no @ found, assume its *@somehost */
       luser[1] = '\0';
-      strncpy(lhost, user_host_or_nick, HOSTLEN);
+      strlcpy(lhost, user_host_or_nick, sizeof(lhost));
     }
 
     return 1;
@@ -786,11 +786,11 @@ find_user_host(struct Client *source_p,
      * if found in original user name (non-idented)
      */
 
-    strncpy_irc(luser, target_p->username, USERLEN);
+    strlcpy(luser, target_p->username, sizeof(luser));
     if (*target_p->username == '~')
       luser[0] = '*';
 
-    strncpy_irc(lhost, cluster(target_p->host), HOSTLEN);
+    strlcpy(lhost, cluster(target_p->host), sizeof(lhost));
   }
 
   return 1;

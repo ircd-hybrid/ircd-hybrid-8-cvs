@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_part.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
+ *   $Id: m_part.c,v 1.5 2002/04/27 05:30:21 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -70,7 +70,7 @@ _moddeinit(void)
   mod_del_cmd(part_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 
 static void part_one_client(struct Client *client_p,
@@ -101,7 +101,7 @@ m_part(struct Client *client_p,
   reason[0] = '\0';
 
   if (parc > 2)
-    strncpy_irc(reason, parv[2], TOPICLEN);
+    strlcpy(reason, parv[2], sizeof(reason));
 
   name = strtoken(&p, parv[1], ",");
 
