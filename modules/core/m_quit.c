@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_quit.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
+ *   $Id: m_quit.c,v 1.5 2002/02/12 09:46:50 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -40,7 +40,7 @@ struct Message quit_msgtab[] = {
   {"QUIT", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, &p_unregistered, &m_quit},
   {"QUIT", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_quit},
 #ifdef ENABLE_TS5
-  {"QUIT", 0, 0, 0, 0, MFLG_SLOW, 0, ms_quit},
+  {"QUIT", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, ms_quit},
 #endif
   {NULL, 0, 0, 1, 0, 0, 0, NULL, NULL}
 };
@@ -58,7 +58,7 @@ _moddeinit(void)
   mod_del_cmd(quit_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
 ** m_quit
