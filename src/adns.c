@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: adns.c,v 1.3 2002/01/06 07:18:47 a1kmm Exp $
+ *  $Id: adns.c,v 1.4 2002/01/13 07:41:04 a1kmm Exp $
  */
 
 #include "fileio.h"
@@ -147,12 +147,19 @@ dns_cancel_all(void)
   adns_forallqueries_begin(dns_state);
   while ((q = adns_forallqueries_next(dns_state, (void **)&r)) != NULL)
   {
-    adns_cancel(q);
-    adns__query_done(q);
-    adns_check(dns_state, &q, &answer, (void **)&query);
+    if (q->state != query_done)
+    {
+      adns_cancel(q);
+      adns__query_done(q);
+      adns_check(dns_state, &q, &answer, (void **)&query);
+    }
     assert(query->callback != NULL);
-    query->query = NULL;
-    query->callback(query->ptr, NULL);
+    if (query->callback != NULL)
+    {
+      MyFree(query->query);
+      query->query = NULL;
+      query->callback(query->ptr, NULL);
+    }
   }
 }
 
