@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: channel.h,v 1.2 2002/01/06 07:18:11 a1kmm Exp $
+ * $Id: channel.h,v 1.3 2002/02/14 08:05:21 a1kmm Exp $
  */
 
 #include <sys/types.h>        /* time_t */
@@ -179,8 +179,13 @@ struct Ban          /* also used for exceptions -orabidoo */
 
 #define CLEANUP_CHANNELS_TIME (30*60)
 #define MAX_VCHAN_TIME (60*60)
+
 /* Number of chanops, peon, voiced, halfops sublists */
+#ifdef REQUIRE_OANDV
+#define MAX_SUBLISTS 5
+#else
 #define MAX_SUBLISTS 4
+#endif
 
 #ifdef INTENSIVE_DEBUG
 void do_channel_integrity_check(void);

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_who.c,v 1.5 2002/02/12 08:15:16 a1kmm Exp $
+ *   $Id: m_who.c,v 1.6 2002/02/14 08:05:24 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -66,7 +66,7 @@ _moddeinit(void)
   mod_del_cmd(who_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 static void do_who_on_channel(struct Client *source_p,
                               struct Channel *chptr, char *real_name,
@@ -488,6 +488,7 @@ do_who_list(struct Client *source_p, struct Channel *chptr,
     else
       done++;
 
+#ifdef REQUIRE_OANDV
     if (chanops_voiced_ptr != NULL)
     {
       target_p = chanops_voiced_ptr->data;
@@ -496,6 +497,7 @@ do_who_list(struct Client *source_p, struct Channel *chptr,
     }
     else
       done++;
+#endif
   }
 }
 

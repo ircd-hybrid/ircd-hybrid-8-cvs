@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel_mode.c,v 1.3 2002/01/06 07:18:47 a1kmm Exp $
+ * $Id: channel_mode.c,v 1.4 2002/02/14 08:05:26 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -2725,7 +2725,7 @@ set_channel_mode(struct Client *client_p, struct Client *source_p,
  * side effects -
  */
 void
-set_channel_mode_flags(char flags_ptr[4][2],
+set_channel_mode_flags(char flags_ptr[][2],
                        struct Channel *chptr, struct Client *source_p)
 {
   if (chptr->mode.mode & MODE_HIDEOPS && !is_any_op(chptr, source_p))
@@ -2734,6 +2734,9 @@ set_channel_mode_flags(char flags_ptr[4][2],
     flags_ptr[1][0] = '\0';
     flags_ptr[2][0] = '\0';
     flags_ptr[3][0] = '\0';
+#ifdef REQUIRE_OANDV
+    flags_ptr[4][0] = '\0';
+#endif
   }
   else
   {
@@ -2741,6 +2744,9 @@ set_channel_mode_flags(char flags_ptr[4][2],
     flags_ptr[1][0] = '%';
     flags_ptr[2][0] = '+';
     flags_ptr[3][0] = '\0';
+#ifdef REQUIRE_OANDV
+    flags_ptr[4][0] = '@';
+#endif
 
     flags_ptr[0][1] = '\0';
     flags_ptr[1][1] = '\0';

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: channel.c,v 1.5 2002/01/13 07:15:38 a1kmm Exp $
+ * $Id: channel.c,v 1.6 2002/02/14 08:05:26 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -731,6 +731,9 @@ channel_member_names(struct Client *source_p,
     members_ptr[1] = chptr->halfops.head;
     members_ptr[2] = chptr->voiced.head;
     members_ptr[3] = chptr->peons.head;
+#ifdef REQUIRE_OANDV
+    members_ptr[4] = chptr->chanops_voiced.head;
+#endif
     is_member = IsMember(source_p, chptr);
 
     /* Note: This code will show one chanop followed by one voiced followed
