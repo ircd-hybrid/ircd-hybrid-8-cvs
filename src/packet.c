@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: packet.c,v 1.4 2002/01/06 07:18:50 a1kmm Exp $
+ *   $Id: packet.c,v 1.5 2002/02/17 05:28:56 a1kmm Exp $
  */
 
 #include <stdio.h>
@@ -178,14 +178,8 @@ read_ctrl_packet(int fd, void *data)
   assert(lserver != NULL);
   reply = &lserver->slinkrpl;
 
-  /* if the server died, kill it off now -davidt */
   if (IsDead(server))
-  {
-    exit_client(server, server, &me,
-                (server->flags & FLAGS_SENDQEX) ?
-                "SendQ exceeded" : "Dead socket");
     return;
-  }
 
   if (!reply->command)
   {
@@ -303,14 +297,8 @@ read_packet(int fd, void *data)
 #ifndef NDEBUG
   struct hook_io_data hdata;
 #endif
-  /* if the client is dead, kill it off now -davidt */
   if (IsDead(client_p))
-  {
-    exit_client(client_p, client_p, &me,
-                (client_p->flags & FLAGS_SENDQEX) ?
-                "SendQ exceeded" : "Dead socket");
     return;
-  }
 
 #ifndef HAVE_SOCKETPAIR
   if (HasServlink(client_p))

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: s_bsd.c,v 1.5 2002/01/13 07:15:39 a1kmm Exp $
+ *  $Id: s_bsd.c,v 1.6 2002/02/17 05:28:56 a1kmm Exp $
  */
 
 #include "config.h"
@@ -344,6 +344,18 @@ close_connection(struct Client *client_p)
     fd_close(client_p->fd);
     client_p->fd = -1;
   }
+
+  if (HasServlink(client_p))
+  {
+    fd_close(client_p->localClient->ctrlfd);
+#ifndef HAVE_SOCKETPAIR
+    fd_close(client_p->localClient->ctrlfd_r);
+    fd_close(client_p->fd_r);
+    client_p->localClient->ctrlfd_r = -1;
+    client_p->fd_r = -1;
+#endif
+    client_p->localClient->ctrlfd = -1;
+  } 
 
   linebuf_donebuf(&client_p->localClient->buf_sendq);
   linebuf_donebuf(&client_p->localClient->buf_recvq);
