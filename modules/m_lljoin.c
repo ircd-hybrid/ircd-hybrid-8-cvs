@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_lljoin.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ * $Id: m_lljoin.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "channel.h"
@@ -43,7 +43,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void ms_lljoin(struct Client *,struct Client *,int,char **);
+static void ms_lljoin(struct Client *, struct Client *, int, char **);
 
 struct Message lljoin_msgtab = {
   "LLJOIN", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0L,
@@ -63,7 +63,7 @@ _moddeinit(void)
   mod_del_cmd(&lljoin_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_lljoin
@@ -84,37 +84,36 @@ char *_version = "$Revision: 1.1 $";
  * this is now..
  *
  */
-static void ms_lljoin(struct Client *client_p,
-                     struct Client *source_p,
-                     int parc,
-                     char *parv[])
+static void
+ms_lljoin(struct Client *client_p,
+          struct Client *source_p, int parc, char *parv[])
 {
   char *chname = NULL;
   char *nick = NULL;
   char *key = NULL;
   char *vkey = NULL;
   char *pvc = NULL;
-  int  vc_ts;
-  int  flags;
-  int  i;
+  int vc_ts;
+  int flags;
+  int i;
   struct Client *target_p;
   struct Channel *chptr, *vchan_chptr, *root_vchan;
   int cjoin = 0;
 
-  if(uplink && !IsCapable(uplink,CAP_LL))
-    {
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-			   "*** LLJOIN requested from non LL server %s",
-			   client_p->name);
-      return;
-    }
+  if (uplink && !IsCapable(uplink, CAP_LL))
+  {
+    sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "*** LLJOIN requested from non LL server %s",
+                         client_p->name);
+    return;
+  }
 
   chname = parv[1];
-  if(chname == NULL)
+  if (chname == NULL)
     return;
 
   nick = parv[2];
-  if(nick == NULL)
+  if (nick == NULL)
     return;
 
   if (nick[0] == '!')
@@ -122,13 +121,13 @@ static void ms_lljoin(struct Client *client_p,
     cjoin = 1;
     nick++;
   }
- 
-  if(parc > 4)
+
+  if (parc > 4)
   {
     key = parv[4];
     vkey = parv[3];
   }
-  else if(parc >3)
+  else if (parc > 3)
   {
     key = vkey = parv[3];
   }
@@ -137,26 +136,26 @@ static void ms_lljoin(struct Client *client_p,
 
   target_p = find_client(nick);
 
-  if( !target_p || !target_p->user )
+  if (!target_p || !target_p->user)
     return;
 
-  if( !MyClient(target_p) )
+  if (!MyClient(target_p))
     return;
 
   chptr = hash_find_channel(chname);
 
   if (cjoin)
   {
-    if(!chptr) /* Uhm, bad! */
+    if (!chptr)                 /* Uhm, bad! */
     {
       sendto_realops_flags(FLAGS_ALL, L_ALL,
-        "LLJOIN %s %s called by %s, but root chan doesn't exist!",
-        chname, nick, client_p->name);
+                           "LLJOIN %s %s called by %s, but root chan doesn't exist!",
+                           chname, nick, client_p->name);
       return;
     }
     flags = CHFL_CHANOP;
 
-    if(! (vchan_chptr = cjoin_channel(chptr, target_p, chname)))
+    if (!(vchan_chptr = cjoin_channel(chptr, target_p, chname)))
       return;
 
     root_vchan = chptr;
@@ -173,7 +172,7 @@ static void ms_lljoin(struct Client *client_p,
       chptr = vchan_chptr = get_or_create_channel(target_p, chname, NULL);
       flags = CHFL_CHANOP;
     }
-    
+
     if (vchan_chptr != chptr)
     {
       root_vchan = chptr;
@@ -182,7 +181,7 @@ static void ms_lljoin(struct Client *client_p,
     else
       root_vchan = chptr;
 
-    if(!chptr || !root_vchan)
+    if (!chptr || !root_vchan)
       return;
 
     if (chptr->users == 0)
@@ -194,7 +193,7 @@ static void ms_lljoin(struct Client *client_p,
     /* check_spambot_warning(target_p, chname); */
 
     /* They _could_ join a channel twice due to lag */
-    if(chptr)
+    if (chptr)
     {
       if (IsMember(target_p, chptr))    /* already a member, ignore this */
         return;
@@ -206,102 +205,88 @@ static void ms_lljoin(struct Client *client_p,
       return;
     }
 
-    if( (i = can_join(target_p, chptr, key)) )
+    if ((i = can_join(target_p, chptr, key)))
     {
-      sendto_one(target_p,
-                 form_str(i), me.name, nick, root_vchan->chname);
+      sendto_one(target_p, form_str(i), me.name, nick, root_vchan->chname);
       return;
     }
   }
 
   if ((target_p->user->joined >= ConfigChannel.max_chans_per_user) &&
-      (!IsOper(target_p) || (target_p->user->joined >= 
-                             ConfigChannel.max_chans_per_user*3)))
-    {
-      sendto_one(target_p, form_str(ERR_TOOMANYCHANNELS),
-		 me.name, nick, root_vchan->chname );
-      return; 
-    }
-  
-  if(flags == CHFL_CHANOP)
-    {
-      chptr->channelts = CurrentTime;
-      /*
-       * XXX - this is a rather ugly hack.
-       *
-       * Unfortunately, there's no way to pass
-       * the fact that it is a vchan through SJOIN...
-       */
-      /* Prevent users creating a fake vchan */
-      if (chname[0] == '#' && chname[1] == '#')
-        {
-          if ((pvc = strrchr(chname+3, '_')))
-          {
-            /*
-             * OK, name matches possible vchan:
-             * ##channel_blah
-             */
-            pvc++; /*  point pvc after last _ */
-            vc_ts = atol(pvc);
-            /*
-             * if blah is the same as the TS, up the TS
-             * by one, to prevent this channel being
-             * seen as a vchan
-             */
-            if (vc_ts == CurrentTime)
-              chptr->channelts++;
-          }
-        }
+      (!IsOper(target_p) || (target_p->user->joined >=
+                             ConfigChannel.max_chans_per_user * 3)))
+  {
+    sendto_one(target_p, form_str(ERR_TOOMANYCHANNELS),
+               me.name, nick, root_vchan->chname);
+    return;
+  }
 
-      sendto_one(uplink,
-		 ":%s SJOIN %lu %s + :@%s",
-		 me.name,
-		 (unsigned long) chptr->channelts,
-		 chptr->chname,
-		 nick);
+  if (flags == CHFL_CHANOP)
+  {
+    chptr->channelts = CurrentTime;
+    /*
+     * XXX - this is a rather ugly hack.
+     *
+     * Unfortunately, there's no way to pass
+     * the fact that it is a vchan through SJOIN...
+     */
+    /* Prevent users creating a fake vchan */
+    if (chname[0] == '#' && chname[1] == '#')
+    {
+      if ((pvc = strrchr(chname + 3, '_')))
+      {
+        /*
+         * OK, name matches possible vchan:
+         * ##channel_blah
+         */
+        pvc++;                  /*  point pvc after last _ */
+        vc_ts = atol(pvc);
+        /*
+         * if blah is the same as the TS, up the TS
+         * by one, to prevent this channel being
+         * seen as a vchan
+         */
+        if (vc_ts == CurrentTime)
+          chptr->channelts++;
+      }
     }
+
+    sendto_one(uplink,
+               ":%s SJOIN %lu %s + :@%s",
+               me.name, (unsigned long)chptr->channelts, chptr->chname, nick);
+  }
   else if ((flags == CHFL_HALFOP) && (IsCapable(uplink, CAP_HOPS)))
-    {
-      sendto_one(uplink,
-		 ":%s SJOIN %lu %s + :%%%s",
-		 me.name,
-		 (unsigned long) chptr->channelts,
-		 chptr->chname,
-		 nick);
-    }
+  {
+    sendto_one(uplink,
+               ":%s SJOIN %lu %s + :%%%s",
+               me.name, (unsigned long)chptr->channelts, chptr->chname, nick);
+  }
   else
-    {
-      sendto_one(uplink,
-		 ":%s SJOIN %lu %s + :%s",
-		 me.name,
-		 (unsigned long) chptr->channelts,
-		 chptr->chname,
-		 nick);
-    }
+  {
+    sendto_one(uplink,
+               ":%s SJOIN %lu %s + :%s",
+               me.name, (unsigned long)chptr->channelts, chptr->chname, nick);
+  }
 
   add_user_to_channel(chptr, target_p, flags);
 
-  if ( chptr != root_vchan )
-    add_vchan_to_client_cache(target_p,root_vchan,chptr);
- 
+  if (chptr != root_vchan)
+    add_vchan_to_client_cache(target_p, root_vchan, chptr);
+
   sendto_channel_local(ALL_MEMBERS, chptr,
-		       ":%s!%s@%s JOIN :%s",
-		       target_p->name,
-		       target_p->username,
-		       target_p->host,
-		       root_vchan->chname);
-  
-  if( flags & CHFL_CHANOP )
+                       ":%s!%s@%s JOIN :%s",
+                       target_p->name,
+                       target_p->username,
+                       target_p->host, root_vchan->chname);
+
+  if (flags & CHFL_CHANOP)
   {
     chptr->mode.mode |= MODE_TOPICLIMIT;
     chptr->mode.mode |= MODE_NOPRIVMSGS;
-      
-    sendto_channel_local(ALL_MEMBERS,chptr,
-                         ":%s MODE %s +nt",
-                         me.name, root_vchan->chname);
-    sendto_one(uplink, 
-               ":%s MODE %s +nt",
-               me.name, chptr->chname);
+
+    sendto_channel_local(ALL_MEMBERS, chptr,
+                         ":%s MODE %s +nt", me.name, root_vchan->chname);
+    sendto_one(uplink, ":%s MODE %s +nt", me.name, chptr->chname);
   }
 
   channel_member_names(target_p, chptr, chname, 1);

@@ -19,7 +19,7 @@
  *
  *
  *
- * $Id: rsa.c,v 1.1 2002/01/04 09:14:26 a1kmm Exp $
+ * $Id: rsa.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
  */
 
 #include "config.h"
@@ -40,26 +40,27 @@
 #include "rsa.h"
 #include "s_conf.h"
 #include "s_log.h"
-#include "client.h" /* CIPHERKEYLEN .. eww */
+#include "client.h"             /* CIPHERKEYLEN .. eww */
 
 #ifdef HAVE_LIBCRYPTO
 
 void report_crypto_errors(void);
 int verify_private_key(void);
-static void binary_to_hex( unsigned char * bin, char * hex, int length );
+static void binary_to_hex(unsigned char *bin, char *hex, int length);
 
-        
+
 
 /*
  * report_crypto_errors - Dump crypto error list to log
  */
-void report_crypto_errors(void)
+void
+report_crypto_errors(void)
 {
   unsigned long e = 0;
   unsigned long cnt = 0;
 
   ERR_load_crypto_strings();
-  while ( (cnt < 100) && (e = ERR_get_error()) )
+  while ((cnt < 100) && (e = ERR_get_error()))
   {
     ilog(L_CRIT, "SSL error: %s", ERR_error_string(e, 0));
     cnt++;
@@ -69,24 +70,25 @@ void report_crypto_errors(void)
 /*
  * verify_private_key - reread private key and verify against inmem key
  */
-int verify_private_key(void)
+int
+verify_private_key(void)
 {
-  BIO * file;
-  RSA * key;
-  RSA * mkey;
+  BIO *file;
+  RSA *key;
+  RSA *mkey;
 
   /* If the rsa_private_key directive isn't found, error out. */
   if (ServerInfo.rsa_private_key == NULL)
   {
     ilog(L_NOTICE, "rsa_private_key in serverinfo{} is not defined.");
-    return(-1);
+    return (-1);
   }
 
   /* If rsa_private_key_file isn't available, error out. */
   if (ServerInfo.rsa_private_key_file == NULL)
   {
     ilog(L_NOTICE, "Internal error: rsa_private_key_file isn't defined.");
-    return(-1);
+    return (-1);
   }
 
   file = BIO_new_file(ServerInfo.rsa_private_key_file, "r");
@@ -98,7 +100,7 @@ int verify_private_key(void)
   if (file == NULL)
   {
     ilog(L_NOTICE, "Failed to open private key file - can't validate it");
-    return(-1);
+    return (-1);
   }
 
   /*
@@ -110,7 +112,7 @@ int verify_private_key(void)
    *         For some reason the system thinks PEM_read_bio_RSAPrivateKey
    *         is returning an int, not a RSA *.
    * androsyn -- Thats because you didn't have a prototype and including
-   * 		 pem.h breaks things for some reason..
+   *             pem.h breaks things for some reason..
    */
   key = (RSA *) PEM_read_bio_RSAPrivateKey(file, NULL, 0, NULL);
 
@@ -118,7 +120,7 @@ int verify_private_key(void)
   {
     ilog(L_NOTICE, "PEM_read_bio_RSAPrivateKey() failed; possibly not RSA?");
     report_crypto_errors();
-    return(-1);
+    return (-1);
   }
 
   BIO_set_close(file, BIO_CLOSE);
@@ -133,11 +135,11 @@ int verify_private_key(void)
    */
   if (mkey->pad != key->pad)
     ilog(L_CRIT, "Private key corrupted: pad %i != pad %i",
-                 mkey->pad, key->pad);
+         mkey->pad, key->pad);
 
   if (mkey->version != key->version)
     ilog(L_CRIT, "Private key corrupted: version %i != version %i",
-                  mkey->version, key->version);
+         mkey->version, key->version);
 
   if (BN_cmp(mkey->n, key->n))
     ilog(L_CRIT, "Private key corrupted: n differs");
@@ -157,47 +159,49 @@ int verify_private_key(void)
     ilog(L_CRIT, "Private key corrupted: iqmp differs");
 
   RSA_free(key);
-  return(0);
+  return (0);
 }
 
 
-static void binary_to_hex( unsigned char * bin, char * hex, int length )
+static void
+binary_to_hex(unsigned char *bin, char *hex, int length)
 {
-  char * trans = "0123456789ABCDEF";
+  char *trans = "0123456789ABCDEF";
   int i;
 
-  for( i = 0; i < length; i++ )
+  for (i = 0; i < length; i++)
   {
-    hex[i<<1]     = trans[bin[i] >> 4];
-    hex[(i<<1)+1] = trans[bin[i] & 0xf];
+    hex[i << 1] = trans[bin[i] >> 4];
+    hex[(i << 1) + 1] = trans[bin[i] & 0xf];
   }
-  hex[i<<1] = '\0';
+  hex[i << 1] = '\0';
 }
 
-int get_randomness( unsigned char * buf, int length )
+int
+get_randomness(unsigned char *buf, int length)
 {
-    /* Seed OpenSSL PRNG with EGD enthropy pool -kre */
-    if (ConfigFileEntry.use_egd &&
-        (ConfigFileEntry.egdpool_path != NULL))
-    {
-      if (RAND_egd(ConfigFileEntry.egdpool_path) == -1)
-            return -1;
-    }
+  /* Seed OpenSSL PRNG with EGD enthropy pool -kre */
+  if (ConfigFileEntry.use_egd && (ConfigFileEntry.egdpool_path != NULL))
+  {
+    if (RAND_egd(ConfigFileEntry.egdpool_path) == -1)
+      return -1;
+  }
 
-  if ( RAND_status() )
-    return RAND_bytes( buf, length );
-  else /* XXX - abort? */
-    return RAND_pseudo_bytes( buf, length );
+  if (RAND_status())
+    return RAND_bytes(buf, length);
+  else                          /* XXX - abort? */
+    return RAND_pseudo_bytes(buf, length);
 }
 
-int generate_challenge( char **, char **, RSA *);
-int generate_challenge( char ** r_challenge, char ** r_response, RSA *rsa )
+int generate_challenge(char **, char **, RSA *);
+int
+generate_challenge(char **r_challenge, char **r_response, RSA * rsa)
 {
   unsigned char secret[32], *tmp;
   unsigned long length, ret;
 
-  if(!rsa)
-  	return -1;
+  if (!rsa)
+    return -1;
   get_randomness(secret, 32);
   *r_response = MyMalloc(65);
   binary_to_hex(secret, *r_response, 32);
@@ -206,17 +210,17 @@ int generate_challenge( char ** r_challenge, char ** r_response, RSA *rsa )
   tmp = MyMalloc(length);
   ret = RSA_public_encrypt(32, secret, tmp, rsa, RSA_PKCS1_PADDING);
 
-  *r_challenge = MyMalloc( (length << 1) + 1 );
-  binary_to_hex( tmp, *r_challenge, length );
-  (*r_challenge)[length<<1] = 0;
+  *r_challenge = MyMalloc((length << 1) + 1);
+  binary_to_hex(tmp, *r_challenge, length);
+  (*r_challenge)[length << 1] = 0;
   MyFree(tmp);
 
   if (ret < 0)
   {
     report_crypto_errors();
-    return(-1);
+    return (-1);
   }
-  return(0);
+  return (0);
 }
 
 #endif /* HAVE_LIBCRYPTO */

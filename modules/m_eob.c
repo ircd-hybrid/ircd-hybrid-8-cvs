@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_eob.c,v 1.1 2002/01/04 09:13:16 a1kmm Exp $
+ *   $Id: m_eob.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -34,10 +34,10 @@
 #include "modules.h"
 #include <stdlib.h>
 
-static void ms_eob(struct Client*, struct Client*, int, char**);
+static void ms_eob(struct Client *, struct Client *, int, char **);
 
 struct Message eob_msgtab = {
-  "EOB", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0, 
+  "EOB", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
   {m_unregistered, m_ignore, ms_eob, m_ignore}
 };
 #ifndef STATIC_MODULES
@@ -53,20 +53,21 @@ _moddeinit(void)
   mod_del_cmd(&eob_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * ms_eob - EOB command handler
  *      parv[0] = sender prefix   
  *      parv[1] = servername   
  */
-static void ms_eob(struct Client *client_p, struct Client *source_p,
-                  int parc, char *parv[])
+static void
+ms_eob(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
-   sendto_realops_flags(FLAGS_ALL, L_ALL,
-                        "End of burst from %s (%d seconds)",
-                        source_p->name, 
-			(signed int)(CurrentTime - source_p->firsttime));
+  sendto_realops_flags(FLAGS_ALL, L_ALL,
+                       "End of burst from %s (%d seconds)",
+                       source_p->name,
+                       (signed int)(CurrentTime - source_p->firsttime));
 
-   SetEob(client_p);
+  SetEob(client_p);
 }

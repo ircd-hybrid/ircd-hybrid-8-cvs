@@ -3,7 +3,7 @@
  *
  * This code was borrowed from the squid web cache by Adrian Chadd.
  *
- * $Id: event.c,v 1.1 2002/01/04 09:13:56 a1kmm Exp $
+ * $Id: event.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  *
  * Original header follows:
  *
@@ -73,10 +73,10 @@ static time_t event_time_min = -1;
  */
 
 void
-eventAdd(const char *name, EVH *func, void *arg, time_t when)
+eventAdd(const char *name, EVH * func, void *arg, time_t when)
 {
   int i;
-  
+
   /* find first inactive index, or use next index */
   for (i = 0; i < event_count; i++)
     if (!event_table[i].active)
@@ -89,7 +89,7 @@ eventAdd(const char *name, EVH *func, void *arg, time_t when)
   event_table[i].name = name;
   event_table[i].arg = arg;
   event_table[i].when = CurrentTime + when;
-  event_table[i].frequency = when; 
+  event_table[i].frequency = when;
   event_table[i].active = 1;
 
   if ((event_table[i].when < event_time_min) || (event_time_min == -1))
@@ -105,15 +105,15 @@ eventAdd(const char *name, EVH *func, void *arg, time_t when)
  */
 
 void
-eventDelete(EVH *func, void *arg)
+eventDelete(EVH * func, void *arg)
 {
   int i;
- 
+
   i = eventFind(func, arg);
 
   if (i == -1)
     return;
-  
+
   event_table[i].name = NULL;
   event_table[i].func = NULL;
   event_table[i].arg = NULL;
@@ -129,19 +129,19 @@ eventDelete(EVH *func, void *arg)
  * Side Effects: Adds the event to the event list within +- 1/3 of the
  *	         specified frequency.
  */
- 
+
 void
-eventAddIsh(const char *name, EVH *func, void *arg, time_t delta_ish)
+eventAddIsh(const char *name, EVH * func, void *arg, time_t delta_ish)
 {
   if (delta_ish >= 3.0)
-    {
-      const time_t two_third = (2 * delta_ish) / 3;
-      delta_ish = two_third + ((random() % 1000) * two_third) / 1000;
-      /*
-       * XXX I hate the above magic, I don't even know if its right.
-       * Grr. -- adrian
-       */
-    }
+  {
+    const time_t two_third = (2 * delta_ish) / 3;
+    delta_ish = two_third + ((random() % 1000) * two_third) / 1000;
+    /*
+     * XXX I hate the above magic, I don't even know if its right.
+     * Grr. -- adrian
+     */
+  }
   eventAdd(name, func, arg, delta_ish);
 }
 
@@ -162,15 +162,15 @@ eventRun(void)
     return;
 
   for (i = 0; i < event_count; i++)
+  {
+    if (event_table[i].active && (event_table[i].when <= CurrentTime))
     {
-      if (event_table[i].active && (event_table[i].when <= CurrentTime))
-        {
-          last_event_ran = event_table[i].name;
-          event_table[i].func(event_table[i].arg);
-          event_table[i].when = CurrentTime + event_table[i].frequency;
-          event_time_min = -1;
-        }
+      last_event_ran = event_table[i].name;
+      event_table[i].func(event_table[i].arg);
+      event_table[i].when = CurrentTime + event_table[i].frequency;
+      event_time_min = -1;
     }
+  }
 }
 
 
@@ -181,22 +181,24 @@ eventRun(void)
  * Output: Specifies the next time eventRun() should be run
  * Side Effects: None
  */
- 
+
 time_t
 eventNextTime(void)
 {
   int i;
 
   if (event_count == 0)
-    return (CurrentTime+1);
+    return (CurrentTime + 1);
   else if (event_time_min == -1)
+  {
+    for (i = 0; i < event_count; i++)
     {
-      for (i = 0; i < event_count; i++)
-        {
-          if (event_table[i].active && ((event_table[i].when < event_time_min) || (event_time_min == -1)))
-            event_time_min = event_table[i].when;
-        }
+      if (event_table[i].active
+          && ((event_table[i].when < event_time_min)
+              || (event_time_min == -1)))
+        event_time_min = event_table[i].when;
     }
+  }
   return event_time_min;
 }
 
@@ -222,16 +224,15 @@ eventInit(void)
  */
 
 int
-eventFind(EVH *func, void *arg)
+eventFind(EVH * func, void *arg)
 {
   int i;
   for (i = 0; i < event_count; i++)
-    {
-      if ((event_table[i].func == func) &&
-          (event_table[i].arg == arg) &&
-          event_table[i].active)
-        return i;
-    }
+  {
+    if ((event_table[i].func == func) &&
+        (event_table[i].arg == arg) && event_table[i].active)
+      return i;
+  }
   return -1;
 }
 
@@ -250,24 +251,24 @@ show_events(struct Client *source_p)
 
   if (last_event_ran)
     sendto_one(source_p, ":%s NOTICE %s :*** Last event to run: %s",
-               me.name, source_p->name,
-               last_event_ran);
+               me.name, source_p->name, last_event_ran);
 
   sendto_one(source_p,
-     ":%s NOTICE %s :*** Operation            Next Execution",
-     me.name, source_p->name);
+             ":%s NOTICE %s :*** Operation            Next Execution",
+             me.name, source_p->name);
 
   for (i = 0; i < event_count; i++)
+  {
+    if (event_table[i].active)
     {
-      if (event_table[i].active)
-        {
-          sendto_one(source_p,
-                     ":%s NOTICE %s :*** %-20s %-3d seconds",
-                     me.name, source_p->name, event_table[i].name,
-                     (int)(event_table[i].when - CurrentTime));
-        }
+      sendto_one(source_p,
+                 ":%s NOTICE %s :*** %-20s %-3d seconds",
+                 me.name, source_p->name, event_table[i].name,
+                 (int)(event_table[i].when - CurrentTime));
     }
-  sendto_one(source_p, ":%s NOTICE %s :*** Finished", me.name, source_p->name);
+  }
+  sendto_one(source_p, ":%s NOTICE %s :*** Finished", me.name,
+             source_p->name);
 }
 
 /* 
@@ -286,5 +287,3 @@ set_back_events(time_t by)
     else
       event_table[i].when = 0;
 }
-
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_oper.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_oper.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -44,21 +44,22 @@
 #include <unistd.h>
 
 
-static struct ConfItem *find_password_aconf(char *name, struct Client *source_p);
+static struct ConfItem *find_password_aconf(char *name,
+                                            struct Client *source_p);
 static int match_oper_password(char *password, struct ConfItem *aconf);
-int oper_up( struct Client *source_p, struct ConfItem *aconf );
+int oper_up(struct Client *source_p, struct ConfItem *aconf);
 #ifdef CRYPT_OPER_PASSWORD
-extern        char *crypt();
+extern char *crypt();
 #endif /* CRYPT_OPER_PASSWORD */
 
-static void m_oper(struct Client*, struct Client*, int, char**);
-static void ms_oper(struct Client*, struct Client*, int, char**);
-static void mo_oper(struct Client*, struct Client*, int, char**);
+static void m_oper(struct Client *, struct Client *, int, char **);
+static void ms_oper(struct Client *, struct Client *, int, char **);
+static void mo_oper(struct Client *, struct Client *, int, char **);
 
 
 struct Message oper_msgtab = {
   "OPER", 0, 0, 3, 0, MFLG_SLOW, 0,
-  {m_unregistered, m_oper, ms_oper, mo_oper} 
+  {m_unregistered, m_oper, ms_oper, mo_oper}
 };
 
 #ifndef STATIC_MODULES
@@ -74,7 +75,7 @@ _moddeinit(void)
   mod_del_cmd(&oper_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /*
@@ -83,85 +84,89 @@ char *_version = "$Revision: 1.1 $";
 **      parv[1] = oper name
 **      parv[2] = oper password
 */
-static void m_oper(struct Client *client_p, struct Client *source_p,
-                  int parc, char *parv[])
+static void
+m_oper(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
   struct ConfItem *aconf;
   struct ConfItem *oconf = NULL;
-  char  *name;
-  char  *password;
+  char *name;
+  char *password;
   dlink_node *ptr;
 
   name = parv[1];
   password = parv[2];
 
   if (EmptyString(password))
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, source_p->name, "OPER");
+    return;
+  }
+
+  if ((aconf = find_password_aconf(name, source_p)) == NULL)
+  {
+    sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
+    if (ConfigFileEntry.failed_oper_notice)
     {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, source_p->name, "OPER");
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "Failed OPER attempt - host mismatch by %s (%s@%s)",
+                           source_p->name, source_p->username,
+                           source_p->host);
+    }
+    return;
+  }
+
+  if (match_oper_password(password, aconf))
+  {
+    /*
+       20001216:
+       detach old iline
+       -einride
+     */
+    ptr = source_p->localClient->confs.head;
+    if (ptr)
+    {
+
+      oconf = ptr->data;
+      detach_conf(source_p, oconf);
+    }
+
+    if (attach_conf(source_p, aconf) != 0)
+    {
+      sendto_one(source_p, ":%s NOTICE %s :Can't attach conf!",
+                 me.name, source_p->name);
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "Failed OPER attempt by %s (%s@%s) can't attach conf!",
+                           source_p->name, source_p->username,
+                           source_p->host);
+      /* 
+         20001216:
+         Reattach old iline
+         -einride
+       */
+      attach_conf(source_p, oconf);
       return;
     }
 
-  if( (aconf = find_password_aconf(name,source_p)) == NULL)
-    {
-      sendto_one(source_p, form_str(ERR_NOOPERHOST), me.name, source_p->name);
-      if (ConfigFileEntry.failed_oper_notice)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "Failed OPER attempt - host mismatch by %s (%s@%s)",
-                               source_p->name, source_p->username, source_p->host);
-        }
-      return;
-    }
+    oper_up(source_p, aconf);
 
-  if ( match_oper_password(password,aconf) )
-    {
-      /*
-        20001216:
-        detach old iline
-        -einride
-      */
-      ptr = source_p->localClient->confs.head;
-      if (ptr)
-      {
-       
-        oconf = ptr->data;
-        detach_conf(source_p,oconf);
-      }
-
-      if( attach_conf(source_p, aconf) != 0 )
-        {
-          sendto_one(source_p,":%s NOTICE %s :Can't attach conf!",
-                     me.name,source_p->name);
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "Failed OPER attempt by %s (%s@%s) can't attach conf!",
-                               source_p->name, source_p->username, source_p->host);
-          /* 
-             20001216:
-             Reattach old iline
-             -einride
-          */
-          attach_conf(source_p, oconf);
-          return;
-        }
-
-      oper_up( source_p, aconf );
-      
-      ilog(L_TRACE, "OPER %s by %s!%s@%s",
-	   name, source_p->name, source_p->username, source_p->host);
-      log_oper(source_p, name);
-      return;
-    }
+    ilog(L_TRACE, "OPER %s by %s!%s@%s",
+         name, source_p->name, source_p->username, source_p->host);
+    log_oper(source_p, name);
+    return;
+  }
   else
+  {
+    sendto_one(source_p, form_str(ERR_PASSWDMISMATCH), me.name, parv[0]);
+    if (ConfigFileEntry.failed_oper_notice)
     {
-      sendto_one(source_p,form_str(ERR_PASSWDMISMATCH),me.name, parv[0]);
-      if (ConfigFileEntry.failed_oper_notice)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "Failed OPER attempt by %s (%s@%s)",
-                               source_p->name, source_p->username, source_p->host);
-        }
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "Failed OPER attempt by %s (%s@%s)",
+                           source_p->name, source_p->username,
+                           source_p->host);
     }
+  }
 }
 
 /*
@@ -170,8 +175,9 @@ static void m_oper(struct Client *client_p, struct Client *source_p,
 **      parv[1] = oper name
 **      parv[2] = oper password
 */
-static void mo_oper(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+mo_oper(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, parv[0]);
   SendMessageFile(source_p, &ConfigFileEntry.opermotd);
@@ -184,21 +190,22 @@ static void mo_oper(struct Client *client_p, struct Client *source_p,
 **      parv[1] = oper name
 **      parv[2] = oper password
 */
-static void ms_oper(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+ms_oper(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   /* if message arrived from server, trust it, and set to oper */
-  
+
   if (!IsOper(source_p))
-    {
-      if (source_p->status == STAT_CLIENT)
-        source_p->handler = OPER_HANDLER;
-      
-      source_p->flags |= FLAGS_OPER;
-      Count.oper++;
-      sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, NOFLAGS,
-                    ":%s MODE %s :+o", parv[0], parv[0]);
-    }
+  {
+    if (source_p->status == STAT_CLIENT)
+      source_p->handler = OPER_HANDLER;
+
+    source_p->flags |= FLAGS_OPER;
+    Count.oper++;
+    sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, NOFLAGS,
+                  ":%s MODE %s :+o", parv[0], parv[0]);
+  }
 }
 
 /*
@@ -208,7 +215,8 @@ static void ms_oper(struct Client *client_p, struct Client *source_p,
  * output       -
  */
 
-struct ConfItem *find_password_aconf(char *name, struct Client *source_p)
+struct ConfItem *
+find_password_aconf(char *name, struct Client *source_p)
 {
   struct ConfItem *aconf;
 
@@ -217,10 +225,10 @@ struct ConfItem *find_password_aconf(char *name, struct Client *source_p)
       !(aconf = find_conf_exact(name, source_p->username,
                                 source_p->localClient->sockhost,
                                 CONF_OPERATOR)))
-    {
-      return 0;
-    }
-  return(aconf);
+  {
+    return 0;
+  }
+  return (aconf);
 }
 
 /*
@@ -232,8 +240,8 @@ struct ConfItem *find_password_aconf(char *name, struct Client *source_p)
  * side effects - none
  */
 
-static int match_oper_password(char *password,
-                               struct ConfItem *aconf)
+static int
+match_oper_password(char *password, struct ConfItem *aconf)
 {
   char *encr;
 
@@ -244,10 +252,10 @@ static int match_oper_password(char *password,
 #ifdef CRYPT_OPER_PASSWORD
   /* use first two chars of the password they send in as salt */
   /* If the password in the conf is MD5, and ircd is linked   
-  ** to scrypt on FreeBSD, or the standard crypt library on
-  ** glibc Linux, then this code will work fine on generating
-  ** the proper encrypted hash for comparison.
-  */
+     ** to scrypt on FreeBSD, or the standard crypt library on
+     ** glibc Linux, then this code will work fine on generating
+     ** the proper encrypted hash for comparison.
+   */
 
   /* passwd may be NULL pointer. Head it off at the pass... */
   if (aconf->passwd == NULL)
@@ -259,7 +267,7 @@ static int match_oper_password(char *password,
     encr = "";
 #else
   encr = password;
-#endif  /* CRYPT_OPER_PASSWORD */
+#endif /* CRYPT_OPER_PASSWORD */
 
   if (strcmp(encr, aconf->passwd) == 0)
     return YES;

@@ -17,23 +17,24 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: ircd_signal.c,v 1.1 2002/01/04 09:14:10 a1kmm Exp $
+ * $Id: ircd_signal.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 
 #include <signal.h>
 #include <stdlib.h>
 
 #include "ircd_signal.h"
-#include "ircd.h"         /* dorehash */
-#include "restart.h"      /* server_reboot */
+#include "ircd.h"               /* dorehash */
+#include "restart.h"            /* server_reboot */
 #include "s_log.h"
 #include "memory.h"
 #include "s_bsd.h"
 /*
  * dummy_handler - don't know if this is really needed but if alarm is still
  * being used we probably will
- */ 
-static void dummy_handler(int sig)
+ */
+static void
+dummy_handler(int sig)
 {
   /* Empty */
 }
@@ -41,7 +42,8 @@ static void dummy_handler(int sig)
 /*
  * sigterm_handler - exit the server
  */
-static void sigterm_handler(int sig)  
+static void
+sigterm_handler(int sig)
 {
   /* XXX we had a flush_connections() here - we should close all the
    * connections and flush data. read server_reboot() for my explanation.
@@ -50,11 +52,12 @@ static void sigterm_handler(int sig)
   ilog(L_CRIT, "Server killed By SIGTERM");
   exit(-1);
 }
-  
+
 /* 
  * sighup_handler - reread the server configuration
  */
-static void sighup_handler(int sig)
+static void
+sighup_handler(int sig)
 {
   dorehash = 1;
 }
@@ -62,30 +65,32 @@ static void sighup_handler(int sig)
 /*
  * sigint_handler - restart the server
  */
-static void sigint_handler(int sig)
+static void
+sigint_handler(int sig)
 {
   static int restarting = 0;
 
-  if (server_state.foreground) 
-    {
-      ilog(L_WARN, "Server exiting on SIGINT");
-      exit(0);
-    }
+  if (server_state.foreground)
+  {
+    ilog(L_WARN, "Server exiting on SIGINT");
+    exit(0);
+  }
   else
+  {
+    ilog(L_WARN, "Server Restarting on SIGINT");
+    if (restarting == 0)
     {
-      ilog(L_WARN, "Server Restarting on SIGINT");
-      if (restarting == 0) 
-        {
-          restarting = 1;
-          server_reboot();
-        }
+      restarting = 1;
+      server_reboot();
     }
+  }
 }
 
 /*
  * setup_signals - initialize signal handlers for server
  */
-void setup_signals()
+void
+setup_signals()
 {
   struct sigaction act;
 
@@ -123,5 +128,3 @@ void setup_signals()
 #endif
 
 }
-
-

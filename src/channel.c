@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: channel.c,v 1.1 2002/01/04 09:13:43 a1kmm Exp $
+ * $Id: channel.c,v 1.2 2002/01/04 11:06:38 a1kmm Exp $
  */
 #include "tools.h"
 #include "channel.h"
@@ -58,9 +58,9 @@ static void destroy_channel(struct Channel *);
 static void delete_members(struct Channel *chptr, dlink_list * list);
 
 static void send_mode_list(struct Client *client_p, char *chname,
-                           dlink_list *top, char flag, int clear);
+                           dlink_list * top, char flag, int clear);
 static int check_banned(struct Channel *chptr, struct Client *who,
-                                                char *s, char *s2);
+                        char *s, char *s2);
 
 static char buf[BUFSIZE];
 static char modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
@@ -70,13 +70,15 @@ static char modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
  *
  * Initializes the channel blockheap
  */
-static void channelheap_garbage_collect(void *unused)
+static void
+channelheap_garbage_collect(void *unused)
 {
   BlockHeapGarbageCollect(channel_heap);
   BlockHeapGarbageCollect(ban_heap);
 }
 
-void init_channels(void)
+void
+init_channels(void)
 {
   channel_heap = BlockHeapCreate(sizeof(struct Channel), 1024);
   ban_heap = BlockHeapCreate(sizeof(struct Ban), 2048);
@@ -318,7 +320,8 @@ send_channel_modes(struct Client *client_p, struct Channel *chptr)
   send_members(client_p, modebuf, parabuf, chptr, &chptr->chanops, "@");
 
 #ifdef REQUIRE_OANDV
-  send_members(client_p, modebuf, parabuf, chptr, &chptr->chanops_voiced, "@+");
+  send_members(client_p, modebuf, parabuf, chptr, &chptr->chanops_voiced,
+               "@+");
 #endif
 
   if (IsCapable(client_p, CAP_HOPS))
@@ -441,7 +444,8 @@ sub1_from_channel(struct Channel *chptr, int perm)
                                  * It should never happen but...
                                  */
     /* persistent channel */
-    if (perm == 0 || (chptr->channelts + ConfigChannel.persist_time) > CurrentTime)
+    if (perm == 0
+        || (chptr->channelts + ConfigChannel.persist_time) > CurrentTime)
       destroy_channel(chptr);
   }
 }
@@ -527,21 +531,20 @@ cleanup_channels(void *unused)
     }
     else
     {
-      if(chptr->users == 0)
+      if (chptr->users == 0)
       {
-        if((chptr->channelts + ConfigChannel.persist_time) > CurrentTime)
-	{
-	  if(uplink && IsCapable(uplink, CAP_LL))
-	    sendto_one(uplink, ":%s DROP %s", me.name, chptr->chname);
-	  destroy_channel(chptr);
-	}
+        if ((chptr->channelts + ConfigChannel.persist_time) > CurrentTime)
+        {
+          if (uplink && IsCapable(uplink, CAP_LL))
+            sendto_one(uplink, ":%s DROP %s", me.name, chptr->chname);
+          destroy_channel(chptr);
+        }
       }
       else
       {
         if ((CurrentTime - chptr->users_last >= CLEANUP_CHANNELS_TIME))
         {
-          if (uplink
-                 && IsCapable(uplink, CAP_LL) && (chptr->locusers == 0))
+          if (uplink && IsCapable(uplink, CAP_LL) && (chptr->locusers == 0))
           {
             sendto_one(uplink, ":%s DROP %s", me.name, chptr->chname);
             destroy_channel(chptr);
@@ -919,9 +922,9 @@ is_banned(struct Channel *chptr, struct Client *who)
   if (!IsPerson(who))
     return (0);
 
-  ircsprintf(src_host,"%s!%s@%s", who->name, who->username, who->host);
-  ircsprintf(src_iphost,"%s!%s@%s", who->name, who->username,
-	     who->localClient->sockhost);
+  ircsprintf(src_host, "%s!%s@%s", who->name, who->username, who->host);
+  ircsprintf(src_iphost, "%s!%s@%s", who->name, who->username,
+             who->localClient->sockhost);
 
   return (check_banned(chptr, who, src_host, src_iphost));
 }
@@ -995,9 +998,9 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
   assert(source_p->localClient != NULL);
 
   ircsprintf(src_host,
-	     "%s!%s@%s", source_p->name, source_p->username, source_p->host);
-  ircsprintf(src_iphost,"%s!%s@%s", source_p->name, source_p->username,
-	     source_p->localClient->sockhost);
+             "%s!%s@%s", source_p->name, source_p->username, source_p->host);
+  ircsprintf(src_iphost, "%s!%s@%s", source_p->name, source_p->username,
+             source_p->localClient->sockhost);
 
   if ((check_banned(chptr, source_p, src_host, src_iphost)) == CHFL_BAN)
     return (ERR_BANNEDFROMCHAN);
@@ -1014,7 +1017,8 @@ can_join(struct Client *source_p, struct Channel *chptr, char *key)
       for (ptr = chptr->invexlist.head; ptr; ptr = ptr->next)
       {
         invex = ptr->data;
-        if (match(invex->banstr, src_host) || match(invex->banstr, src_iphost))
+        if (match(invex->banstr, src_host)
+            || match(invex->banstr, src_iphost))
           break;
       }
       if (ptr == NULL)
@@ -1137,9 +1141,9 @@ is_voiced(struct Channel *chptr, struct Client *who)
 int
 can_send(struct Channel *chptr, struct Client *source_p)
 {
-  if(MyClient(source_p) && find_channel_resv(chptr->chname))
+  if (MyClient(source_p) && find_channel_resv(chptr->chname))
     return CAN_SEND_NO;
-    
+
   if (is_any_op(chptr, source_p))
     return CAN_SEND_OPV;
   if (is_voiced(chptr, source_p))
@@ -1230,15 +1234,15 @@ check_spambot_warning(struct Client *source_p, const char *name)
  * side effects - compares usercount and servercount against their split
  *                values and adjusts splitmode accordingly
  */
-void check_splitmode()
+void
+check_splitmode()
 {
-  if(splitmode)
+  if (splitmode)
   {
-    if((Count.server >= split_servers) &&
-       (Count.total >= split_users))
+    if ((Count.server >= split_servers) && (Count.total >= split_users))
     {
       splitmode = 0;
-      
+
       sendto_realops_flags(FLAGS_ALL, L_ALL,
                            "Network rejoined, deactivating splitmode");
       eventDelete(check_splitmode, NULL);
@@ -1246,15 +1250,13 @@ void check_splitmode()
   }
   else
   {
-    if((Count.server < split_servers) &&
-       (Count.total < split_users))
+    if ((Count.server < split_servers) && (Count.total < split_users))
     {
       splitmode = 1;
 
-      sendto_realops_flags(FLAGS_ALL,L_ALL,
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
                            "Network split, activating splitmode");
       eventAdd("check_splitmode", check_splitmode, NULL, 60);
     }
   }
 }
-

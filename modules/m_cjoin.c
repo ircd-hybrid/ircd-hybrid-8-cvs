@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_cjoin.c,v 1.1 2002/01/04 09:13:13 a1kmm Exp $
+ *   $Id: m_cjoin.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -28,7 +28,7 @@
 #include "channel_mode.h"
 #include "vchannel.h"
 #include "client.h"
-#include "common.h"   /* bleah */
+#include "common.h"             /* bleah */
 #include "hash.h"
 #include "irc_string.h"
 #include "ircd.h"
@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void m_cjoin(struct Client*, struct Client*, int, char**);
+static void m_cjoin(struct Client *, struct Client *, int, char **);
 
 struct Message cjoin_msgtab = {
   "CJOIN", 0, 0, 2, 0, MFLG_SLOW, 0,
@@ -64,7 +64,7 @@ _moddeinit(void)
   mod_del_cmd(&cjoin_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** m_cjoin
@@ -72,44 +72,41 @@ char *_version = "$Revision: 1.1 $";
 **      parv[1] = channel
 **      parv[2] = channel password (key)
 */
-static void m_cjoin(struct Client *client_p,
-                   struct Client *source_p,
-                   int parc,
-                   char *parv[])
+static void
+m_cjoin(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
-  static char   jbuf[BUFSIZE];
+  static char jbuf[BUFSIZE];
   struct Channel *chptr = NULL;
   struct Channel *vchan_chptr = NULL;
   struct Channel *root_vchan = NULL;
-  char  *name;
-  char  *p = NULL;
+  char *name;
+  char *p = NULL;
 
   if (!(source_p->user))
-    {
-      /* something is *fucked* - bail */
-      return;
-    }
-
-  if(ConfigChannel.use_vchans == 0)
   {
-    sendto_one(source_p, form_str(ERR_VCHANDISABLED),
-               me.name, parv[0]);
+    /* something is *fucked* - bail */
     return;
   }
-  
+
+  if (ConfigChannel.use_vchans == 0)
+  {
+    sendto_one(source_p, form_str(ERR_VCHANDISABLED), me.name, parv[0]);
+    return;
+  }
+
   if (ConfigChannel.vchans_oper_only && !IsOper(source_p))
   {
-    sendto_one(source_p, form_str(ERR_NOPRIVILEGES),
-               me.name, parv[0]);
+    sendto_one(source_p, form_str(ERR_NOPRIVILEGES), me.name, parv[0]);
     return;
   }
 
   if (*parv[1] == '\0')
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "CJOIN");
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "CJOIN");
+    return;
+  }
 
 
   /* Ok, only allowed to CJOIN already existing channels
@@ -119,94 +116,86 @@ static void m_cjoin(struct Client *client_p,
   *jbuf = '\0';
 
   name = parv[1];
-  if ( (p = strchr(name,',')) )
+  if ((p = strchr(name, ',')))
     *p = '\0';
 
   if (!check_channel_name(name))
-    {
-      sendto_one(source_p, form_str(ERR_BADCHANNAME),
-		 me.name, parv[0], (unsigned char*) name);
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_BADCHANNAME),
+               me.name, parv[0], (unsigned char *)name);
+    return;
+  }
 
   if (*name == '&')
-    {
-      sendto_one(source_p, form_str(ERR_BADCHANNAME),
-		 me.name, parv[0], (unsigned char*) name);
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_BADCHANNAME),
+               me.name, parv[0], (unsigned char *)name);
+    return;
+  }
 
   if (!IsChannelName(name))
-    {
-      sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
-		 me.name, parv[0], name);
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL), me.name, parv[0], name);
+    return;
+  }
 
   (void)strncpy(jbuf, name, sizeof(jbuf) - 1);
 
   if ((chptr = hash_find_channel(name)) == NULL)
+  {
+    /* if chptr isn't found locally, it =could= exist
+     * on the uplink. So ask.
+     */
+    if (!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL))
     {
-      /* if chptr isn't found locally, it =could= exist
-       * on the uplink. So ask.
+      /* cache the channel if it exists on uplink
+       * If the channel as seen by the uplink, has vchans,
+       * the uplink will have to SJOIN all of those.
        */
-      if ( !ServerInfo.hub && uplink &&
-           IsCapable(uplink, CAP_LL))
-        {
-          /* cache the channel if it exists on uplink
-           * If the channel as seen by the uplink, has vchans,
-           * the uplink will have to SJOIN all of those.
-           */
-          sendto_one(uplink, ":%s CBURST %s !%s",
-                     me.name, parv[1], source_p->name);
+      sendto_one(uplink, ":%s CBURST %s !%s",
+                 me.name, parv[1], source_p->name);
 
-          return;
-        }
-      else
-        {
-          sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
-                     me.name, source_p->name, name);
-        }
       return;
     }
+    else
+    {
+      sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
+                 me.name, source_p->name, name);
+    }
+    return;
+  }
 
-  if (! (vchan_chptr = cjoin_channel(chptr, source_p, name)) )
+  if (!(vchan_chptr = cjoin_channel(chptr, source_p, name)))
     return;
 
   root_vchan = chptr;
   chptr = vchan_chptr;
-  
+
   /*
-  **  Complete user entry to the new channel
-  */
+     **  Complete user entry to the new channel
+   */
   add_user_to_channel(chptr, source_p, CHFL_CHANOP);
 
   sendto_channel_local(ALL_MEMBERS, chptr,
-			":%s!%s@%s JOIN :%s",
-			source_p->name,
-			source_p->username,
-			source_p->host,
-			root_vchan->chname);
+                       ":%s!%s@%s JOIN :%s",
+                       source_p->name,
+                       source_p->username,
+                       source_p->host, root_vchan->chname);
 
   sendto_server(client_p, NULL, chptr, NOCAPS, NOCAPS, NOFLAGS,
                 ":%s SJOIN %lu %s + :@%s",
                 me.name,
-                (unsigned long) chptr->channelts,
-                chptr->chname,
-                source_p->name);
+                (unsigned long)chptr->channelts,
+                chptr->chname, source_p->name);
 
   vchan_chptr->mode.mode |= MODE_TOPICLIMIT;
   vchan_chptr->mode.mode |= MODE_NOPRIVMSGS;
 
-  sendto_channel_local(ALL_MEMBERS,chptr,
-			":%s MODE %s +nt",
-			me.name,
-			root_vchan->chname);
+  sendto_channel_local(ALL_MEMBERS, chptr,
+                       ":%s MODE %s +nt", me.name, root_vchan->chname);
 
   sendto_server(source_p, NULL, vchan_chptr, NOCAPS, NOCAPS, NOFLAGS,
-                ":%s MODE %s +nt",
-                me.name,
-                vchan_chptr->chname);
+                ":%s MODE %s +nt", me.name, vchan_chptr->chname);
 
   del_invite(vchan_chptr, source_p);
   channel_member_names(source_p, vchan_chptr, root_vchan->chname, 1);

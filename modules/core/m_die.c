@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_die.c,v 1.1 2002/01/04 10:57:31 a1kmm Exp $
+ *   $Id: m_die.c,v 1.2 2002/01/04 11:06:34 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -37,7 +37,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mo_die(struct Client*, struct Client*, int, char**);
+static void mo_die(struct Client *, struct Client *, int, char **);
 
 struct Message die_msgtab = {
   "DIE", 0, 0, 1, 0, MFLG_SLOW, 0,
@@ -56,56 +56,57 @@ _moddeinit(void)
   mod_del_cmd(&die_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_die - DIE command handler
  */
-static void mo_die(struct Client *client_p, struct Client *source_p,
-                  int parc, char *parv[])
+static void
+mo_die(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
-  struct Client* target_p;
+  struct Client *target_p;
   dlink_node *ptr;
 
   if (!IsOperDie(source_p))
-    {
-      sendto_one(source_p,":%s NOTICE %s :You need die = yes;", me.name, parv[0]);
-      return;
-    }
+  {
+    sendto_one(source_p, ":%s NOTICE %s :You need die = yes;", me.name,
+               parv[0]);
+    return;
+  }
 
   if (parc < 2)
+  {
+    sendto_one(source_p, ":%s NOTICE %s :Need server name /die %s",
+               me.name, source_p->name, me.name);
+    return;
+  }
+  else
+  {
+    if (irccmp(parv[1], me.name))
     {
-      sendto_one(source_p,":%s NOTICE %s :Need server name /die %s",
-                 me.name,source_p->name,me.name);
+      sendto_one(source_p, ":%s NOTICE %s :Mismatch on /die %s",
+                 me.name, source_p->name, me.name);
       return;
     }
-  else
-    {
-      if (irccmp(parv[1], me.name))
-        {
-          sendto_one(source_p,":%s NOTICE %s :Mismatch on /die %s",
-                     me.name,source_p->name,me.name);
-          return;
-        }
-    }
+  }
 
-  for(ptr = lclient_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  for (ptr = lclient_list.head; ptr; ptr = ptr->next)
+  {
+    target_p = ptr->data;
 
-      sendto_one(target_p,
-		 ":%s NOTICE %s :Server Terminating. %s",
-		 me.name, target_p->name,
-		 get_client_name(source_p, HIDE_IP));
-    }
+    sendto_one(target_p,
+               ":%s NOTICE %s :Server Terminating. %s",
+               me.name, target_p->name, get_client_name(source_p, HIDE_IP));
+  }
 
-  for(ptr = serv_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  for (ptr = serv_list.head; ptr; ptr = ptr->next)
+  {
+    target_p = ptr->data;
 
-      sendto_one(target_p, ":%s ERROR :Terminated by %s",
-		 me.name, get_client_name(source_p, HIDE_IP));
-    }
+    sendto_one(target_p, ":%s ERROR :Terminated by %s",
+               me.name, get_client_name(source_p, HIDE_IP));
+  }
 
   /*
    * XXX we called flush_connections() here. Read server_reboot()
@@ -119,4 +120,3 @@ static void mo_die(struct Client *client_p, struct Client *source_p,
   exit(0);
   /* NOT REACHED */
 }
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_quit.c,v 1.1 2002/01/04 10:57:32 a1kmm Exp $
+ *   $Id: m_quit.c,v 1.2 2002/01/04 11:06:34 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -33,8 +33,8 @@
 #include "modules.h"
 #include "s_conf.h"
 
-static void m_quit(struct Client*, struct Client*, int, char**);
-static void ms_quit(struct Client*, struct Client*, int, char**);
+static void m_quit(struct Client *, struct Client *, int, char **);
+static void ms_quit(struct Client *, struct Client *, int, char **);
 
 struct Message quit_msgtab = {
   "QUIT", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
@@ -54,41 +54,40 @@ _moddeinit(void)
   mod_del_cmd(&quit_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** m_quit
 **      parv[0] = sender prefix
 **      parv[1] = comment
 */
-static void m_quit(struct Client *client_p,
-                  struct Client *source_p,
-                  int parc,
-                  char *parv[])
+static void
+m_quit(struct Client *client_p,
+       struct Client *source_p, int parc, char *parv[])
 {
   char *comment = (parc > 1 && parv[1]) ? parv[1] : client_p->name;
-  char reason [TOPICLEN + 1];
+  char reason[TOPICLEN + 1];
 
   source_p->flags |= FLAGS_NORMALEX;
   if (strlen(comment) > (size_t) TOPICLEN)
     comment[TOPICLEN] = '\0';
 
   if (ConfigFileEntry.client_exit && comment[0])
-    {
+  {
 #ifndef VMS
-      snprintf(reason, TOPICLEN, "Client Exit: %s", comment);
+    snprintf(reason, TOPICLEN, "Client Exit: %s", comment);
 #else
-      sprintf(reason, "Client Exit: %s", comment);
+    sprintf(reason, "Client Exit: %s", comment);
 #endif
-      comment = reason;
-    }
-  
-  if(!IsOper(source_p) && 
-     (source_p->firsttime + ConfigFileEntry.anti_spam_exit_message_time)
-     > CurrentTime)
-    {
-      comment = "Client Quit";
-    }
+    comment = reason;
+  }
+
+  if (!IsOper(source_p) &&
+      (source_p->firsttime + ConfigFileEntry.anti_spam_exit_message_time)
+      > CurrentTime)
+  {
+    comment = "Client Quit";
+  }
 
   exit_client(client_p, source_p, source_p, comment);
 }
@@ -98,10 +97,9 @@ static void m_quit(struct Client *client_p,
 **      parv[0] = sender prefix
 **      parv[1] = comment
 */
-static void ms_quit(struct Client *client_p,
-                   struct Client *source_p,
-                   int parc,
-                   char *parv[])
+static void
+ms_quit(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   char *comment = (parc > 1 && parv[1]) ? parv[1] : client_p->name;
 
@@ -111,4 +109,3 @@ static void ms_quit(struct Client *client_p,
 
   exit_client(client_p, source_p, source_p, comment);
 }
-

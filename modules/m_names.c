@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_names.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_names.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -28,7 +28,7 @@
 #include "channel_mode.h"
 #include "vchannel.h"
 #include "client.h"
-#include "common.h"   /* bleah */
+#include "common.h"             /* bleah */
 #include "hash.h"
 #include "irc_string.h"
 #include "ircd.h"
@@ -48,8 +48,8 @@
 static void names_all_visible_channels(struct Client *source_p);
 static void names_non_public_non_secret(struct Client *source_p);
 
-static void m_names(struct Client*, struct Client*, int, char**);
-static void ms_names(struct Client*, struct Client*, int, char**);
+static void m_names(struct Client *, struct Client *, int, char **);
+static void ms_names(struct Client *, struct Client *, int, char **);
 
 struct Message names_msgtab = {
   "NAMES", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -69,7 +69,7 @@ _moddeinit(void)
   mod_del_cmd(&names_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /************************************************************************
@@ -82,11 +82,10 @@ char *_version = "$Revision: 1.1 $";
 **      parv[1] = channel
 **      parv[2] = vkey
 */
-static void m_names(struct Client *client_p,
-                    struct Client *source_p,
-                    int parc,
-                    char *parv[])
-{ 
+static void
+m_names(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
+{
   struct Channel *vchan = NULL;
   struct Channel *ch2ptr = NULL;
   char *s;
@@ -94,55 +93,53 @@ static void m_names(struct Client *client_p,
   char *vkey = NULL;
 
   if (!BadPtr(para))
+  {
+    if ((s = strchr(para, ',')))
+      *s = '\0';
+
+    if (parc > 2)
+      vkey = parv[2];
+
+    if (!check_channel_name(para))
     {
-      if( (s = strchr(para, ',')) )
-        *s = '\0';
+      sendto_one(source_p, form_str(ERR_BADCHANNAME),
+                 me.name, parv[0], (unsigned char *)para);
+      return;
+    }
 
-      if (parc > 2)
-        vkey = parv[2];
+    if ((ch2ptr = hash_find_channel(para)) != NULL)
+    {
+      if (HasVchans(ch2ptr))
+      {
+        vchan = map_vchan(ch2ptr, source_p);
 
-      if (!check_channel_name(para))
-        { 
-          sendto_one(source_p, form_str(ERR_BADCHANNAME),
-                     me.name, parv[0], (unsigned char *)para);
+        if ((vkey && !vkey[1]) || (!vchan && !vkey))
+        {
+          show_vchans(source_p, ch2ptr, "names");
           return;
         }
-
-      if ((ch2ptr = hash_find_channel(para)) != NULL)
+        else if (vkey && vkey[1])
         {
-          if (HasVchans(ch2ptr))
-            {
-              vchan = map_vchan(ch2ptr, source_p);
-
-              if ((vkey && !vkey[1]) || (!vchan && !vkey))
-                {
-                  show_vchans(source_p, ch2ptr, "names");
-                  return;
-                }
-              else if (vkey && vkey[1])
-                {
-                  vchan = find_vchan(ch2ptr, vkey);
-                  if(!vchan)
-                    return;
-                }
-              channel_member_names(source_p, vchan, ch2ptr->chname, 1);
-            }
-          else
-            {
-              channel_member_names(source_p, ch2ptr, ch2ptr->chname, 1);
-            }
+          vchan = find_vchan(ch2ptr, vkey);
+          if (!vchan)
+            return;
         }
+        channel_member_names(source_p, vchan, ch2ptr->chname, 1);
+      }
       else
-        sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name,
-                   parv[0], para);
+      {
+        channel_member_names(source_p, ch2ptr, ch2ptr->chname, 1);
+      }
     }
+    else
+      sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, parv[0], para);
+  }
   else
-    {
-      names_all_visible_channels(source_p);
-      names_non_public_non_secret(source_p);
-      sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, parv[0],
-                 "*");
-    }
+  {
+    names_all_visible_channels(source_p);
+    names_non_public_non_secret(source_p);
+    sendto_one(source_p, form_str(RPL_ENDOFNAMES), me.name, parv[0], "*");
+  }
 }
 
 /*
@@ -153,31 +150,32 @@ static void m_names(struct Client *client_p,
  * side effects - lists all visible channels whee!
  */
 
-static void names_all_visible_channels(struct Client *source_p)
+static void
+names_all_visible_channels(struct Client *source_p)
 {
   struct Channel *chptr;
   struct Channel *bchan;
-  char *chname=NULL;
+  char *chname = NULL;
 
   /* 
    * First, do all visible channels (public and the one user self is)
    */
 
   for (chptr = GlobalChannelList; chptr; chptr = chptr->nextch)
+  {
+    if (IsVchan(chptr))
     {
-      if (IsVchan(chptr))
-        {
-          bchan = find_bchan (chptr);
-          if (bchan != NULL)
-            chname = bchan->chname;
-        }
-      else
-        chname = chptr->chname;
-
-      /* Find users on same channel (defined by chptr) */
-
-      channel_member_names( source_p, chptr, chname, 0);
+      bchan = find_bchan(chptr);
+      if (bchan != NULL)
+        chname = bchan->chname;
     }
+    else
+      chname = chptr->chname;
+
+    /* Find users on same channel (defined by chptr) */
+
+    channel_member_names(source_p, chptr, chname, 0);
+  }
 }
 
 /*
@@ -188,21 +186,21 @@ static void names_all_visible_channels(struct Client *source_p)
  * side effects - lists all non public non secret channels
  */
 
-static void names_non_public_non_secret(struct Client *source_p)
+static void
+names_non_public_non_secret(struct Client *source_p)
 {
   int mlen;
   int tlen;
   int cur_len;
   int reply_to_send = NO;
   int dont_show = NO;
-  dlink_node    *lp;
+  dlink_node *lp;
   struct Client *c2ptr;
-  struct Channel *ch3ptr=NULL;
+  struct Channel *ch3ptr = NULL;
   char buf[BUFSIZE];
   char *t;
 
-  ircsprintf(buf,form_str(RPL_NAMREPLY),
-             me.name,source_p->name," * * :");
+  ircsprintf(buf, form_str(RPL_NAMREPLY), me.name, source_p->name, " * * :");
 
   mlen = strlen(buf);
   cur_len = mlen;
@@ -211,72 +209,70 @@ static void names_non_public_non_secret(struct Client *source_p)
   /* Second, do all non-public, non-secret channels in one big sweep */
 
   for (c2ptr = GlobalClientList; c2ptr; c2ptr = c2ptr->next)
+  {
+    if (!IsPerson(c2ptr) || IsInvisible(c2ptr))
+      continue;
+    /*
+     * dont show a client if they are on a secret channel or
+     * they are on a channel source_p is on since they have already
+     * been shown earlier. -avalon
+     */
+    for (lp = c2ptr->user->channel.head; lp; lp = lp->next)
     {
-      if (!IsPerson(c2ptr) || IsInvisible(c2ptr))
-        continue;
-      /*
-       * dont show a client if they are on a secret channel or
-       * they are on a channel source_p is on since they have already
-       * been shown earlier. -avalon
-       */
-      for( lp = c2ptr->user->channel.head; lp; lp = lp->next )
-        {
-          ch3ptr = lp->data;
+      ch3ptr = lp->data;
 
-          if ( (!PubChannel(ch3ptr) || IsMember(source_p, ch3ptr)) ||
-               (SecretChannel(ch3ptr)))
-          {
-            dont_show = YES;
-            break;
-          }
-        }
-      if (dont_show) /* on any secret channels or shown already? */
-        continue;
+      if ((!PubChannel(ch3ptr) || IsMember(source_p, ch3ptr)) ||
+          (SecretChannel(ch3ptr)))
+      {
+        dont_show = YES;
+        break;
+      }
+    }
+    if (dont_show)              /* on any secret channels or shown already? */
+      continue;
 
-      if(lp == NULL)    /* Nothing to do. yay */
-        continue;
+    if (lp == NULL)             /* Nothing to do. yay */
+      continue;
 
-      if ( (cur_len + NICKLEN + 2)  > (BUFSIZE - 3))
-        {
-          sendto_one(source_p, "%s", buf);
-          cur_len = mlen;
-          t = buf + mlen;
-        }
-
-      if(ch3ptr->mode.mode & MODE_HIDEOPS)
-        ircsprintf(t," %s ", c2ptr->name);
-      else
-        ircsprintf(t,"%s%s ", channel_chanop_or_voice(ch3ptr, c2ptr),
-                   c2ptr->name);
-
-      tlen = strlen(t);
-      cur_len += tlen;
-      t += tlen;
-
-      reply_to_send = YES;
-
+    if ((cur_len + NICKLEN + 2) > (BUFSIZE - 3))
+    {
+      sendto_one(source_p, "%s", buf);
+      cur_len = mlen;
+      t = buf + mlen;
     }
 
+    if (ch3ptr->mode.mode & MODE_HIDEOPS)
+      ircsprintf(t, " %s ", c2ptr->name);
+    else
+      ircsprintf(t, "%s%s ", channel_chanop_or_voice(ch3ptr, c2ptr),
+                 c2ptr->name);
+
+    tlen = strlen(t);
+    cur_len += tlen;
+    t += tlen;
+
+    reply_to_send = YES;
+
+  }
+
   if (reply_to_send)
-    sendto_one(source_p, "%s", buf );
+    sendto_one(source_p, "%s", buf);
 }
 
-static void ms_names( struct Client *client_p,
-                     struct Client *source_p,
-                     int parc,
-                     char *parv[])
-{ 
+static void
+ms_names(struct Client *client_p,
+         struct Client *source_p, int parc, char *parv[])
+{
   /* If its running as a hub, and linked with lazy links
    * then allow leaf to use normal client m_names()
    * other wise, ignore it.
    */
 
-  if( ServerInfo.hub )
-    {
-      if(!IsCapable(client_p->from,CAP_LL))
-        return;
-    }
+  if (ServerInfo.hub)
+  {
+    if (!IsCapable(client_p->from, CAP_LL))
+      return;
+  }
 
-  m_names(client_p,source_p,parc,parv);
+  m_names(client_p, source_p, parc, parv);
 }
-

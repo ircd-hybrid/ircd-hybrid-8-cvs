@@ -2,7 +2,7 @@
  * modules/m_help.c
  * Copyright (C) 2001 Hybrid Development Team
  *
- *   $Id: m_help.c,v 1.1 2002/01/04 09:13:16 a1kmm Exp $
+ *   $Id: m_help.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -17,9 +17,9 @@
 #include "parse.h"
 #include "modules.h"
 
-static void m_help(struct Client*, struct Client*, int, char**);
-static void mo_help(struct Client*, struct Client*, int, char**);
-static void mo_uhelp(struct Client*, struct Client*, int, char**);
+static void m_help(struct Client *, struct Client *, int, char **);
+static void mo_help(struct Client *, struct Client *, int, char **);
+static void mo_uhelp(struct Client *, struct Client *, int, char **);
 static void dohelp(struct Client *, char *, char *, char *);
 static void sendhelpfile(struct Client *, char *, char *, char *);
 
@@ -34,28 +34,29 @@ struct Message uhelp_msgtab = {
 };
 #ifndef STATIC_MODULES
 
-  void
+void
 _modinit(void)
 {
   mod_add_cmd(&help_msgtab);
   mod_add_cmd(&uhelp_msgtab);
 }
 
-  void
+void
 _moddeinit(void)
 {
   mod_del_cmd(&help_msgtab);
   mod_del_cmd(&uhelp_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_help - HELP message handler
  *      parv[0] = sender prefix
  */
-static void m_help(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+m_help(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
   static time_t last_used = 0;
 
@@ -63,7 +64,7 @@ static void m_help(struct Client *client_p, struct Client *source_p,
   if ((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
   {
     /* safe enough to give this on a local connect only */
-    sendto_one(source_p,form_str(RPL_LOAD2HI),me.name,parv[0]);
+    sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0]);
     return;
   }
   else
@@ -71,7 +72,7 @@ static void m_help(struct Client *client_p, struct Client *source_p,
     last_used = CurrentTime;
   }
 
-  if(parc > 1)
+  if (parc > 1)
     dohelp(source_p, UHPATH, parv[1], parv[0]);
   else
     dohelp(source_p, UHPATH, NULL, parv[0]);
@@ -81,10 +82,11 @@ static void m_help(struct Client *client_p, struct Client *source_p,
  * mo_help - HELP message handler
  *      parv[0] = sender prefix
  */
-static void mo_help(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+mo_help(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
-  if(parc > 1)
+  if (parc > 1)
     dohelp(source_p, HPATH, parv[1], parv[0]);
   else
     dohelp(source_p, HPATH, NULL, parv[0]);
@@ -96,17 +98,18 @@ static void mo_help(struct Client *client_p, struct Client *source_p,
  *      parv[0] = sender prefix
  */
 
-static void mo_uhelp(struct Client *client_p, struct Client *source_p,
-                     int parc, char *parv[])
+static void
+mo_uhelp(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
-  if(parc > 1)
+  if (parc > 1)
     dohelp(source_p, UHPATH, parv[1], parv[0]);
   else
     dohelp(source_p, UHPATH, NULL, parv[0]);
 }
 
-static void dohelp(struct Client *source_p, char *hpath,
-                   char *topic, char *nick)
+static void
+dohelp(struct Client *source_p, char *hpath, char *topic, char *nick)
 {
   char path[MAXPATHLEN + 1];
   struct stat sb;
@@ -121,7 +124,7 @@ static void dohelp(struct Client *source_p, char *hpath,
     }
   }
   else
-    topic = "index"; /* list available help topics */
+    topic = "index";            /* list available help topics */
 
   if (strchr(topic, '/'))
   {
@@ -153,8 +156,8 @@ static void dohelp(struct Client *source_p, char *hpath,
   return;
 }
 
-static void sendhelpfile(struct Client *source_p, char *path,
-                         char *topic, char *nick)
+static void
+sendhelpfile(struct Client *source_p, char *path, char *topic, char *nick)
 {
   FILE *file;
   char line[HELPLEN];
@@ -181,4 +184,3 @@ static void sendhelpfile(struct Client *source_p, char *path,
   sendto_one(source_p, form_str(RPL_ENDOFHELP), me.name, nick, topic);
   return;
 }
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_away.c,v 1.1 2002/01/04 09:13:13 a1kmm Exp $
+ *   $Id: m_away.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -36,7 +36,7 @@
 
 #include <stdlib.h>
 
-static void m_away(struct Client*, struct Client*, int, char**);
+static void m_away(struct Client *, struct Client *, int, char **);
 
 struct Message away_msgtab = {
   "AWAY", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -54,7 +54,8 @@ _moddeinit(void)
 {
   mod_del_cmd(&away_msgtab);
 }
-char *_version = "$Revision: 1.1 $";
+
+char *_version = "$Revision: 1.2 $";
 #endif
 /***********************************************************************
  * m_away() - Added 14 Dec 1988 by jto. 
@@ -72,51 +73,49 @@ char *_version = "$Revision: 1.1 $";
 **      parv[0] = sender prefix
 **      parv[1] = away message
 */
-static void m_away(struct Client *client_p,
-                  struct Client *source_p,
-                  int parc,
-                  char *parv[])
+static void
+m_away(struct Client *client_p,
+       struct Client *source_p, int parc, char *parv[])
 {
-  char  *away, *awy2 = parv[1];
+  char *away, *awy2 = parv[1];
 
   /* make sure the user exists */
   if (!(source_p->user))
-    {
-      sendto_realops_flags(FLAGS_DEBUG, L_ALL,
-                           "Got AWAY from nil user, from %s (%s)",
-			   client_p->name, source_p->name);
-      return;
-    }
+  {
+    sendto_realops_flags(FLAGS_DEBUG, L_ALL,
+                         "Got AWAY from nil user, from %s (%s)",
+                         client_p->name, source_p->name);
+    return;
+  }
   away = source_p->user->away;
 
   if (parc < 2 || !*awy2)
-    {
-      /* Marking as not away */
+  {
+    /* Marking as not away */
 
-      if (away)
-        {
-          /* we now send this only if they were away before --is */
-          sendto_server(client_p, source_p, NULL, CAP_UID, NOCAPS,
-                        NOFLAGS, ":%s AWAY", ID(source_p));
-          sendto_server(client_p, source_p, NULL, NOCAPS, CAP_UID,
-                        NOFLAGS, ":%s AWAY", source_p->name);
-          MyFree(away);
-          source_p->user->away = NULL;
-        }
-      if (MyConnect(source_p))
-        sendto_one(source_p, form_str(RPL_UNAWAY),
-                   me.name, parv[0]);
-      return;
+    if (away)
+    {
+      /* we now send this only if they were away before --is */
+      sendto_server(client_p, source_p, NULL, CAP_UID, NOCAPS,
+                    NOFLAGS, ":%s AWAY", ID(source_p));
+      sendto_server(client_p, source_p, NULL, NOCAPS, CAP_UID,
+                    NOFLAGS, ":%s AWAY", source_p->name);
+      MyFree(away);
+      source_p->user->away = NULL;
     }
+    if (MyConnect(source_p))
+      sendto_one(source_p, form_str(RPL_UNAWAY), me.name, parv[0]);
+    return;
+  }
 
   /* Marking as away */
-  
+
   if (MyConnect(source_p) && !IsOper(source_p) &&
-     (CurrentTime-source_p->user->last_away)<ConfigFileEntry.pace_wait)
-    {
-      sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0]);
-      return;
-    }
+      (CurrentTime - source_p->user->last_away) < ConfigFileEntry.pace_wait)
+  {
+    sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0]);
+    return;
+  }
 
   source_p->user->last_away = CurrentTime;
 
@@ -134,12 +133,11 @@ static void m_away(struct Client *client_p,
   else
     MyFree(away);
 
-  away = (char *)MyMalloc(strlen(awy2)+1);
-  strcpy(away,awy2);
+  away = (char *)MyMalloc(strlen(awy2) + 1);
+  strcpy(away, awy2);
 
   source_p->user->away = away;
 
   if (MyConnect(source_p))
     sendto_one(source_p, form_str(RPL_NOWAWAY), me.name, parv[0]);
 }
-

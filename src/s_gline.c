@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: s_gline.c,v 1.1 2002/01/04 09:14:40 a1kmm Exp $
+ *  $Id: s_gline.c,v 1.2 2002/01/04 11:06:42 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -80,11 +80,12 @@ add_gline(struct ConfItem *aconf)
  * output       - struct ConfItem pointer if a gline was found for this client
  * side effects - none
  */
-struct ConfItem*
-find_gkill(struct Client* client_p, char* username)
+struct ConfItem *
+find_gkill(struct Client *client_p, char *username)
 {
   assert(0 != client_p);
-  return (IsExemptKline(client_p)) ? 0 : find_is_glined(client_p->host, username);
+  return (IsExemptKline(client_p)) ? 0 : find_is_glined(client_p->host,
+                                                        username);
 }
 
 /*
@@ -94,24 +95,23 @@ find_gkill(struct Client* client_p, char* username)
  * output       - pointer to struct ConfItem if user@host glined
  * side effects -
  */
-struct ConfItem*
-find_is_glined(const char* host, const char* name)
+struct ConfItem *
+find_is_glined(const char *host, const char *name)
 {
   dlink_node *gline_node;
-  struct ConfItem *kill_ptr; 
+  struct ConfItem *kill_ptr;
 
-  for(gline_node = glines.head; gline_node; gline_node = gline_node->next)
+  for (gline_node = glines.head; gline_node; gline_node = gline_node->next)
+  {
+    kill_ptr = gline_node->data;
+    if ((kill_ptr->name && (!name || match(kill_ptr->name, name)))
+        && (kill_ptr->host && (!host || match(kill_ptr->host, host))))
     {
-      kill_ptr = gline_node->data;
-      if( (kill_ptr->name && (!name || match(kill_ptr->name,name)))
-	  &&
-	  (kill_ptr->host && (!host || match(kill_ptr->host,host))))
-        {
-          return(kill_ptr);
-        }
+      return (kill_ptr);
     }
+  }
 
-  return((struct ConfItem *)NULL);
+  return ((struct ConfItem *)NULL);
 }
 
 /*
@@ -122,22 +122,22 @@ find_is_glined(const char* host, const char* name)
  * side effects -
  */
 int
-remove_gline_match(const char* user, const char* host)
+remove_gline_match(const char *user, const char *host)
 {
   dlink_node *gline_node;
   struct ConfItem *kill_ptr;
 
-  for(gline_node = glines.head; gline_node; gline_node = gline_node->next)
+  for (gline_node = glines.head; gline_node; gline_node = gline_node->next)
+  {
+    kill_ptr = gline_node->data;
+    if (!irccmp(kill_ptr->host, host) && !irccmp(kill_ptr->name, user))
     {
-      kill_ptr = gline_node->data;
-      if(!irccmp(kill_ptr->host,host) && !irccmp(kill_ptr->name,user))
-	{
-          free_conf(kill_ptr);
-          dlinkDelete(gline_node, &glines);
-          free_dlink_node(gline_node);
-          return 1;
-	}
+      free_conf(kill_ptr);
+      dlinkDelete(gline_node, &glines);
+      free_dlink_node(gline_node);
+      return 1;
     }
+  }
   return 0;
 }
 
@@ -172,18 +172,18 @@ expire_glines()
   dlink_node *next_node;
   struct ConfItem *kill_ptr;
 
-  for(gline_node = glines.head; gline_node; gline_node = next_node)
-    {
-      kill_ptr = gline_node->data;
-      next_node = gline_node->next;
+  for (gline_node = glines.head; gline_node; gline_node = next_node)
+  {
+    kill_ptr = gline_node->data;
+    next_node = gline_node->next;
 
-      if(kill_ptr->hold <= CurrentTime)
-	{
-	  free_conf(kill_ptr);
-          dlinkDelete(gline_node, &glines);
-          free_dlink_node(gline_node);
-	}
+    if (kill_ptr->hold <= CurrentTime)
+    {
+      free_conf(kill_ptr);
+      dlinkDelete(gline_node, &glines);
+      free_dlink_node(gline_node);
     }
+  }
 }
 
 /*
@@ -203,20 +203,21 @@ expire_pending_glines()
   dlink_node *next_node;
   struct gline_pending *glp_ptr;
 
-  for(pending_node = pending_glines.head; pending_node; pending_node = next_node)
-    {
-      glp_ptr = pending_node->data;
-      next_node = pending_node->next;
+  for (pending_node = pending_glines.head; pending_node;
+       pending_node = next_node)
+  {
+    glp_ptr = pending_node->data;
+    next_node = pending_node->next;
 
-      if(((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <= CurrentTime)
+    if (((glp_ptr->last_gline_time + GLINE_PENDING_EXPIRE) <= CurrentTime)
         || find_is_glined(glp_ptr->host, glp_ptr->user))
-      
-        {
-          MyFree(glp_ptr->reason1);
-          MyFree(glp_ptr->reason2);
-          MyFree(glp_ptr);
-          dlinkDelete(pending_node, &pending_glines);
-          free_dlink_node(pending_node);
-        }
+
+    {
+      MyFree(glp_ptr->reason1);
+      MyFree(glp_ptr->reason2);
+      MyFree(glp_ptr);
+      dlinkDelete(pending_node, &pending_glines);
+      free_dlink_node(pending_node);
     }
+  }
 }

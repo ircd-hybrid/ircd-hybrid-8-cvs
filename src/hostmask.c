@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * $Id: hostmask.c,v 1.1 2002/01/04 09:14:02 a1kmm Exp $ 
+ * $Id: hostmask.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $ 
  */
 
 #include <stdlib.h>
@@ -429,7 +429,7 @@ find_conf_by_address(const char *name, struct irc_inaddr *addr, int type,
     const char *p;
     /* And yes - we have to check p after strchr and p after increment for
      * NULL -kre */
-    for (p = name; p != NULL; )
+    for (p = name; p != NULL;)
     {
       for (arec = atable[hash_text(p)]; arec; arec = arec->next)
         if ((arec->type == (type & ~0x1)) &&
@@ -441,11 +441,11 @@ find_conf_by_address(const char *name, struct irc_inaddr *addr, int type,
           hprecv = arec->precedence;
           hprec = arec->aconf;
         }
-        p = strchr(p, '.');
-        if (p != NULL)
-          p++;
-        else
-          break;
+      p = strchr(p, '.');
+      if (p != NULL)
+        p++;
+      else
+        break;
     }
     for (arec = atable[0]; arec; arec = arec->next)
       if (arec->type == (type & ~0x1) &&
@@ -715,9 +715,9 @@ report_auth(struct Client *client_p)
          * sender, so prepare the strings for comparing --fl_ */
 
         sendto_one(client_p, form_str(RPL_STATSILINE), me.name,
-                   client_p->name, (IsConfRestricted(aconf)) ? 'i' : 'I', name,
-                   show_iline_prefix(client_p, aconf, user),
-                   host, port, classname);
+                   client_p->name, (IsConfRestricted(aconf)) ? 'i' : 'I',
+                   name, show_iline_prefix(client_p, aconf, user), host, port,
+                   classname);
       }
 }
 
@@ -743,15 +743,13 @@ report_Klines(struct Client *client_p, int tkline, int mask)
 
   if (mask)
   {
-     aconf = find_address_conf(client_p->host, client_p->username,
-                               NULL, 0);
-     if (!aconf || (aconf->status & CONF_KILL) == 0)
-       return;
-     get_printable_conf(aconf, &name, &host, &pass, &user, &port,
-                        &classname);
-     sendto_one(client_p, form_str(RPL_STATSKLINE), me.name,
-                client_p->name, c, host, user, pass);
-     return;
+    aconf = find_address_conf(client_p->host, client_p->username, NULL, 0);
+    if (!aconf || (aconf->status & CONF_KILL) == 0)
+      return;
+    get_printable_conf(aconf, &name, &host, &pass, &user, &port, &classname);
+    sendto_one(client_p, form_str(RPL_STATSKLINE), me.name,
+               client_p->name, c, host, user, pass);
+    return;
   }
 
   for (i = 0; i < ATABLE_SIZE; i++)

@@ -4,7 +4,7 @@
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Co Center
  *
- * $Id: fileio.c,v 1.1 2002/01/04 09:13:56 a1kmm Exp $
+ * $Id: fileio.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,18 @@
  */
 #include "fileio.h"
 #include "irc_string.h"
-#include "client.h"	/* for FLAGS_ALL */
-#include "send.h"	/* sendto_realops_flags */
+#include "client.h"             /* for FLAGS_ALL */
+#include "send.h"               /* sendto_realops_flags */
 #include "memory.h"
 
 /* The following are to get the fd manipulation routines. eww. */
 #include "fdlist.h"
 
-#include <stdio.h>  /* BUFSIZ, EOF */
-#include <stdlib.h> /* malloc, free */
-#include <fcntl.h>  /* O_RDONLY, O_WRONLY, ... */
-#include <unistd.h> /* read, write, open, close */
-#include <assert.h> /* assert */
+#include <stdio.h>              /* BUFSIZ, EOF */
+#include <stdlib.h>             /* malloc, free */
+#include <fcntl.h>              /* O_RDONLY, O_WRONLY, ... */
+#include <unistd.h>             /* read, write, open, close */
+#include <assert.h>             /* assert */
 #include <errno.h>
 #include <string.h>
 
@@ -46,37 +46,40 @@
 int
 file_open(const char *filename, int mode, int fmode)
 {
-    int fd;
-    fd = open(filename, mode, fmode);
-    if (fd == MASTER_MAX) {
-        fd_close(fd); /* Too many FDs! */
-        errno = ENFILE;
-        fd = -1;
-    } else if (fd >= 0)
-        fd_open(fd, FD_FILE, filename);
-    
-    return fd;
+  int fd;
+  fd = open(filename, mode, fmode);
+  if (fd == MASTER_MAX)
+  {
+    fd_close(fd);               /* Too many FDs! */
+    errno = ENFILE;
+    fd = -1;
+  }
+  else if (fd >= 0)
+    fd_open(fd, FD_FILE, filename);
+
+  return fd;
 }
 
 void
 file_close(int fd)
 {
-    /*
-     * Debug - we set type to FD_FILECLOSE so we can get trapped
-     * in fd_close() with type == FD_FILE. This will allow us to
-     * convert all abusers of fd_close() of a FD_FILE fd over
-     * to file_close() .. mwahaha!
-     */
-    assert(fd_table[fd].type == FD_FILE);
-    fd_table[fd].type = FD_FILECLOSE;
-    fd_close(fd);
+  /*
+   * Debug - we set type to FD_FILECLOSE so we can get trapped
+   * in fd_close() with type == FD_FILE. This will allow us to
+   * convert all abusers of fd_close() of a FD_FILE fd over
+   * to file_close() .. mwahaha!
+   */
+  assert(fd_table[fd].type == FD_FILE);
+  fd_table[fd].type = FD_FILECLOSE;
+  fd_close(fd);
 }
 
-FBFILE* fbopen(const char* filename, const char* mode)
+FBFILE *
+fbopen(const char *filename, const char *mode)
 {
   int openmode = 0;
   int pmode = 0;
-  FBFILE* fb = NULL;
+  FBFILE *fb = NULL;
   int fd;
   assert(filename);
   assert(mode);
@@ -85,28 +88,29 @@ FBFILE* fbopen(const char* filename, const char* mode)
   {
     switch (*mode)
     {
-    case 'r':
-      openmode = O_RDONLY;
-      break;
-    case 'w':
-      openmode = O_WRONLY | O_CREAT | O_TRUNC;
-      pmode = 0644;
-      break;
-    case 'a':
-      openmode = O_WRONLY | O_CREAT | O_APPEND;
-      pmode = 0644;
-      break;
-    case '+':
-      openmode &= ~(O_RDONLY | O_WRONLY);
-      openmode |= O_RDWR;
-      break;
-    default:
-      break;
+      case 'r':
+        openmode = O_RDONLY;
+        break;
+      case 'w':
+        openmode = O_WRONLY | O_CREAT | O_TRUNC;
+        pmode = 0644;
+        break;
+      case 'a':
+        openmode = O_WRONLY | O_CREAT | O_APPEND;
+        pmode = 0644;
+        break;
+      case '+':
+        openmode &= ~(O_RDONLY | O_WRONLY);
+        openmode |= O_RDWR;
+        break;
+      default:
+        break;
     }
     ++mode;
   }
 
-  if ((fd = file_open(filename, openmode, pmode)) == -1) {
+  if ((fd = file_open(filename, openmode, pmode)) == -1)
+  {
     return fb;
   }
 
@@ -115,14 +119,16 @@ FBFILE* fbopen(const char* filename, const char* mode)
   return fb;
 }
 
-FBFILE* fdbopen(int fd, const char* mode)
+FBFILE *
+fdbopen(int fd, const char *mode)
 {
   /*
    * ignore mode, if file descriptor hasn't been opened with the
    * correct mode, the first use will fail
    */
-  FBFILE* fb = (FBFILE*) MyMalloc(sizeof(FBFILE));
-  if (NULL != fb) {
+  FBFILE *fb = (FBFILE *) MyMalloc(sizeof(FBFILE));
+  if (NULL != fb)
+  {
     fb->ptr = fb->endp = fb->buf;
     fb->fd = fd;
     fb->flags = 0;
@@ -131,14 +137,16 @@ FBFILE* fdbopen(int fd, const char* mode)
   return fb;
 }
 
-void fbclose(FBFILE* fb)
+void
+fbclose(FBFILE * fb)
 {
   assert(fb);
   file_close(fb->fd);
   MyFree(fb);
 }
 
-static int fbfill(FBFILE* fb)
+static int
+fbfill(FBFILE * fb)
 {
   int n;
   assert(fb);
@@ -147,7 +155,7 @@ static int fbfill(FBFILE* fb)
   n = read(fb->fd, fb->buf, BUFSIZ);
   if (0 < n)
   {
-    fb->ptr  = fb->buf;
+    fb->ptr = fb->buf;
     fb->endp = fb->buf + n;
   }
   else if (n < 0)
@@ -157,13 +165,13 @@ static int fbfill(FBFILE* fb)
   return n;
 }
 
-int fbgetc(FBFILE* fb)
+int
+fbgetc(FBFILE * fb)
 {
   assert(fb);
-  if(fb->pbptr)
+  if (fb->pbptr)
   {
-    if( (fb->pbptr == (fb->pbuf+BUFSIZ)) ||
-	(!*fb->pbptr) )
+    if ((fb->pbptr == (fb->pbuf + BUFSIZ)) || (!*fb->pbptr))
       fb->pbptr = NULL;
   }
 
@@ -172,39 +180,41 @@ int fbgetc(FBFILE* fb)
   return EOF;
 }
 
-void fbungetc(char c, FBFILE* fb)
+void
+fbungetc(char c, FBFILE * fb)
 {
   assert(fb);
 
-  if(!fb->pbptr)
+  if (!fb->pbptr)
   {
-    fb->pbptr = fb->pbuf+BUFSIZ;
+    fb->pbptr = fb->pbuf + BUFSIZ;
   }
 
-  if(fb->pbptr != fb->pbuf)
+  if (fb->pbptr != fb->pbuf)
   {
     fb->pbptr--;
     *fb->pbptr = c;
   }
 }
 
-char* fbgets(char* buf, size_t len, FBFILE* fb)
+char *
+fbgets(char *buf, size_t len, FBFILE * fb)
 {
-  char* p = buf;
+  char *p = buf;
   assert(buf);
   assert(fb);
   assert(0 < len);
 
-  if(fb->pbptr)
+  if (fb->pbptr)
   {
-    strncpy_irc(buf,fb->pbptr,len);
+    strncpy_irc(buf, fb->pbptr, len);
     fb->pbptr = NULL;
-    return(buf);
+    return (buf);
   }
 
   if (fb->ptr == fb->endp && fbfill(fb) < 1)
     return 0;
-  --len; 
+  --len;
   while (len--)
   {
     *p = *fb->ptr++;
@@ -233,8 +243,9 @@ char* fbgets(char* buf, size_t len, FBFILE* fb)
   *p = '\0';
   return buf;
 }
- 
-int fbputs(const char* str, FBFILE* fb)
+
+int
+fbputs(const char *str, FBFILE * fb)
 {
   int n = -1;
   assert(str);
@@ -249,11 +260,10 @@ int fbputs(const char* str, FBFILE* fb)
   return n;
 }
 
-int fbstat(struct stat* sb, FBFILE* fb)
+int
+fbstat(struct stat *sb, FBFILE * fb)
 {
   assert(sb);
   assert(fb);
   return fstat(fb->fd, sb);
 }
-
-

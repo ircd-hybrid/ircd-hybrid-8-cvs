@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_post.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_post.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -33,7 +33,7 @@
 #include "modules.h"
 #include "s_conf.h"
 
-static void mr_post(struct Client*, struct Client*, int, char**);
+static void mr_post(struct Client *, struct Client *, int, char **);
 
 struct Message post_msgtab = {
   "POST", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
@@ -53,17 +53,16 @@ _moddeinit(void)
   mod_del_cmd(&post_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** mr_post
 **      parv[0] = sender prefix
 **      parv[1] = comment
 */
-static void mr_post(struct Client *client_p,
-                  struct Client *source_p,
-                  int parc,
-                  char *parv[])
+static void
+mr_post(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   sendto_realops_flags(FLAGS_REJ, L_ALL,
                        "Client rejected for POST command: [%s@%s]",

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_user.c,v 1.1 2002/01/04 09:13:33 a1kmm Exp $
+ *   $Id: m_user.c,v 1.2 2002/01/04 11:06:20 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -38,7 +38,7 @@
 
 #define UFLAGS  (FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_SERVNOTICE)
 
-static void mr_user(struct Client*, struct Client*, int, char**);
+static void mr_user(struct Client *, struct Client *, int, char **);
 
 struct Message user_msgtab = {
   "USER", 0, 0, 5, 0, MFLG_SLOW, 0L,
@@ -58,7 +58,7 @@ _moddeinit(void)
   mod_del_cmd(&user_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** mr_user
@@ -68,26 +68,24 @@ char *_version = "$Revision: 1.1 $";
 **      parv[3] = server host name (used only from other servers)
 **      parv[4] = users real name info
 */
-static void mr_user(struct Client* client_p, struct Client* source_p,
-		   int parc, char *parv[])
+static void
+mr_user(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
-  char* p;
- 
-  if ((p = strchr(parv[1],'@')))
-    *p = '\0'; 
+  char *p;
+
+  if ((p = strchr(parv[1], '@')))
+    *p = '\0';
 
   if (*parv[4] == '\0')
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, BadPtr(parv[0]) ? "*" : parv[0], "USER");
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, BadPtr(parv[0]) ? "*" : parv[0], "USER");
+    return;
+  }
 
-  do_local_user(parv[0], client_p, source_p,
-                parv[1],	/* username */
-                parv[2],	/* host */
-                parv[3],	/* server */
-                parv[4]	/* users real name */ );
+  do_local_user(parv[0], client_p, source_p, parv[1],   /* username */
+                parv[2],        /* host */
+                parv[3],        /* server */
+                parv[4] /* users real name */ );
 }
-
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: motd.c,v 1.1 2002/01/04 09:14:21 a1kmm Exp $
+ *   $Id: motd.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -47,14 +47,15 @@
 ** InitMessageFile
 **
 */
-void InitMessageFile(MotdType motdType, char *fileName, MessageFile *motd)
-  {
-    strncpy_irc(motd->fileName, fileName, PATH_MAX);
-    motd->fileName[PATH_MAX] = '\0';
-    motd->motdType = motdType;
-    motd->contentsOfFile = NULL;
-    motd->lastChangedDate[0] = '\0';
-  }
+void
+InitMessageFile(MotdType motdType, char *fileName, MessageFile * motd)
+{
+  strncpy_irc(motd->fileName, fileName, PATH_MAX);
+  motd->fileName[PATH_MAX] = '\0';
+  motd->motdType = motdType;
+  motd->contentsOfFile = NULL;
+  motd->lastChangedDate[0] = '\0';
+}
 
 /*
 ** SendMessageFile
@@ -63,64 +64,65 @@ void InitMessageFile(MotdType motdType, char *fileName, MessageFile *motd)
 ** user requested motd, but not on each connecting client.
 */
 
-int SendMessageFile(struct Client *source_p, MessageFile *motdToPrint)
+int
+SendMessageFile(struct Client *source_p, MessageFile * motdToPrint)
 {
   MessageFileLine *linePointer;
   MotdType motdType;
   char *nick;
 
-  if(motdToPrint != NULL)
+  if (motdToPrint != NULL)
     motdType = motdToPrint->motdType;
   else
     return -1;
 
-  switch(motdType)
-    {
+  switch (motdType)
+  {
     case USER_MOTD:
       nick = BadPtr(source_p->name) ? "*" : source_p->name;
-      
-      if (motdToPrint->contentsOfFile == (MessageFileLine *)NULL)
-        {
-          sendto_one(source_p, form_str(ERR_NOMOTD), me.name, nick);
-          return 0;
-        }
+
+      if (motdToPrint->contentsOfFile == (MessageFileLine *) NULL)
+      {
+        sendto_one(source_p, form_str(ERR_NOMOTD), me.name, nick);
+        return 0;
+      }
 
       sendto_one(source_p, form_str(RPL_MOTDSTART), me.name, nick, me.name);
 
-      for(linePointer = motdToPrint->contentsOfFile;linePointer;
-          linePointer = linePointer->next)
-        {
-          sendto_one(source_p,
-                     form_str(RPL_MOTD),
-                     me.name, nick, linePointer->line);
-        }
+      for (linePointer = motdToPrint->contentsOfFile; linePointer;
+           linePointer = linePointer->next)
+      {
+        sendto_one(source_p,
+                   form_str(RPL_MOTD), me.name, nick, linePointer->line);
+      }
       sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, nick);
       return 0;
       /* NOT REACHED */
       break;
 
     case USER_LINKS:
-      if (motdToPrint->contentsOfFile == (MessageFileLine *)NULL)
-	return -1;
+      if (motdToPrint->contentsOfFile == (MessageFileLine *) NULL)
+        return -1;
 
-      for(linePointer = motdToPrint->contentsOfFile;linePointer;
-          linePointer = linePointer->next)
-        {
-          sendto_one(source_p, ":%s 364 %s %s",
-		     me.name, source_p->name, linePointer->line);
-        }
+      for (linePointer = motdToPrint->contentsOfFile; linePointer;
+           linePointer = linePointer->next)
+      {
+        sendto_one(source_p, ":%s 364 %s %s",
+                   me.name, source_p->name, linePointer->line);
+      }
       /* NOT REACHED */
       return 0;
       break;
 
     case OPER_MOTD:
-      if (motdToPrint->contentsOfFile == (MessageFileLine *)NULL)
-        {
+      if (motdToPrint->contentsOfFile == (MessageFileLine *) NULL)
+      {
 /*          sendto_one(source_p, ":%s NOTICE %s :No OPER MOTD", me.name,
  *          source_p->name); */
-          return -1;
-        }
-      sendto_one(source_p,":%s NOTICE %s :Start of OPER MOTD",me.name,source_p->name);
+        return -1;
+      }
+      sendto_one(source_p, ":%s NOTICE %s :Start of OPER MOTD", me.name,
+                 source_p->name);
       break;
 
     case HELP_MOTD:
@@ -132,19 +134,19 @@ int SendMessageFile(struct Client *source_p, MessageFile *motdToPrint)
     default:
       return 0;
       /* NOT REACHED */
-    }
+  }
 
-  sendto_one(source_p,":%s NOTICE %s :%s",me.name,source_p->name,
+  sendto_one(source_p, ":%s NOTICE %s :%s", me.name, source_p->name,
              motdToPrint->lastChangedDate);
 
 
-  for(linePointer = motdToPrint->contentsOfFile;linePointer;
-      linePointer = linePointer->next)
-    {
-      sendto_one(source_p,
-                 ":%s NOTICE %s :%s",
-                 me.name, source_p->name, linePointer->line);
-    }
+  for (linePointer = motdToPrint->contentsOfFile; linePointer;
+       linePointer = linePointer->next)
+  {
+    sendto_one(source_p,
+               ":%s NOTICE %s :%s",
+               me.name, source_p->name, linePointer->line);
+  }
   sendto_one(source_p, ":%s NOTICE %s :End", me.name, source_p->name);
   return 0;
 }
@@ -157,7 +159,8 @@ int SendMessageFile(struct Client *source_p, MessageFile *motdToPrint)
  * side effects	-
  */
 
-int ReadMessageFile(MessageFile *MessageFileptr)
+int
+ReadMessageFile(MessageFile * MessageFileptr)
 {
   struct stat sb;
   struct tm *local_tm;
@@ -172,16 +175,16 @@ int ReadMessageFile(MessageFile *MessageFileptr)
 
   char buffer[MESSAGELINELEN];
   char *p;
-  FBFILE* file;
+  FBFILE *file;
 
-  if( stat(MessageFileptr->fileName, &sb) < 0 )
+  if (stat(MessageFileptr->fileName, &sb) < 0)
     return -1;
 
-  for( mptr = MessageFileptr->contentsOfFile; mptr; mptr = next_mptr)
-    {
-      next_mptr = mptr->next;
-      MyFree(mptr);
-    }
+  for (mptr = MessageFileptr->contentsOfFile; mptr; mptr = next_mptr)
+  {
+    next_mptr = mptr->next;
+    MyFree(mptr);
+  }
 
   MessageFileptr->contentsOfFile = NULL;
 
@@ -192,40 +195,35 @@ int ReadMessageFile(MessageFile *MessageFileptr)
                "%d/%d/%d %d:%d",
                local_tm->tm_mday,
                local_tm->tm_mon + 1,
-               1900 + local_tm->tm_year,
-               local_tm->tm_hour,
-               local_tm->tm_min);
+               1900 + local_tm->tm_year, local_tm->tm_hour, local_tm->tm_min);
 
 
   if ((file = fbopen(MessageFileptr->fileName, "r")) == 0)
-    return(-1);
+    return (-1);
 
   while (fbgets(buffer, MESSAGELINELEN, file))
+  {
+    if ((p = strchr(buffer, '\n')))
+      *p = '\0';
+    newMessageLine = (MessageFileLine *) MyMalloc(sizeof(MessageFileLine));
+
+    strncpy_irc(newMessageLine->line, buffer, MESSAGELINELEN);
+    newMessageLine->line[MESSAGELINELEN] = '\0';
+    newMessageLine->next = (MessageFileLine *) NULL;
+
+    if (MessageFileptr->contentsOfFile)
     {
-      if ((p = strchr(buffer, '\n')))
-        *p = '\0';
-      newMessageLine = (MessageFileLine*) MyMalloc(sizeof(MessageFileLine));
-
-      strncpy_irc(newMessageLine->line, buffer, MESSAGELINELEN);
-      newMessageLine->line[MESSAGELINELEN] = '\0';
-      newMessageLine->next = (MessageFileLine *)NULL;
-
-      if (MessageFileptr->contentsOfFile)
-        {
-          if (currentMessageLine)
-            currentMessageLine->next = newMessageLine;
-          currentMessageLine = newMessageLine;
-        }
-      else
-        {
-          MessageFileptr->contentsOfFile = newMessageLine;
-          currentMessageLine = newMessageLine;
-        }
+      if (currentMessageLine)
+        currentMessageLine->next = newMessageLine;
+      currentMessageLine = newMessageLine;
     }
+    else
+    {
+      MessageFileptr->contentsOfFile = newMessageLine;
+      currentMessageLine = newMessageLine;
+    }
+  }
 
   fbclose(file);
-  return(0);
+  return (0);
 }
-
-
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_operwall.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_operwall.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -33,8 +33,8 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mo_operwall(struct Client*, struct Client*, int, char**);
-static void ms_operwall(struct Client*, struct Client*, int, char**);
+static void mo_operwall(struct Client *, struct Client *, int, char **);
+static void ms_operwall(struct Client *, struct Client *, int, char **);
 
 struct Message operwall_msgtab = {
   "OPERWALL", 0, 0, 2, 0, MFLG_SLOW, 0,
@@ -54,7 +54,7 @@ _moddeinit(void)
   mod_del_cmd(&operwall_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_operwall - OPERWALL message handler
@@ -63,17 +63,18 @@ char *_version = "$Revision: 1.1 $";
  *      parv[1] = message text
  */
 
-static void mo_operwall(struct Client *client_p, struct Client *source_p,
-                       int parc, char *parv[])
+static void
+mo_operwall(struct Client *client_p, struct Client *source_p,
+            int parc, char *parv[])
 {
   char *message = parv[1];
 
   if (EmptyString(message))
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "OPERWALL");
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "OPERWALL");
+    return;
+  }
 
   sendto_server(NULL, source_p, NULL, NOCAPS, NOCAPS, LL_ICLIENT,
                 ":%s OPERWALL :%s", parv[0], message);
@@ -87,22 +88,21 @@ static void mo_operwall(struct Client *client_p, struct Client *source_p,
  *      parv[1] = message text
  */
 
-static void ms_operwall(struct Client *client_p, struct Client *source_p,
-                       int parc, char *parv[])
+static void
+ms_operwall(struct Client *client_p, struct Client *source_p,
+            int parc, char *parv[])
 {
   char *message = parv[1];
 
   if (EmptyString(message))
-    {
-      if (MyClient(source_p))
-        sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                   me.name, parv[0], "OPERWALL");
-      return;
-    }
+  {
+    if (MyClient(source_p))
+      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+                 me.name, parv[0], "OPERWALL");
+    return;
+  }
 
   sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, LL_ICLIENT,
                 ":%s OPERWALL :%s", parv[0], message);
   sendto_wallops_flags(FLAGS_OPERWALL, source_p, "%s", message);
 }
-
-

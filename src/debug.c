@@ -1,4 +1,6 @@
-/* debug.c - debugging functions */
+/* debug.c - debugging functions
+ * $Id: debug.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
+ */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -12,8 +14,10 @@
 debug_tab dtab[] = {
   /* the second field here is always 0, unless you
      want this to be enabled by default.. */
-  {"send", 0},
-  {"error", 0},
+  {"send", 0}
+  ,
+  {"error", 0}
+  ,
   {NULL, 0}
 };
 
@@ -35,7 +39,7 @@ int num_debug_mod = 0;
  *   This function creates a new debugging entity, with the name specified.
  */
 
-void 
+void
 add_mod_debug(char *what)
 {
   dmtab = realloc(dmtab, sizeof(debug_tab) * (num_debug_mod + 1));
@@ -62,7 +66,7 @@ add_mod_debug(char *what)
  *   supplied is written to stdout.  Otherwise no action is taken.
  */
 
-void 
+void
 deprintf(char *what, char *fmt, ...)
 {
 #ifdef DEBUGMODE
@@ -71,10 +75,10 @@ deprintf(char *what, char *fmt, ...)
 
   va_start(ap, fmt);
 
-  if(!debugging(what)) 
-    {
-      return;
-    }
+  if (!debugging(what))
+  {
+    return;
+  }
 
 
   vsnprintf(buffer, sizeof(buffer) - 1, fmt, ap);
@@ -101,22 +105,22 @@ deprintf(char *what, char *fmt, ...)
  *   to "to".
  */
 
-int 
+int
 set_debug(char *what, int to)
 {
   debug_tab *tab;
-  
+
   tab = find_debug_tab(what);
-  
-  if (tab) 
-    {
-      tab->debugging = to;
-      return 0;
-    } 
-  else 
-    {
-      return 1;
-    }
+
+  if (tab)
+  {
+    tab->debugging = to;
+    return 0;
+  }
+  else
+  {
+    return 1;
+  }
 }
 
 /*
@@ -137,24 +141,24 @@ set_debug(char *what, int to)
 debug_tab *
 find_debug_tab(char *what)
 {
-  int i; 
+  int i;
   debug_tab *tab = NULL;
 
-  for (i = 0; dtab[i].name; i++) 
+  for (i = 0; dtab[i].name; i++)
+  {
+    if (!strcmp(dtab[i].name, what))
     {
-      if (!strcmp(dtab[i].name, what)) 
-	{
-	  tab = &dtab[i];
-	}
+      tab = &dtab[i];
     }
+  }
 
-  for (i = 0; i < num_debug_mod; i++) 
+  for (i = 0; i < num_debug_mod; i++)
+  {
+    if (!strcmp(dmtab[i].name, what))
     {
-      if (!strcmp(dmtab[i].name, what)) 
-	{
-	  tab = &dtab[i];
-	}
+      tab = &dtab[i];
     }
+  }
 
   return tab;
 }
@@ -175,18 +179,18 @@ find_debug_tab(char *what)
  *   Enables debugging for the entity "what", if it exists.
  */
 
-int 
+int
 enable_debug(char *what)
 {
   debug_tab *tab;
 
   tab = find_debug_tab(what);
 
-  if (tab) 
-    {
-      tab->debugging = 1;
-      return 0;
-    } 
+  if (tab)
+  {
+    tab->debugging = 1;
+    return 0;
+  }
   /* else not found */
   return -1;
 }
@@ -207,19 +211,19 @@ enable_debug(char *what)
  *   Disbles debugging for the entity "what", if it exists.
  */
 
-int 
+int
 disable_debug(char *what)
 {
   debug_tab *tab;
 
   tab = find_debug_tab(what);
 
-  if (tab) 
-    {
-      tab->debugging = 0;
-      return 0;
-    } 
-    
+  if (tab)
+  {
+    tab->debugging = 0;
+    return 0;
+  }
+
   /* else not found */
   return -1;
 }
@@ -240,13 +244,13 @@ disable_debug(char *what)
  *   debugged.
  */
 
-int 
+int
 debugging(char *what)
 {
   debug_tab *tab;
 
   tab = find_debug_tab(what);
-  if (!tab) 
+  if (!tab)
     return 0;
 
   return tab->debugging;

@@ -19,7 +19,7 @@
  *
  *  (C) 1988 University of Oulu,Computing Center and Jarkko Oikarinen"
  *
- *  $Id: kdparse.c,v 1.1 2002/01/04 09:14:10 a1kmm Exp $
+ *  $Id: kdparse.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -43,39 +43,40 @@
  * Side Effects - Parse one new style K line
  */
 
-void parse_k_file(FBFILE *file)
+void
+parse_k_file(FBFILE * file)
 {
   struct ConfItem *aconf;
-  char* user_field=(char *)NULL;
-  char* reason_field=(char *)NULL;
-  char* host_field=(char *)NULL;
-  char  line[BUFSIZE];
-  char* p;
+  char *user_field = (char *)NULL;
+  char *reason_field = (char *)NULL;
+  char *host_field = (char *)NULL;
+  char line[BUFSIZE];
+  char *p;
 
   while (fbgets(line, sizeof(line), file))
-    {
-      if ((p = strchr(line, '\n')))
-        *p = '\0';
+  {
+    if ((p = strchr(line, '\n')))
+      *p = '\0';
 
-      if ((*line == '\0') || (*line == '#'))
-        continue;
+    if ((*line == '\0') || (*line == '#'))
+      continue;
 
-      if ((user_field = getfield(line)) == NULL)
-	continue;
+    if ((user_field = getfield(line)) == NULL)
+      continue;
 
-      if ((host_field = getfield(NULL)) == NULL)
-	continue;
+    if ((host_field = getfield(NULL)) == NULL)
+      continue;
 
-      if ((reason_field = getfield(NULL)) == NULL)
-	continue;
-	  
-      aconf = make_conf();
-      aconf->status = CONF_KILL;
-      conf_add_fields(aconf,host_field,reason_field,user_field,0,NULL);
+    if ((reason_field = getfield(NULL)) == NULL)
+      continue;
 
-      if (aconf->host != NULL)
-	add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
-    }
+    aconf = make_conf();
+    aconf->status = CONF_KILL;
+    conf_add_fields(aconf, host_field, reason_field, user_field, 0, NULL);
+
+    if (aconf->host != NULL)
+      add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
+  }
 }
 
 /*
@@ -85,33 +86,34 @@ void parse_k_file(FBFILE *file)
  * Side Effects - Parse one new style D line
  */
 
-void parse_d_file(FBFILE *file)
+void
+parse_d_file(FBFILE * file)
 {
   struct ConfItem *aconf;
-  char* reason_field=(char *)NULL;
-  char* host_field=(char *)NULL;
-  char  line[BUFSIZE];
-  char* p;
+  char *reason_field = (char *)NULL;
+  char *host_field = (char *)NULL;
+  char line[BUFSIZE];
+  char *p;
 
   while (fbgets(line, sizeof(line), file))
-    {
-      if ((p = strchr(line, '\n')))
-        *p = '\0';
+  {
+    if ((p = strchr(line, '\n')))
+      *p = '\0';
 
-      if ((*line == '\0') || (line[0] == '#'))
-        continue;
+    if ((*line == '\0') || (line[0] == '#'))
+      continue;
 
-      if ((host_field = getfield(line)) == NULL)
-	continue;
+    if ((host_field = getfield(line)) == NULL)
+      continue;
 
-      if ((reason_field = getfield(NULL)) == NULL)
-	continue;
-	  
-      aconf = make_conf();
-      aconf->status = CONF_DLINE;
-      conf_add_fields(aconf,host_field,reason_field,"",0,NULL);
-      conf_add_d_conf(aconf);
-    }
+    if ((reason_field = getfield(NULL)) == NULL)
+      continue;
+
+    aconf = make_conf();
+    aconf->status = CONF_DLINE;
+    conf_add_fields(aconf, host_field, reason_field, "", 0, NULL);
+    conf_add_d_conf(aconf);
+  }
 }
 
 /*
@@ -121,44 +123,44 @@ void parse_d_file(FBFILE *file)
  * output	- next field
  * side effects	- field breakup for ircd.conf file.
  */
-char *getfield(char *newline)
+char *
+getfield(char *newline)
 {
   static char *line = (char *)NULL;
-  char  *end, *field;
-        
+  char *end, *field;
+
   if (newline)
     line = newline;
 
   if (line == (char *)NULL)
-    return((char *)NULL);
+    return ((char *)NULL);
 
   field = line;
 
   /* XXX make this skip to first " if present */
-  if(*field == '"')
+  if (*field == '"')
     field++;
   else
-    return((char *)NULL);	/* mal-formed field */
+    return ((char *)NULL);      /* mal-formed field */
 
-  if ((end = strchr(line,',')) == NULL)
-    {
-      end = line + strlen(line);
-      line = (char *)NULL;
-      /* XXX verify properly terminating " */
-      if(*end == '"')
-	*end = '\0';
-      else
-	return((char *)NULL);
-    }
+  if ((end = strchr(line, ',')) == NULL)
+  {
+    end = line + strlen(line);
+    line = (char *)NULL;
+    /* XXX verify properly terminating " */
+    if (*end == '"')
+      *end = '\0';
+    else
+      return ((char *)NULL);
+  }
   else
-    {
-      line = end + 1;
-      --end;
-      if(*end == '"')
-	*end = '\0';
-      else
-	return((char *)NULL);
-    }
-  return(field);
+  {
+    line = end + 1;
+    --end;
+    if (*end == '"')
+      *end = '\0';
+    else
+      return ((char *)NULL);
+  }
+  return (field);
 }
-

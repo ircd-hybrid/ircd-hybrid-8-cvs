@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_close.c,v 1.1 2002/01/04 09:13:13 a1kmm Exp $
+ *   $Id: m_close.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -34,7 +34,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mo_close(struct Client*, struct Client*, int, char**);
+static void mo_close(struct Client *, struct Client *, int, char **);
 
 struct Message close_msgtab = {
   "CLOSE", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -53,38 +53,38 @@ _moddeinit(void)
   mod_del_cmd(&close_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_close - CLOSE message handler
  *  - added by Darren Reed Jul 13 1992.
  */
-static void mo_close(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+mo_close(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
-  struct Client  *target_p;
-  dlink_node     *ptr;
-  dlink_node     *ptr_next;
-  int            closed = 0;
+  struct Client *target_p;
+  dlink_node *ptr;
+  dlink_node *ptr_next;
+  int closed = 0;
 
 
 
   for (ptr = unknown_list.head; ptr; ptr = ptr_next)
-    {
-      target_p = ptr->data;
-      ptr_next = ptr->next;
+  {
+    target_p = ptr->data;
+    ptr_next = ptr->next;
 
-  /* Which list would connecting servers be found in? serv_list ? */
+    /* Which list would connecting servers be found in? serv_list ? */
 #if 0
-      if (!IsUnknown(target_p) && !IsConnecting(target_p) &&
-          !IsHandshake(target_p) && !IsDoingKauth(target_p))
-        continue;
+    if (!IsUnknown(target_p) && !IsConnecting(target_p) &&
+        !IsHandshake(target_p) && !IsDoingKauth(target_p))
+      continue;
 #endif
-      sendto_one(source_p, form_str(RPL_CLOSING), me.name, parv[0],
-                 get_client_name(target_p, SHOW_IP), target_p->status);
-      (void)exit_client(target_p, target_p, target_p, "Oper Closing");
-      closed++;
-    }
+    sendto_one(source_p, form_str(RPL_CLOSING), me.name, parv[0],
+               get_client_name(target_p, SHOW_IP), target_p->status);
+    (void)exit_client(target_p, target_p, target_p, "Oper Closing");
+    closed++;
+  }
   sendto_one(source_p, form_str(RPL_CLOSEEND), me.name, parv[0], closed);
 }
-

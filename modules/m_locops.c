@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_locops.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ *   $Id: m_locops.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -35,7 +35,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void m_locops(struct Client *,struct Client *,int,char **);
+static void m_locops(struct Client *, struct Client *, int, char **);
 
 struct Message locops_msgtab = {
   "LOCOPS", 0, 0, 2, 0, MFLG_SLOW, 0,
@@ -55,7 +55,7 @@ _moddeinit(void)
   mod_del_cmd(&locops_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_locops - LOCOPS message handler
@@ -63,21 +63,20 @@ char *_version = "$Revision: 1.1 $";
  *      parv[0] = sender prefix
  *      parv[1] = message text
  */
-static void m_locops(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+m_locops(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
   char *message = NULL;
 
   message = parv[1];
 
   if (EmptyString(message))
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "LOCOPS");
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "LOCOPS");
+    return;
+  }
 
   sendto_wallops_flags(FLAGS_LOCOPS, source_p, "LOCOPS - %s", message);
 }
-
-

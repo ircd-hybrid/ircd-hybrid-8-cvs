@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_motd.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ *   $Id: m_motd.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "client.h"
 #include "tools.h"
@@ -31,7 +31,7 @@
 #include "handlers.h"
 #include "hook.h"
 #include "msg.h"
-#include "s_serv.h"     /* hunt_server */
+#include "s_serv.h"             /* hunt_server */
 #include "parse.h"
 #include "modules.h"
 #include "s_conf.h"
@@ -41,8 +41,8 @@
 #include <time.h>
 
 static void mr_motd(struct Client *, struct Client *, int, char **);
-static void m_motd(struct Client*, struct Client*, int, char**);
-static void mo_motd(struct Client*, struct Client*, int, char**);
+static void m_motd(struct Client *, struct Client *, int, char **);
+static void mo_motd(struct Client *, struct Client *, int, char **);
 
 static void motd_spy(struct Client *);
 
@@ -65,18 +65,19 @@ _moddeinit(void)
   mod_del_cmd(&motd_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /* mr_motd()
  *
  * parv[0] = sender prefix
  */
-static void mr_motd(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+mr_motd(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   /* allow unregistered clients to see the motd, but exit them */
-  SendMessageFile(source_p,&ConfigFileEntry.motd);
+  SendMessageFile(source_p, &ConfigFileEntry.motd);
   exit_client(client_p, source_p, source_p, "Client Exit after MOTD");
 }
 
@@ -85,30 +86,32 @@ static void mr_motd(struct Client *client_p, struct Client *source_p,
 **      parv[0] = sender prefix
 **      parv[1] = servername
 */
-static void m_motd(struct Client *client_p, struct Client *source_p,
-                  int parc, char *parv[])
+static void
+m_motd(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
   static time_t last_used = 0;
 
-  if((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
-    {
-      /* safe enough to give this on a local connect only */
-      sendto_one(source_p,form_str(RPL_LOAD2HI),me.name,source_p->name);
-      return;
-    }
+  if ((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
+  {
+    /* safe enough to give this on a local connect only */
+    sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, source_p->name);
+    return;
+  }
   else
     last_used = CurrentTime;
 
   /* This is safe enough to use during non hidden server mode */
-  if(!ConfigServerHide.disable_remote)
-    {
-      if (hunt_server(client_p, source_p, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
-	return;
-    }
+  if (!ConfigServerHide.disable_remote)
+  {
+    if (hunt_server(client_p, source_p, ":%s MOTD :%s", 1, parc, parv) !=
+        HUNTED_ISME)
+      return;
+  }
 
   motd_spy(source_p);
-  
-  SendMessageFile(source_p,&ConfigFileEntry.motd);
+
+  SendMessageFile(source_p, &ConfigFileEntry.motd);
 }
 
 /*
@@ -116,18 +119,20 @@ static void m_motd(struct Client *client_p, struct Client *source_p,
 **      parv[0] = sender prefix
 **      parv[1] = servername
 */
-static void mo_motd(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+mo_motd(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
-  if(IsServer(source_p))
+  if (IsServer(source_p))
     return;
 
-  if (hunt_server(client_p, source_p, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
+  if (hunt_server(client_p, source_p, ":%s MOTD :%s", 1, parc, parv) !=
+      HUNTED_ISME)
     return;
 
   motd_spy(source_p);
-  
-  SendMessageFile(source_p,&ConfigFileEntry.motd);
+
+  SendMessageFile(source_p, &ConfigFileEntry.motd);
 }
 
 /* motd_spy()
@@ -136,7 +141,8 @@ static void mo_motd(struct Client *client_p, struct Client *source_p,
  * output       - none
  * side effects - hook doing_motd is called
  */
-static void motd_spy(struct Client *source_p)
+static void
+motd_spy(struct Client *source_p)
 {
   struct hook_spy_data data;
 
@@ -144,4 +150,3 @@ static void motd_spy(struct Client *source_p)
 
   hook_call_event("doing_motd", &data);
 }
-

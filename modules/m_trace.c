@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_trace.c,v 1.1 2002/01/04 09:13:33 a1kmm Exp $
+ *   $Id: m_trace.c,v 1.2 2002/01/04 11:06:20 a1kmm Exp $
  */
 #include "handlers.h"
 #include "class.h"
@@ -44,8 +44,8 @@
 #include <time.h>
 
 static void m_trace(struct Client *, struct Client *, int, char **);
-static void ms_trace(struct Client*, struct Client*, int, char**);
-static void mo_trace(struct Client*, struct Client*, int, char**);
+static void ms_trace(struct Client *, struct Client *, int, char **);
+static void mo_trace(struct Client *, struct Client *, int, char **);
 
 static void trace_spy(struct Client *);
 
@@ -68,10 +68,12 @@ _moddeinit(void)
   hook_del_event("doing_trace");
   mod_del_cmd(&trace_msgtab);
 }
-char *_version = "$Revision: 1.1 $";
+
+char *_version = "$Revision: 1.2 $";
 #endif
-static int report_this_status(struct Client *source_p, struct Client *target_p,int dow,
-                              int link_u_p, int link_u_s);
+static int report_this_status(struct Client *source_p,
+                              struct Client *target_p, int dow, int link_u_p,
+                              int link_u_s);
 
 
 /*
@@ -80,8 +82,9 @@ static int report_this_status(struct Client *source_p, struct Client *target_p,i
  *	parv[0] = sender prefix
  *	parv[1] = target client/server to trace
  */
-static void m_trace(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+m_trace(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   char *tname;
 
@@ -98,193 +101,192 @@ static void m_trace(struct Client *client_p, struct Client *source_p,
 **      parv[0] = sender prefix
 **      parv[1] = servername
 */
-static void mo_trace(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+mo_trace(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
-  struct Client       *target_p = NULL;
-  struct Class        *cltmp;
-  char  *tname;
-  int   doall, link_s[MAXCONNECTIONS], link_u[MAXCONNECTIONS];
-  int   cnt = 0, wilds, dow;
+  struct Client *target_p = NULL;
+  struct Class *cltmp;
+  char *tname;
+  int doall, link_s[MAXCONNECTIONS], link_u[MAXCONNECTIONS];
+  int cnt = 0, wilds, dow;
   static time_t now;
   dlink_node *ptr;
   char *looking_for = parv[0];
 
-  if(!IsClient(source_p))
+  if (!IsClient(source_p))
     return;
-    
+
   if (parc > 2)
     if (hunt_server(client_p, source_p, ":%s TRACE %s :%s", 2, parc, parv))
       return;
-  
+
   if (parc > 1)
     tname = parv[1];
   else
     tname = me.name;
 
   switch (hunt_server(client_p, source_p, ":%s TRACE :%s", 1, parc, parv))
+  {
+    case HUNTED_PASS:          /* note: gets here only if parv[1] exists */
     {
-    case HUNTED_PASS: /* note: gets here only if parv[1] exists */
-      {
-        struct Client *ac2ptr;
-        
-        ac2ptr = next_client_double(GlobalClientList, tname);
-        if (ac2ptr)
-          sendto_one(source_p, form_str(RPL_TRACELINK), me.name, looking_for,
-                     ircd_version, debugmode, tname, ac2ptr->from->name);
-        else
-          sendto_one(source_p, form_str(RPL_TRACELINK), me.name, looking_for,
-                     ircd_version, debugmode, tname, "ac2ptr_is_NULL!!");
-        return;
-      }
+      struct Client *ac2ptr;
+
+      ac2ptr = next_client_double(GlobalClientList, tname);
+      if (ac2ptr)
+        sendto_one(source_p, form_str(RPL_TRACELINK), me.name, looking_for,
+                   ircd_version, debugmode, tname, ac2ptr->from->name);
+      else
+        sendto_one(source_p, form_str(RPL_TRACELINK), me.name, looking_for,
+                   ircd_version, debugmode, tname, "ac2ptr_is_NULL!!");
+      return;
+    }
     case HUNTED_ISME:
       break;
     default:
       return;
-    }
+  }
 
   trace_spy(source_p);
 
-  doall = (parv[1] && (parc > 1)) ? match(tname, me.name): TRUE;
+  doall = (parv[1] && (parc > 1)) ? match(tname, me.name) : TRUE;
   wilds = !parv[1] || strchr(tname, '*') || strchr(tname, '?');
   dow = wilds || doall;
-  
+
   now = time(NULL);
 
-  if(!IsOper(source_p) || !dow) /* non-oper traces must be full nicks */
-                              /* lets also do this for opers tracing nicks */
+  if (!IsOper(source_p) || !dow)        /* non-oper traces must be full nicks */
+    /* lets also do this for opers tracing nicks */
+  {
+    const char *name;
+    const char *class_name;
+    char ipaddr[HOSTIPLEN];
+
+    target_p = find_client(tname);
+
+    if (target_p && IsPerson(target_p))
     {
-      const char* name;
-      const char* class_name;
-      char ipaddr[HOSTIPLEN];
+      name = get_client_name(target_p, HIDE_IP);
+      inetntop(target_p->localClient->aftype,
+               &IN_ADDR(target_p->localClient->ip), ipaddr, HOSTIPLEN);
 
-      target_p = find_client(tname);
-      
-      if(target_p && IsPerson(target_p)) 
+      class_name = get_client_class(target_p);
+
+      if (IsOper(target_p))
       {
-        name = get_client_name(target_p, HIDE_IP);
-        inetntop(target_p->localClient->aftype, &IN_ADDR(target_p->localClient->ip), ipaddr, HOSTIPLEN);
-
-        class_name = get_client_class(target_p);
-
-        if (IsOper(target_p))
-        {
-          sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
-                     me.name, parv[0], class_name, name, 
-                     MyOper(source_p) ? ipaddr :
-		     (IsIPSpoof(target_p) ? "255.255.255.255" : ipaddr),
-                     now - target_p->lasttime,
-                     (target_p->user) ? (now - target_p->user->last) : 0);
-        }
-        else
-        {
-          sendto_one(source_p,form_str(RPL_TRACEUSER),
-                     me.name, parv[0], class_name, name, 
-                     MyOper(source_p) ? ipaddr : 
-		     (IsIPSpoof(target_p) ? "255.255.255.255" : ipaddr),
-                     now - target_p->lasttime,
-                     (target_p->user)?(now - target_p->user->last):0);
-        }
+        sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
+                   me.name, parv[0], class_name, name,
+                   MyOper(source_p) ? ipaddr :
+                   (IsIPSpoof(target_p) ? "255.255.255.255" : ipaddr),
+                   now - target_p->lasttime,
+                   (target_p->user) ? (now - target_p->user->last) : 0);
       }
-      
-      sendto_one(source_p, form_str(RPL_ENDOFTRACE),me.name,
-                 parv[0], tname);
-      return;
+      else
+      {
+        sendto_one(source_p, form_str(RPL_TRACEUSER),
+                   me.name, parv[0], class_name, name,
+                   MyOper(source_p) ? ipaddr :
+                   (IsIPSpoof(target_p) ? "255.255.255.255" : ipaddr),
+                   now - target_p->lasttime,
+                   (target_p->user) ? (now - target_p->user->last) : 0);
+      }
     }
 
-  memset((void *)link_s,0,sizeof(link_s));
-  memset((void *)link_u,0,sizeof(link_u));
+    sendto_one(source_p, form_str(RPL_ENDOFTRACE), me.name, parv[0], tname);
+    return;
+  }
+
+  memset((void *)link_s, 0, sizeof(link_s));
+  memset((void *)link_u, 0, sizeof(link_u));
 
   /*
    * Count up all the servers and clients in a downlink.
    */
   if (doall)
-   {
+  {
     for (target_p = GlobalClientList; target_p; target_p = target_p->next)
-     {
+    {
       if (IsPerson(target_p))
-        {
-          link_u[target_p->from->fd]++;
-        }
+      {
+        link_u[target_p->from->fd]++;
+      }
       else if (IsServer(target_p))
-	{
-	  link_s[target_p->from->fd]++;
-	}
-     }
-   }
-   
+      {
+        link_s[target_p->from->fd]++;
+      }
+    }
+  }
+
   /* report all direct connections */
   for (ptr = lclient_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  {
+    target_p = ptr->data;
 
-      if (IsInvisible(target_p) && dow &&
-          !(MyConnect(source_p) && IsOper(source_p)) &&
-          !IsOper(target_p) && (target_p != source_p))
-        continue;
-      if (!doall && wilds && !match(tname, target_p->name))
-        continue;
-      if (!dow && irccmp(tname, target_p->name))
-        continue;
+    if (IsInvisible(target_p) && dow &&
+        !(MyConnect(source_p) && IsOper(source_p)) &&
+        !IsOper(target_p) && (target_p != source_p))
+      continue;
+    if (!doall && wilds && !match(tname, target_p->name))
+      continue;
+    if (!dow && irccmp(tname, target_p->name))
+      continue;
 
-      cnt = report_this_status(source_p,target_p,dow,0,0);
-    }
+    cnt = report_this_status(source_p, target_p, dow, 0, 0);
+  }
 
   for (ptr = serv_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  {
+    target_p = ptr->data;
 
-      if (!doall && wilds && !match(tname, target_p->name))
-        continue;
-      if (!dow && irccmp(tname, target_p->name))
-        continue;
+    if (!doall && wilds && !match(tname, target_p->name))
+      continue;
+    if (!dow && irccmp(tname, target_p->name))
+      continue;
 
-      cnt = report_this_status(source_p, target_p, dow,
-                               link_u[target_p->fd],
-                               link_s[target_p->fd]);
-    }
+    cnt = report_this_status(source_p, target_p, dow,
+                             link_u[target_p->fd], link_s[target_p->fd]);
+  }
 
   /* This section is to report the unknowns */
   for (ptr = unknown_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  {
+    target_p = ptr->data;
 
-      if (!doall && wilds && !match(tname, target_p->name))
-        continue;
-      if (!dow && irccmp(tname, target_p->name))
-        continue;
+    if (!doall && wilds && !match(tname, target_p->name))
+      continue;
+    if (!dow && irccmp(tname, target_p->name))
+      continue;
 
-      cnt = report_this_status(source_p,target_p,dow,0,0);
-    }
+    cnt = report_this_status(source_p, target_p, dow, 0, 0);
+  }
 
   /*
    * Add these lines to summarize the above which can get rather long
    * and messy when done remotely - Avalon
    */
   if (!SendWallops(source_p) || !cnt)
-    {
-      /* redundant given we dont allow trace from non-opers anyway.. but its
-       * left here in case that should ever change --fl
-       */
-      if(!cnt)
-	sendto_one(source_p, form_str(RPL_TRACESERVER),
-	           me.name, parv[0], 0, link_s[me.fd],
-		   link_u[me.fd], me.name, "*", "*", me.name);
-		   
-      /* let the user have some idea that its at the end of the
-       * trace
-       */
-      sendto_one(source_p, form_str(RPL_ENDOFTRACE),me.name,
-                 parv[0],tname);
-      return;
-    }
-    
+  {
+    /* redundant given we dont allow trace from non-opers anyway.. but its
+     * left here in case that should ever change --fl
+     */
+    if (!cnt)
+      sendto_one(source_p, form_str(RPL_TRACESERVER),
+                 me.name, parv[0], 0, link_s[me.fd],
+                 link_u[me.fd], me.name, "*", "*", me.name);
+
+    /* let the user have some idea that its at the end of the
+     * trace
+     */
+    sendto_one(source_p, form_str(RPL_ENDOFTRACE), me.name, parv[0], tname);
+    return;
+  }
+
   for (cltmp = ClassList; doall && cltmp; cltmp = cltmp->next)
     if (Links(cltmp) > 0)
       sendto_one(source_p, form_str(RPL_TRACECLASS), me.name,
                  parv[0], ClassName(cltmp), Links(cltmp));
-		 
-  sendto_one(source_p, form_str(RPL_ENDOFTRACE),me.name, parv[0],tname);
+
+  sendto_one(source_p, form_str(RPL_ENDOFTRACE), me.name, parv[0], tname);
 }
 
 
@@ -293,14 +295,15 @@ static void mo_trace(struct Client *client_p, struct Client *source_p,
 **      parv[0] = sender prefix
 **      parv[1] = servername
 */
-static void ms_trace(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+ms_trace(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
   if (hunt_server(client_p, source_p, ":%s TRACE %s :%s", 2, parc, parv))
     return;
 
-  if( IsOper(source_p) )
-    mo_trace(client_p,source_p,parc,parv);
+  if (IsOper(source_p))
+    mo_trace(client_p, source_p, parc, parv);
   return;
 }
 
@@ -313,35 +316,37 @@ static void ms_trace(struct Client *client_p, struct Client *source_p,
  * output	- counter of number of hits
  * side effects - NONE
  */
-static int report_this_status(struct Client *source_p, struct Client *target_p,
-                              int dow, int link_u_p, int link_s_p)
+static int
+report_this_status(struct Client *source_p, struct Client *target_p,
+                   int dow, int link_u_p, int link_s_p)
 {
-  const char* name;
-  const char* class_name;
-  char  ip[HOSTIPLEN];
-  int cnt=0;
+  const char *name;
+  const char *class_name;
+  char ip[HOSTIPLEN];
+  int cnt = 0;
   static time_t now;
 
-  inetntop(target_p->localClient->aftype, &IN_ADDR(target_p->localClient->ip), ip, HOSTIPLEN);
+  inetntop(target_p->localClient->aftype, &IN_ADDR(target_p->localClient->ip),
+           ip, HOSTIPLEN);
   name = get_client_name(target_p, HIDE_IP);
   class_name = get_client_class(target_p);
 
-  now = time(NULL);  
+  now = time(NULL);
 
-  switch(target_p->status)
-    {
+  switch (target_p->status)
+  {
     case STAT_CONNECTING:
       sendto_one(source_p, form_str(RPL_TRACECONNECTING), me.name,
-                 source_p->name, class_name, 
-		 IsOperAdmin(source_p) ? name : target_p->name);
-		   
+                 source_p->name, class_name,
+                 IsOperAdmin(source_p) ? name : target_p->name);
+
       cnt++;
       break;
     case STAT_HANDSHAKE:
       sendto_one(source_p, form_str(RPL_TRACEHANDSHAKE), me.name,
-                 source_p->name, class_name, 
+                 source_p->name, class_name,
                  IsOperAdmin(source_p) ? name : target_p->name);
-		   
+
       cnt++;
       break;
     case STAT_ME:
@@ -349,8 +354,9 @@ static int report_this_status(struct Client *source_p, struct Client *target_p,
     case STAT_UNKNOWN:
       /* added time -Taner */
       sendto_one(source_p, form_str(RPL_TRACEUNKNOWN),
-		 me.name, source_p->name, class_name, name, ip,
-		 target_p->firsttime ? CurrentTime - target_p->firsttime : -1);
+                 me.name, source_p->name, class_name, name, ip,
+                 target_p->firsttime ? CurrentTime -
+                 target_p->firsttime : -1);
       cnt++;
       break;
     case STAT_CLIENT:
@@ -358,54 +364,54 @@ static int report_this_status(struct Client *source_p, struct Client *target_p,
        * but anyone can see all the opers.
        */
       if ((IsOper(source_p) &&
-	   (MyClient(source_p) || !(dow && IsInvisible(target_p))))
-	  || !dow || IsOper(target_p))
-	{
-          if (IsAdmin(target_p))
-	    sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
-                       me.name, source_p->name, class_name, name,
-                       IsOperAdmin(source_p) ? ip : "255.255.255.255",
-                       now - target_p->lasttime,
-                       (target_p->user) ? (now - target_p->user->last) : 0);
-		       
-	  else if (IsOper(target_p))
-	    sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
-		       me.name, source_p->name, class_name, name, 
-		       MyOper(source_p) ? ip : 
-		       (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-		       now - target_p->lasttime,
-		       (target_p->user)?(now - target_p->user->last):0);
-		       
-	  else
-	    sendto_one(source_p, form_str(RPL_TRACEUSER),
-		       me.name, source_p->name, class_name, name,
-		       MyOper(source_p) ? ip : 
-		       (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
-		       now - target_p->lasttime,
-		       (target_p->user)?(now - target_p->user->last):0);
-	  cnt++;
-	}
+           (MyClient(source_p) || !(dow && IsInvisible(target_p))))
+          || !dow || IsOper(target_p))
+      {
+        if (IsAdmin(target_p))
+          sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
+                     me.name, source_p->name, class_name, name,
+                     IsOperAdmin(source_p) ? ip : "255.255.255.255",
+                     now - target_p->lasttime,
+                     (target_p->user) ? (now - target_p->user->last) : 0);
+
+        else if (IsOper(target_p))
+          sendto_one(source_p, form_str(RPL_TRACEOPERATOR),
+                     me.name, source_p->name, class_name, name,
+                     MyOper(source_p) ? ip :
+                     (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
+                     now - target_p->lasttime,
+                     (target_p->user) ? (now - target_p->user->last) : 0);
+
+        else
+          sendto_one(source_p, form_str(RPL_TRACEUSER),
+                     me.name, source_p->name, class_name, name,
+                     MyOper(source_p) ? ip :
+                     (IsIPSpoof(target_p) ? "255.255.255.255" : ip),
+                     now - target_p->lasttime,
+                     (target_p->user) ? (now - target_p->user->last) : 0);
+        cnt++;
+      }
       break;
     case STAT_SERVER:
-      if(!IsOperAdmin(source_p))
+      if (!IsOperAdmin(source_p))
         name = get_client_name(target_p, MASK_IP);
 
       sendto_one(source_p, form_str(RPL_TRACESERVER),
-		 me.name, source_p->name, class_name, link_s_p,
-		 link_u_p, name, *(target_p->serv->by) ?
-		 target_p->serv->by : "*", "*",
-		 me.name, now - target_p->lasttime);
+                 me.name, source_p->name, class_name, link_s_p,
+                 link_u_p, name, *(target_p->serv->by) ?
+                 target_p->serv->by : "*", "*",
+                 me.name, now - target_p->lasttime);
       cnt++;
       break;
-      
-    default: /* ...we actually shouldn't come here... --msa */
-      sendto_one(source_p, form_str(RPL_TRACENEWTYPE), me.name,
-		 source_p->name, name);
-      cnt++;
-      break;
-    }
 
-  return(cnt);
+    default:                   /* ...we actually shouldn't come here... --msa */
+      sendto_one(source_p, form_str(RPL_TRACENEWTYPE), me.name,
+                 source_p->name, name);
+      cnt++;
+      break;
+  }
+
+  return (cnt);
 }
 
 /* trace_spy()
@@ -414,7 +420,8 @@ static int report_this_status(struct Client *source_p, struct Client *target_p,
  * output       - none
  * side effects - hook event doing_trace is called
  */
-static void trace_spy(struct Client *source_p)
+static void
+trace_spy(struct Client *source_p)
 {
   struct hook_spy_data data;
 
@@ -422,4 +429,3 @@ static void trace_spy(struct Client *source_p)
 
   hook_call_event("doing_trace", &data);
 }
-

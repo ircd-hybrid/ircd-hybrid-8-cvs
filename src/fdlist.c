@@ -3,14 +3,14 @@
  * fdlist.c   maintain lists of file descriptors
  *
  *
- * $Id: fdlist.c,v 1.1 2002/01/04 09:13:56 a1kmm Exp $
+ * $Id: fdlist.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 #include "fdlist.h"
-#include "client.h"  /* struct Client */
+#include "client.h"             /* struct Client */
 #include "event.h"
-#include "ircd.h"    /* GlobalSetOptions */
-#include "s_bsd.h"   /* highest_fd */
-#include "config.h"  /* option settings */
+#include "ircd.h"               /* GlobalSetOptions */
+#include "s_bsd.h"              /* highest_fd */
+#include "config.h"             /* option settings */
 #include "send.h"
 #include "memory.h"
 #include <stdarg.h>
@@ -24,26 +24,26 @@ fde_t *fd_table = NULL;
 static void fdlist_update_biggest(int fd, int opening);
 
 /* Highest FD and number of open FDs .. */
-int highest_fd = -1; /* Its -1 because we haven't started yet -- adrian */
+int highest_fd = -1;            /* Its -1 because we haven't started yet -- adrian */
 int number_fd = 0;
 
 static void
 fdlist_update_biggest(int fd, int opening)
-{ 
+{
   if (fd < highest_fd)
     return;
   assert(fd < MAXCONNECTIONS);
 
   if (fd > highest_fd)
-    {
-      /*  
-       * assert that we are not closing a FD bigger than
-       * our known biggest FD
-       */
-      assert(opening);
-      highest_fd = fd;
-      return;
-    }
+  {
+    /*  
+     * assert that we are not closing a FD bigger than
+     * our known biggest FD
+     */
+    assert(opening);
+    highest_fd = fd;
+    return;
+  }
   /* if we are here, then fd == Biggest_FD */
   /*
    * assert that we are closing the biggest FD; we can't be
@@ -55,18 +55,19 @@ fdlist_update_biggest(int fd, int opening)
 }
 
 
-void fdlist_init(void)
+void
+fdlist_init(void)
 {
   static int initialized = 0;
   assert(0 == initialized);
 
   if (!initialized)
-    {
-      /* Since we're doing this once .. */
-      fd_table = MyMalloc((MAXCONNECTIONS + 1) * sizeof(fde_t));
-      memset(fd_table, 0, sizeof(fde_t) * (MAXCONNECTIONS+1));
-      initialized = 1;
-    }
+  {
+    /* Since we're doing this once .. */
+    fd_table = MyMalloc((MAXCONNECTIONS + 1) * sizeof(fde_t));
+    memset(fd_table, 0, sizeof(fde_t) * (MAXCONNECTIONS + 1));
+    initialized = 1;
+  }
 }
 
 /* Called to open a given filedescriptor */
@@ -77,12 +78,12 @@ fd_open(int fd, unsigned int type, const char *desc)
   assert(fd >= 0);
 
   if (F->flags.open)
-    {
+  {
 #ifdef NOTYET
-      debug(51, 1) ("WARNING: Closing open FD %4d\n", fd);
+    debug(51, 1) ("WARNING: Closing open FD %4d\n", fd);
 #endif
-      fd_close(fd);
-    }
+    fd_close(fd);
+  }
   assert(!F->flags.open);
 #ifdef NOTYET
   debug(51, 3) ("fd_open FD %d %s\n", fd, desc);
@@ -114,15 +115,15 @@ fd_close(int fd)
   /* All disk fd's MUST go through file_close() ! */
   assert(F->type != FD_FILE);
   if (F->type == FD_FILE)
-    {
-      assert(F->read_handler == NULL);
-      assert(F->write_handler == NULL);
-    }
+  {
+    assert(F->read_handler == NULL);
+    assert(F->write_handler == NULL);
+  }
 #ifdef NOTYET
   debug(51, 3) ("fd_close FD %d %s\n", fd, F->desc);
 #endif
-  comm_setselect(fd, FDLIST_NONE, COMM_SELECT_WRITE|COMM_SELECT_READ,
-		 NULL, NULL, 0);
+  comm_setselect(fd, FDLIST_NONE, COMM_SELECT_WRITE | COMM_SELECT_READ,
+                 NULL, NULL, 0);
 
   F->flags.open = 0;
   fdlist_update_biggest(fd, 0);
@@ -143,14 +144,15 @@ fd_dump(struct Client *source_p)
   int i;
 
   for (i = 0; i <= highest_fd; i++)
-    {
-      if (!fd_table[i].flags.open)
-	continue;
+  {
+    if (!fd_table[i].flags.open)
+      continue;
 
-      sendto_one(source_p, ":%s NOTICE %s :*** fd %d, desc '%s'", me.name,
-		 source_p->name, i, fd_table[i].desc);
-    }
-  sendto_one(source_p, ":%s NOTICE %s :*** Finished", me.name, source_p->name);
+    sendto_one(source_p, ":%s NOTICE %s :*** fd %d, desc '%s'", me.name,
+               source_p->name, i, fd_table[i].desc);
+  }
+  sendto_one(source_p, ":%s NOTICE %s :*** Finished", me.name,
+             source_p->name);
 }
 
 /*
@@ -164,17 +166,14 @@ fd_note(int fd, const char *format, ...)
 {
   va_list args;
   int len;
-  
+
   if (format)
-    {
-      va_start(args, format);
-      len = vsprintf_irc(fd_table[fd].desc, format, args);
-      assert(len < FD_DESC_SZ); /* + '\0' */
-      va_end(args);
-    }
+  {
+    va_start(args, format);
+    len = vsprintf_irc(fd_table[fd].desc, format, args);
+    assert(len < FD_DESC_SZ);   /* + '\0' */
+    va_end(args);
+  }
   else
     fd_table[fd].desc[0] = '\0';
 }
-
-
-

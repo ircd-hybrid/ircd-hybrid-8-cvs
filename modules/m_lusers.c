@@ -20,14 +20,14 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_lusers.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ *   $Id: m_lusers.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
 #include "ircd.h"
 #include "numeric.h"
-#include "s_serv.h"    /* hunt_server */
-#include "s_user.h"    /* show_lusers */
+#include "s_serv.h"             /* hunt_server */
+#include "s_user.h"             /* show_lusers */
 #include "send.h"
 #include "s_conf.h"
 #include "msg.h"
@@ -36,8 +36,8 @@
 
 /* XXX LazyLinks ? */
 
-static void m_lusers(struct Client*, struct Client*, int, char**);
-static void ms_lusers(struct Client*, struct Client*, int, char**);
+static void m_lusers(struct Client *, struct Client *, int, char **);
+static void ms_lusers(struct Client *, struct Client *, int, char **);
 
 struct Message lusers_msgtab = {
   "LUSERS", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -57,7 +57,7 @@ _moddeinit(void)
   mod_del_cmd(&lusers_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_lusers - LUSERS message handler
@@ -68,26 +68,28 @@ char *_version = "$Revision: 1.1 $";
  * 199970918 JRL hacked to ignore parv[1] completely and require parc > 3
  * to cause a force
  */
-static void m_lusers(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+m_lusers(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
   static time_t last_used = 0;
 
   if ((last_used + ConfigFileEntry.pace_wait) > CurrentTime)
-    {
-      /* safe enough to give this on a local connect only */
-      if (MyClient(source_p))
-        sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0]);
-      return;
-    }
+  {
+    /* safe enough to give this on a local connect only */
+    if (MyClient(source_p))
+      sendto_one(source_p, form_str(RPL_LOAD2HI), me.name, parv[0]);
+    return;
+  }
   else
     last_used = CurrentTime;
 
   if (parc > 2 && !ConfigServerHide.disable_remote)
-    {   
-       if (hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv) != HUNTED_ISME)
-         return;
-    }
+  {
+    if (hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv) !=
+        HUNTED_ISME)
+      return;
+  }
 
   show_lusers(source_p);
 }
@@ -101,17 +103,17 @@ static void m_lusers(struct Client *client_p, struct Client *source_p,
  * 199970918 JRL hacked to ignore parv[1] completely and require parc > 3
  * to cause a force
  */
-static void ms_lusers(struct Client *client_p, struct Client *source_p,
-                     int parc, char *parv[])
+static void
+ms_lusers(struct Client *client_p, struct Client *source_p,
+          int parc, char *parv[])
 {
   if (parc > 2)
+  {
+    if (hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv)
+        != HUNTED_ISME)
     {
-      if(hunt_server(client_p, source_p, ":%s LUSERS %s :%s", 2, parc, parv)
-       != HUNTED_ISME)
-        {
-          return;
-        }
+      return;
     }
+  }
   show_lusers(source_p);
 }
-

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: s_misc.c,v 1.1 2002/01/04 09:14:40 a1kmm Exp $
+ *  $Id: s_misc.c,v 1.2 2002/01/04 11:06:43 a1kmm Exp $
  */
 #include "s_misc.h"
 #include "client.h"
@@ -47,25 +47,26 @@
 #include <unistd.h>
 
 
-static char* months[] = {
-  "January",   "February", "March",   "April",
-  "May",       "June",     "July",    "August",
-  "September", "October",  "November","December"
+static char *months[] = {
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December"
 };
 
-static char* weekdays[] = {
-  "Sunday",   "Monday", "Tuesday", "Wednesday",
+static char *weekdays[] = {
+  "Sunday", "Monday", "Tuesday", "Wednesday",
   "Thursday", "Friday", "Saturday"
 };
 
-char* date(time_t lclock) 
+char *
+date(time_t lclock)
 {
-  static        char        buf[80], plus;
-  struct        tm *lt, *gm;
-  struct        tm        gmbuf;
-  int        minswest;
+  static char buf[80], plus;
+  struct tm *lt, *gm;
+  struct tm gmbuf;
+  int minswest;
 
-  if (!lclock) 
+  if (!lclock)
     lclock = CurrentTime;
   gm = gmtime(&lclock);
   memcpy((void *)&gmbuf, (void *)gm, sizeof(gmbuf));
@@ -73,8 +74,7 @@ char* date(time_t lclock)
   lt = localtime(&lclock);
 
   if (lt->tm_yday == gm->tm_yday)
-    minswest = (gm->tm_hour - lt->tm_hour) * 60 +
-      (gm->tm_min - lt->tm_min);
+    minswest = (gm->tm_hour - lt->tm_hour) * 60 + (gm->tm_min - lt->tm_min);
   else if (lt->tm_yday > gm->tm_yday)
     minswest = (gm->tm_hour - (lt->tm_hour + 24)) * 60;
   else
@@ -83,32 +83,33 @@ char* date(time_t lclock)
   plus = (minswest > 0) ? '-' : '+';
   if (minswest < 0)
     minswest = -minswest;
-  
+
   ircsprintf(buf, "%s %s %d %d -- %02u:%02u:%02u %c%02u:%02u",
-          weekdays[lt->tm_wday], months[lt->tm_mon],lt->tm_mday,
-          lt->tm_year + 1900, lt->tm_hour, lt->tm_min, lt->tm_sec,
-          plus, minswest/60, minswest%60);
+             weekdays[lt->tm_wday], months[lt->tm_mon], lt->tm_mday,
+             lt->tm_year + 1900, lt->tm_hour, lt->tm_min, lt->tm_sec,
+             plus, minswest / 60, minswest % 60);
 
   return buf;
 }
 
-const char* smalldate(time_t lclock)
+const char *
+smalldate(time_t lclock)
 {
-  static  char    buf[MAX_DATE_STRING];
-  struct  tm *lt, *gm;
-  struct  tm      gmbuf;
+  static char buf[MAX_DATE_STRING];
+  struct tm *lt, *gm;
+  struct tm gmbuf;
 
   if (!lclock)
     lclock = CurrentTime;
   gm = gmtime(&lclock);
   memcpy((void *)&gmbuf, (void *)gm, sizeof(gmbuf));
-  gm = &gmbuf; 
+  gm = &gmbuf;
   lt = localtime(&lclock);
-  
+
   ircsprintf(buf, "%d/%d/%d %02d.%02d",
              lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
              lt->tm_hour, lt->tm_min);
-  
+
   return buf;
 }
 
@@ -118,9 +119,10 @@ const char* smalldate(time_t lclock)
  * Make a small YYYYMMDD formatted string suitable for a
  * dated file stamp. 
  */
-char* small_file_date(time_t lclock)
+char *
+small_file_date(time_t lclock)
 {
-  static  char    timebuffer[MAX_DATE_STRING];
+  static char timebuffer[MAX_DATE_STRING];
   struct tm *tmptr;
 
   if (!lclock)
@@ -129,4 +131,3 @@ char* small_file_date(time_t lclock)
   strftime(timebuffer, MAX_DATE_STRING, "%Y%m%d", tmptr);
   return timebuffer;
 }
-

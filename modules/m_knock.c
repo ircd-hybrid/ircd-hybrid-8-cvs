@@ -19,7 +19,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_knock.c,v 1.1 2002/01/04 09:13:22 a1kmm Exp $
+ *   $Id: m_knock.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -40,8 +40,8 @@
 
 #include <string.h>
 
-static void m_knock(struct Client*, struct Client*, int, char**);
-static void ms_knock(struct Client *, struct Client *, int, char**);
+static void m_knock(struct Client *, struct Client *, int, char **);
+static void ms_knock(struct Client *, struct Client *, int, char **);
 
 static void parse_knock_local(struct Client *, struct Client *,
                               int, char **, char *);
@@ -80,7 +80,7 @@ _moddeinit(void)
   mod_del_cmd(&knockll_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /* m_knock
@@ -102,23 +102,23 @@ char *_version = "$Revision: 1.1 $";
  *  dont know about, for us to answer.
  */
 
-static void m_knock(struct Client *client_p,
-                    struct Client *source_p,
-                    int parc, char *parv[])
+static void
+m_knock(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   char *sockhost = NULL;
-  
-  if((ConfigChannel.use_knock == 0) && MyClient(source_p))
-    {
-      sendto_one(source_p, form_str(ERR_KNOCKDISABLED),
-		 me.name, source_p->name);
-      return;
-    }
+
+  if ((ConfigChannel.use_knock == 0) && MyClient(source_p))
+  {
+    sendto_one(source_p, form_str(ERR_KNOCKDISABLED),
+               me.name, source_p->name);
+    return;
+  }
 
   /* a remote KNOCKLL request, check we're capable of handling it.. */
-  if(!MyConnect(source_p))
+  if (!MyConnect(source_p))
   {
-    if(!ServerInfo.hub || !IsCapable(client_p, CAP_LL) || parc < 3)
+    if (!ServerInfo.hub || !IsCapable(client_p, CAP_LL) || parc < 3)
       return;
     else
     {
@@ -126,8 +126,8 @@ static void m_knock(struct Client *client_p,
        * exists.. done here to save messing in parse_knock_local()
        */
       sockhost = parv[2];
-      
-      if(parc > 3)
+
+      if (parc > 3)
       {
         parv[2] = parv[3];
         parv[3] = NULL;
@@ -138,8 +138,8 @@ static void m_knock(struct Client *client_p,
       parc--;
     }
   }
-    
-  if(IsClient(source_p))
+
+  if (IsClient(source_p))
     parse_knock_local(client_p, source_p, parc, parv, sockhost);
 }
 
@@ -149,13 +149,12 @@ static void m_knock(struct Client *client_p,
  *	parv[1] = channel
  *	parv[2] = vchan id
  */
- 
-static void ms_knock(struct Client *client_p,
-                     struct Client *source_p,
-		     int parc,
-		     char *parv[])
+
+static void
+ms_knock(struct Client *client_p,
+         struct Client *source_p, int parc, char *parv[])
 {
-  if(IsClient(source_p))
+  if (IsClient(source_p))
     parse_knock_remote(client_p, source_p, parc, parv);
 }
 
@@ -173,38 +172,37 @@ static void ms_knock(struct Client *client_p,
  *                or sends failure message to source_p
  */
 
-static void parse_knock_local(struct Client *client_p,
-                              struct Client *source_p,
-                              int parc, char *parv[], char *sockhost)
+static void
+parse_knock_local(struct Client *client_p,
+                  struct Client *source_p,
+                  int parc, char *parv[], char *sockhost)
 {
   /* We will cut at the first comma reached, however we will not *
    * process anything afterwards.                                */
 
-  struct Channel      *chptr,*vchan_chptr;
+  struct Channel *chptr, *vchan_chptr;
   char *p, *name, *key;
 
   name = parv[1];
   key = (parc > 2) ? parv[2] : NULL;
 
-  if( (p = strchr(name,',')) )
+  if ((p = strchr(name, ',')))
     *p = '\0';
 
-  if(!IsChannelName(name))
+  if (!IsChannelName(name))
   {
-    sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
-               me.name, parv[0], name);
+    sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL), me.name, parv[0], name);
     return;
   }
 
-  if(!(chptr = hash_find_channel(name)))
+  if (!(chptr = hash_find_channel(name)))
   {
-    if(!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL))
+    if (!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL))
     {
       sendto_one(uplink, ":%s KNOCKLL %s %s %s",
                  source_p->name, parv[1],
-		 IsIPSpoof(source_p) ? "255.255.255.255" :
-		 source_p->localClient->sockhost,
-		 (parc > 2) ? parv[2] : "");
+                 IsIPSpoof(source_p) ? "255.255.255.255" :
+                 source_p->localClient->sockhost, (parc > 2) ? parv[2] : "");
     }
     else
     {
@@ -216,79 +214,77 @@ static void parse_knock_local(struct Client *client_p,
   }
 
   if (IsVchanTop(chptr))
+  {
+    /* They specified a vchan basename */
+    if (on_sub_vchan(chptr, source_p))
     {
-      /* They specified a vchan basename */
-      if(on_sub_vchan(chptr,source_p))
-        {
-          sendto_one(source_p, form_str(ERR_KNOCKONCHAN),
-                     me.name, source_p->name, name);
-          return;
-        }
-      if (key && key[0] == '!')
-        {
-          /* Make "KNOCK #channel !" work like JOIN */
-          if (!key[1])
-            {
-              show_vchans(source_p, chptr, "knock");
-              return;
-            }
-
-          /* Find a matching vchan */
-          if ((vchan_chptr = find_vchan(chptr, key)))
-            {
-	      chptr = vchan_chptr;
-            }
-          else
-            {
-              sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
-              me.name, parv[0], name);
-              return;
-            }
-        }
-      else
-        {
-          /* No key specified */
-          show_vchans(source_p, chptr, "knock");
-          return;
-        }
-    }
-  else if (IsVchan(chptr))
-    {
-      /* Don't allow KNOCK'ing a vchans 'real' name */
-      sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name, parv[0],
-                 name);
-      return;
-    }
-  else
-    {
-      /* Normal channel, just be sure they aren't on it */
-      if (IsMember(source_p, chptr))
-        {
-          sendto_one(source_p, form_str(ERR_KNOCKONCHAN),
-                     me.name, source_p->name, name);
-          return;
-        }
-    }
-
-  if(!((chptr->mode.mode & MODE_INVITEONLY) ||
-       (*chptr->mode.key) ||
-       (chptr->mode.limit && chptr->users >= chptr->mode.limit )
-       ))
-    {
-      sendto_one(source_p, form_str(ERR_CHANOPEN),
+      sendto_one(source_p, form_str(ERR_KNOCKONCHAN),
                  me.name, source_p->name, name);
       return;
     }
+    if (key && key[0] == '!')
+    {
+      /* Make "KNOCK #channel !" work like JOIN */
+      if (!key[1])
+      {
+        show_vchans(source_p, chptr, "knock");
+        return;
+      }
+
+      /* Find a matching vchan */
+      if ((vchan_chptr = find_vchan(chptr, key)))
+      {
+        chptr = vchan_chptr;
+      }
+      else
+      {
+        sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
+                   me.name, parv[0], name);
+        return;
+      }
+    }
+    else
+    {
+      /* No key specified */
+      show_vchans(source_p, chptr, "knock");
+      return;
+    }
+  }
+  else if (IsVchan(chptr))
+  {
+    /* Don't allow KNOCK'ing a vchans 'real' name */
+    sendto_one(source_p, form_str(ERR_BADCHANNAME), me.name, parv[0], name);
+    return;
+  }
+  else
+  {
+    /* Normal channel, just be sure they aren't on it */
+    if (IsMember(source_p, chptr))
+    {
+      sendto_one(source_p, form_str(ERR_KNOCKONCHAN),
+                 me.name, source_p->name, name);
+      return;
+    }
+  }
+
+  if (!((chptr->mode.mode & MODE_INVITEONLY) ||
+        (*chptr->mode.key) ||
+        (chptr->mode.limit && chptr->users >= chptr->mode.limit)))
+  {
+    sendto_one(source_p, form_str(ERR_CHANOPEN),
+               me.name, source_p->name, name);
+    return;
+  }
 
   /* don't allow a knock if the user is banned, or the channel is secret */
   if ((chptr->mode.mode & MODE_SECRET) ||
       (sockhost && is_banned_knock(chptr, source_p, sockhost)) ||
       (!sockhost && is_banned(chptr, source_p)))
-    {
-      sendto_one(source_p, form_str(ERR_CANNOTSENDTOCHAN), me.name, parv[0],
-                 name);
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_CANNOTSENDTOCHAN), me.name, parv[0],
+               name);
+    return;
+  }
 
   /* flood protection:
    * allow one knock per user per knock_delay
@@ -296,15 +292,16 @@ static void parse_knock_local(struct Client *client_p,
    *
    * we only limit local requests..
    */
-  if(MyClient(source_p) &&
-    (source_p->localClient->last_knock + ConfigChannel.knock_delay) > CurrentTime)
+  if (MyClient(source_p) &&
+      (source_p->localClient->last_knock + ConfigChannel.knock_delay) >
+      CurrentTime)
   {
     sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
                me.name, source_p->name, parv[1], "user");
     return;
   }
-  else if((chptr->last_knock +
-         ConfigChannel.knock_delay_channel) > CurrentTime)
+  else if ((chptr->last_knock +
+            ConfigChannel.knock_delay_channel) > CurrentTime)
   {
     sendto_one(source_p, form_str(ERR_TOOMANYKNOCK),
                me.name, source_p->name, parv[1], "channel");
@@ -327,41 +324,41 @@ static void parse_knock_local(struct Client *client_p,
  * side effects - knock is checked for validity, if valid send_knock() is
  * 		  called
  */
-static void parse_knock_remote(struct Client *client_p,
-			       struct Client *source_p,
-			       int parc, char *parv[])
+static void
+parse_knock_remote(struct Client *client_p,
+                   struct Client *source_p, int parc, char *parv[])
 {
-  struct Channel *chptr,*vchan_chptr;
+  struct Channel *chptr, *vchan_chptr;
   char *p, *name, *key;
 
   name = parv[1];
   key = (parc > 2) ? parv[2] : NULL;
 
-  if( (p = strchr(name,',')) )
+  if ((p = strchr(name, ',')))
     *p = '\0';
 
-  if(!IsChannelName(name) || !(chptr = hash_find_channel(name)))
+  if (!IsChannelName(name) || !(chptr = hash_find_channel(name)))
     return;
 
-  if(IsVchanTop(chptr))
+  if (IsVchanTop(chptr))
   {
-    if(on_sub_vchan(chptr,source_p))
+    if (on_sub_vchan(chptr, source_p))
       return;
 
-    if(key && (key[0] == '!') && (vchan_chptr = find_vchan(chptr, key)))
+    if (key && (key[0] == '!') && (vchan_chptr = find_vchan(chptr, key)))
       chptr = vchan_chptr;
     else
       return;
   }
-  else if(IsVchan(chptr) || IsMember(source_p, chptr))
-    return;
-  
-  if(!((chptr->mode.mode & MODE_INVITEONLY) ||
-     (*chptr->mode.key) ||
-     (chptr->mode.limit && chptr->users >= chptr->mode.limit)))
+  else if (IsVchan(chptr) || IsMember(source_p, chptr))
     return;
 
-  if(chptr)
+  if (!((chptr->mode.mode & MODE_INVITEONLY) ||
+        (*chptr->mode.key) ||
+        (chptr->mode.limit && chptr->users >= chptr->mode.limit)))
+    return;
+
+  if (chptr)
     send_knock(client_p, source_p, chptr, name, key, 0);
 
   return;
@@ -378,40 +375,38 @@ static void parse_knock_remote(struct Client *client_p,
  * side effects - knock is sent locally (if enabled) and propagated
  */
 
-static void send_knock(struct Client *client_p, struct Client *source_p,
-                       struct Channel *chptr, char *name, char *key,
-		       int llclient)
+static void
+send_knock(struct Client *client_p, struct Client *source_p,
+           struct Channel *chptr, char *name, char *key, int llclient)
 {
   chptr->last_knock = CurrentTime;
 
-  if(MyClient(source_p))
+  if (MyClient(source_p))
   {
     source_p->localClient->last_knock = CurrentTime;
 
     sendto_one(source_p, form_str(RPL_KNOCKDLVR),
                me.name, source_p->name, name);
   }
-  else if(llclient == 1)
+  else if (llclient == 1)
     sendto_one(source_p, form_str(RPL_KNOCKDLVR),
                me.name, source_p->name, name);
 
-  if(source_p->user != NULL)
-    {
-      if(ConfigChannel.use_knock)
-        sendto_channel_local(ONLY_CHANOPS_HALFOPS,
-  			     chptr,
-  			     form_str(RPL_KNOCK),
-			     me.name,
-			     source_p->name,
-			     name,
-			     source_p->name,
-			     source_p->username,
-			     source_p->host);
-      
-      sendto_server(client_p, source_p, chptr, CAP_KNOCK, NOCAPS, LL_ICLIENT,
-                    ":%s KNOCK %s %s",
-		    source_p->name, name, key ? key : "");
-    }
+  if (source_p->user != NULL)
+  {
+    if (ConfigChannel.use_knock)
+      sendto_channel_local(ONLY_CHANOPS_HALFOPS,
+                           chptr,
+                           form_str(RPL_KNOCK),
+                           me.name,
+                           source_p->name,
+                           name,
+                           source_p->name,
+                           source_p->username, source_p->host);
+
+    sendto_server(client_p, source_p, chptr, CAP_KNOCK, NOCAPS, LL_ICLIENT,
+                  ":%s KNOCK %s %s", source_p->name, name, key ? key : "");
+  }
 
   return;
 }
@@ -424,17 +419,17 @@ static void send_knock(struct Client *client_p, struct Client *source_p,
  * output	- 
  * side effects - return check_banned_knock()
  */
-static int is_banned_knock(struct Channel *chptr, struct Client *who,
-                           char *sockhost)
+static int
+is_banned_knock(struct Channel *chptr, struct Client *who, char *sockhost)
 {
   char src_host[NICKLEN + USERLEN + HOSTLEN + 6];
   char src_iphost[NICKLEN + USERLEN + HOSTLEN + 6];
 
-  if(!IsPerson(who))
+  if (!IsPerson(who))
     return 0;
 
-  ircsprintf(src_host,"%s!%s@%s", who->name, who->username, who->host);
-  ircsprintf(src_iphost,"%s!%s@%s", who->name, who->username, sockhost);
+  ircsprintf(src_host, "%s!%s@%s", who->name, who->username, who->host);
+  ircsprintf(src_iphost, "%s!%s@%s", who->name, who->username, sockhost);
 
   return (check_banned_knock(chptr, who, src_host, src_iphost));
 }
@@ -448,8 +443,9 @@ static int is_banned_knock(struct Channel *chptr, struct Client *who,
  * output	- 
  * side effects - return CHFL_EXCEPTION, CHFL_BAN or 0
  */
-static int check_banned_knock(struct Channel *chptr, struct Client *who,
-                              char *s, char *s2)
+static int
+check_banned_knock(struct Channel *chptr, struct Client *who,
+                   char *s, char *s2)
 {
   dlink_node *ban;
   dlink_node *except;

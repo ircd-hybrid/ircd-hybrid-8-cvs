@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_invite.c,v 1.1 2002/01/04 09:13:19 a1kmm Exp $
+ *   $Id: m_invite.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "tools.h"
 #include "handlers.h"
@@ -61,7 +61,7 @@ _moddeinit(void)
   mod_del_cmd(&invite_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /*
@@ -140,7 +140,7 @@ m_invite(struct Client *client_p,
     vchan = chptr;
   if (IsVchan(chptr))
     chptr = chptr->root_chptr;
-  
+
   if (MyClient(source_p) && !IsMember(source_p, vchan))
   {
     sendto_one(source_p, form_str(ERR_NOTONCHANNEL), me.name, parv[0],
@@ -150,7 +150,7 @@ m_invite(struct Client *client_p,
 
   if ((vchan2 = map_vchan(chptr, target_p)))
   {
-    if (MyClient(source_p) && (vchan2->mode.mode & MODE_SECRET)==0)
+    if (MyClient(source_p) && (vchan2->mode.mode & MODE_SECRET) == 0)
       sendto_one(source_p, form_str(ERR_USERONCHANNEL), me.name, parv[0],
                  parv[1], parv[2]);
     return;
@@ -210,8 +210,8 @@ m_invite(struct Client *client_p,
                chptr->chname);
   }
   sendto_channel_remote(source_p, client_p,
-			ONLY_CHANOPS_HALFOPS, NOCAPS, NOCAPS,
-                        chptr, ":%s INVITE %s :%s", parv[0], 
+                        ONLY_CHANOPS_HALFOPS, NOCAPS, NOCAPS,
+                        chptr, ":%s INVITE %s :%s", parv[0],
                         target_p->name, vchan->chname);
 
   if (!MyConnect(target_p) && target_p->from->serial != current_serial)
@@ -219,6 +219,7 @@ m_invite(struct Client *client_p,
                target_p->name, vchan->chname);
   if (vchan->mode.mode & MODE_PRIVATE)
     sendto_channel_local(ONLY_CHANOPS_HALFOPS, vchan,
-        ":%s NOTICE %s :%s is inviting %s to %s.", me.name, chptr->chname,
-        source_p->name, target_p->name, chptr->chname);
+                         ":%s NOTICE %s :%s is inviting %s to %s.", me.name,
+                         chptr->chname, source_p->name, target_p->name,
+                         chptr->chname);
 }

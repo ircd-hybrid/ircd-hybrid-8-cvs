@@ -20,19 +20,19 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: m_pass.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *  $Id: m_pass.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
-#include "handlers.h"  /* m_pass prototype */
-#include "client.h"      /* client struct */
-#include "irc_string.h"  /* strncpy_irc */
-#include "send.h"        /* sendto_one */
-#include "numeric.h"     /* ERR_xxx */
-#include "ircd.h"        /* me */
+#include "handlers.h"           /* m_pass prototype */
+#include "client.h"             /* client struct */
+#include "irc_string.h"         /* strncpy_irc */
+#include "send.h"               /* sendto_one */
+#include "numeric.h"            /* ERR_xxx */
+#include "ircd.h"               /* me */
 #include "msg.h"
 #include "parse.h"
 #include "modules.h"
 
-static void mr_pass(struct Client*, struct Client*, int, char**);
+static void mr_pass(struct Client *, struct Client *, int, char **);
 
 struct Message pass_msgtab = {
   "PASS", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0,
@@ -52,7 +52,7 @@ _moddeinit(void)
   mod_del_cmd(&pass_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_pass() - Added Sat, 4 March 1989
@@ -63,32 +63,32 @@ char *_version = "$Revision: 1.1 $";
  *      parv[1] = password
  *      parv[2] = optional extra version information
  */
-static void mr_pass(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+mr_pass(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   const char *password = parv[1];
 
   if (EmptyString(password))
-    {
-      sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, BadPtr(parv[0]) ? "*" : parv[0], "PASS");
-      return;
-    }
+  {
+    sendto_one(client_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, BadPtr(parv[0]) ? "*" : parv[0], "PASS");
+    return;
+  }
 
   strncpy_irc(client_p->localClient->passwd, password, PASSWDLEN);
 
   if (parc > 2)
-    {
-      /* 
-       * It looks to me as if orabidoo wanted to have more
-       * than one set of option strings possible here...
-       * i.e. ":AABBTS" as long as TS was the last two chars
-       * however, as we are now using CAPAB, I think we can
-       * safely assume if there is a ":TS" then its a TS server
-       * -Dianora
-       */
-      if (0 == irccmp(parv[2], "TS") && client_p->tsinfo == 0)
-        client_p->tsinfo = TS_DOESTS;
-    }
+  {
+    /* 
+     * It looks to me as if orabidoo wanted to have more
+     * than one set of option strings possible here...
+     * i.e. ":AABBTS" as long as TS was the last two chars
+     * however, as we are now using CAPAB, I think we can
+     * safely assume if there is a ":TS" then its a TS server
+     * -Dianora
+     */
+    if (0 == irccmp(parv[2], "TS") && client_p->tsinfo == 0)
+      client_p->tsinfo = TS_DOESTS;
+  }
 }
-

@@ -16,7 +16,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: hash.c,v 1.1 2002/01/04 09:13:57 a1kmm Exp $
+ *  $Id: hash.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -24,7 +24,7 @@
 
 #include <errno.h>
 #include <assert.h>
-#include <fcntl.h>     /* O_RDWR ... */
+#include <fcntl.h>              /* O_RDWR ... */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,13 +52,13 @@
  * Contributed by James L. Davis
  */
 
-static unsigned int hash_channel_name(const char* name);
+static unsigned int hash_channel_name(const char *name);
 
 #ifdef DEBUGMODE
-static struct HashEntry* clientTable = NULL;
-static struct HashEntry* channelTable = NULL;
-static struct HashEntry* idTable = NULL;
-static struct HashEntry* resvTable = NULL;
+static struct HashEntry *clientTable = NULL;
+static struct HashEntry *channelTable = NULL;
+static struct HashEntry *idTable = NULL;
+static struct HashEntry *resvTable = NULL;
 static int clhits;
 static int clmiss;
 static int chhits;
@@ -79,22 +79,26 @@ static struct HashEntry resvTable[R_MAX];
  */
 extern BlockHeap *channel_heap;
 
-struct HashEntry hash_get_channel_block(int i)
+struct HashEntry
+hash_get_channel_block(int i)
 {
   return channelTable[i];
 }
 
-size_t hash_get_channel_table_size(void)
+size_t
+hash_get_channel_table_size(void)
 {
   return sizeof(struct HashEntry) * CH_MAX;
 }
 
-size_t hash_get_client_table_size(void)
+size_t
+hash_get_client_table_size(void)
 {
   return sizeof(struct HashEntry) * U_MAX;
 }
 
-size_t hash_get_resv_table_size(void)
+size_t
+hash_get_resv_table_size(void)
 {
   return sizeof(struct HashEntry) * R_MAX;
 }
@@ -130,17 +134,17 @@ size_t hash_get_resv_table_size(void)
  * The order shown above is just one instant of the server. 
  */
 
-static unsigned
-int hash_nick_name(const char* name)
+static unsigned int
+hash_nick_name(const char *name)
 {
   unsigned int h = 0;
 
   while (*name)
-    {
-      h = (h << 4) - (h + (unsigned char)ToLower(*name++));
-    }
+  {
+    h = (h << 4) - (h + (unsigned char)ToLower(*name++));
+  }
 
-  return(h & (U_MAX - 1));
+  return (h & (U_MAX - 1));
 }
 
 /*
@@ -149,17 +153,19 @@ int hash_nick_name(const char* name)
  * IDs are a easy to hash -- they're already evenly distributed,
  * and they are always case sensitive.   -orabidoo
  */
-static  unsigned int 
+static unsigned int
 hash_id(const char *nname)
 {
-	unsigned int h = 0;
-	
-	while (*nname) {
-		h = (h << 4) - (h + (unsigned char)*nname++);
-	}
+  unsigned int h = 0;
 
-	return (h & (U_MAX - 1));
+  while (*nname)
+  {
+    h = (h << 4) - (h + (unsigned char)*nname++);
+  }
+
+  return (h & (U_MAX - 1));
 }
+
 /*
  * hash_channel_name
  *
@@ -168,16 +174,16 @@ hash_id(const char *nname)
  * is little or no point hashing on a full channel name which maybe 255 chars
  * long.
  */
-static unsigned
-int hash_channel_name(const char* name)
+static unsigned int
+hash_channel_name(const char *name)
 {
   int i = 30;
   unsigned int h = 0;
 
   while (*name && --i)
-    {
-      h = (h << 4) - (h + (unsigned char)ToLower(*name++));
-    }
+  {
+    h = (h << 4) - (h + (unsigned char)ToLower(*name++));
+  }
 
   return (h & (CH_MAX - 1));
 }
@@ -189,8 +195,8 @@ int hash_channel_name(const char* name)
  * calculate a hash value on at most the first 30 characters and add
  * it to the resv hash
  */
-static unsigned
-int hash_resv_channel(const char *name)
+static unsigned int
+hash_resv_channel(const char *name)
 {
   int i = 30;
   unsigned int h = 0;
@@ -200,7 +206,7 @@ int hash_resv_channel(const char *name)
     h = (h << 4) - (h + (unsigned char)ToLower(*name++));
   }
 
-  return (h & (R_MAX -1));
+  return (h & (R_MAX - 1));
 }
 
 /*
@@ -208,13 +214,15 @@ int hash_resv_channel(const char *name)
  *
  * Nullify the hashtable and its contents so it is completely empty.
  */
-static void clear_client_hash_table()
+static void
+clear_client_hash_table()
 {
 #ifdef DEBUGMODE
   clhits = 0;
   clmiss = 0;
-  if(!clientTable)
-    clientTable = (struct HashEntry*) MyMalloc(U_MAX * sizeof(struct HashEntry));
+  if (!clientTable)
+    clientTable =
+      (struct HashEntry *)MyMalloc(U_MAX * sizeof(struct HashEntry));
 #endif
   memset(clientTable, 0, sizeof(struct HashEntry) * U_MAX);
 }
@@ -224,7 +232,8 @@ static void clear_client_hash_table()
  *
  * Nullify the hashtable and its contents so it is completely empty.
  */
-static void clear_id_hash_table()
+static void
+clear_id_hash_table()
 {
 #ifdef DEBUGMODE
   /* XXX -
@@ -232,8 +241,8 @@ static void clear_id_hash_table()
    * idmiss = 0;
    * -cosine
    */
-  if(!idTable)
-    idTable = (struct HashEntry*) MyMalloc(U_MAX * sizeof(struct HashEntry));
+  if (!idTable)
+    idTable = (struct HashEntry *)MyMalloc(U_MAX * sizeof(struct HashEntry));
 #endif
   memset(idTable, 0, sizeof(struct HashEntry) * U_MAX);
 }
@@ -245,7 +254,7 @@ clear_channel_hash_table()
   chmiss = 0;
   chhits = 0;
   if (!channelTable)
-    channelTable = (struct HashEntry*) MyMalloc(CH_MAX *
+    channelTable = (struct HashEntry *)MyMalloc(CH_MAX *
                                                 sizeof(struct HashEntry));
 #endif
   memset(channelTable, 0, sizeof(struct HashEntry) * CH_MAX);
@@ -257,14 +266,14 @@ clear_resv_hash_table()
 #ifdef DEBUGMODE
   rmiss = 0;
   rhits = 0;
-  if(!resvTable)
-    resvTable = (struct HashEntry*) MyMalloc(R_MAX *
+  if (!resvTable)
+    resvTable = (struct HashEntry *)MyMalloc(R_MAX *
                                              sizeof(struct HashEntry));
 #endif
   memset(resvTable, 0, sizeof(struct HashEntry) * R_MAX);
 }
 
-void 
+void
 init_hash(void)
 {
   clear_client_hash_table();
@@ -279,7 +288,7 @@ init_hash(void)
 int
 add_to_id_hash_table(char *name, struct Client *client_p)
 {
-  unsigned int     hashv;
+  unsigned int hashv;
 
   hashv = hash_id(name);
   client_p->idhnext = (struct Client *)idTable[hashv].list;
@@ -292,16 +301,16 @@ add_to_id_hash_table(char *name, struct Client *client_p)
 /*
  * add_to_client_hash_table
  */
-void 
-add_to_client_hash_table(const char* name, struct Client* client_p)
+void
+add_to_client_hash_table(const char *name, struct Client *client_p)
 {
   unsigned int hashv;
   assert(name != NULL);
   assert(client_p != NULL);
 
   hashv = hash_nick_name(name);
-  client_p->hnext = (struct Client*) clientTable[hashv].list;
-  clientTable[hashv].list = (void*) client_p;
+  client_p->hnext = (struct Client *)clientTable[hashv].list;
+  clientTable[hashv].list = (void *)client_p;
   ++clientTable[hashv].links;
   ++clientTable[hashv].hits;
 }
@@ -310,15 +319,15 @@ add_to_client_hash_table(const char* name, struct Client* client_p)
  * add_to_channel_hash_table
  */
 void
-add_to_channel_hash_table(const char* name, struct Channel* chptr)
+add_to_channel_hash_table(const char *name, struct Channel *chptr)
 {
   unsigned int hashv;
   assert(name != NULL);
   assert(chptr != NULL);
 
   hashv = hash_channel_name(name);
-  chptr->hnextch = (struct Channel*) channelTable[hashv].list;
-  channelTable[hashv].list = (void*) chptr;
+  chptr->hnextch = (struct Channel *)channelTable[hashv].list;
+  channelTable[hashv].list = (void *)chptr;
   ++channelTable[hashv].links;
   ++channelTable[hashv].hits;
 }
@@ -335,8 +344,8 @@ add_to_resv_hash_table(const char *name, struct ResvChannel *resv_p)
 
   hashv = hash_resv_channel(name);
 
-  resv_p->hnext = (struct ResvChannel *) resvTable[hashv].list;
-  resvTable[hashv].list = (void*)resv_p;
+  resv_p->hnext = (struct ResvChannel *)resvTable[hashv].list;
+  resvTable[hashv].list = (void *)resv_p;
   ++resvTable[hashv].links;
   ++resvTable[hashv].hits;
 }
@@ -347,39 +356,40 @@ add_to_resv_hash_table(const char *name, struct ResvChannel *resv_p)
  * hash table
  */
 void
-del_from_id_hash_table(const char* id, struct Client* client_p)
+del_from_id_hash_table(const char *id, struct Client *client_p)
 {
-  struct Client* found_client;
-  struct Client* prev = NULL;
-  unsigned int   hashv;
+  struct Client *found_client;
+  struct Client *prev = NULL;
+  unsigned int hashv;
 
   assert(id != NULL);
   assert(client_p != NULL);
 
   hashv = hash_id(id);
-  found_client = (struct Client*) idTable[hashv].list;
+  found_client = (struct Client *)idTable[hashv].list;
 
-  for ( ; found_client; found_client = found_client->idhnext)
+  for (; found_client; found_client = found_client->idhnext)
+  {
+    if (found_client == client_p)
     {
-      if (found_client == client_p)
-        {
-          if (prev)
-            prev->idhnext = found_client->idhnext;
-          else
-            idTable[hashv].list = (void*) found_client->idhnext;
-          found_client->idhnext = NULL;
+      if (prev)
+        prev->idhnext = found_client->idhnext;
+      else
+        idTable[hashv].list = (void *)found_client->idhnext;
+      found_client->idhnext = NULL;
 
-          assert(idTable[hashv].links > 0);
-          if (idTable[hashv].links > 0)
-            --idTable[hashv].links;
-          return;
-        }
-      prev = found_client;
+      assert(idTable[hashv].links > 0);
+      if (idTable[hashv].links > 0)
+        --idTable[hashv].links;
+      return;
     }
+    prev = found_client;
+  }
   Debug((DEBUG_ERROR, "%#x !in tab %s[%s] %#x %#x %#x %d %d %#x",
-         client_p, client_p->name, client_p->from ? client_p->from->host : "??host",
-         client_p->from, client_p->next, client_p->prev, client_p->fd, 
-         client_p->status, client_p->user));
+         client_p, client_p->name,
+         client_p->from ? client_p->from->host : "??host", client_p->from,
+         client_p->next, client_p->prev, client_p->fd, client_p->status,
+         client_p->user));
 }
 
 /*
@@ -387,82 +397,83 @@ del_from_id_hash_table(const char* id, struct Client* client_p)
  * hash table
  */
 void
-del_from_client_hash_table(const char* name, struct Client* client_p)
+del_from_client_hash_table(const char *name, struct Client *client_p)
 {
-  struct Client* found_client;
-  struct Client* prev = NULL;
-  unsigned int   hashv;
+  struct Client *found_client;
+  struct Client *prev = NULL;
+  unsigned int hashv;
   assert(name != NULL);
   assert(client_p != NULL);
 
   hashv = hash_nick_name(name);
-  found_client = (struct Client*) clientTable[hashv].list;
+  found_client = (struct Client *)clientTable[hashv].list;
 
-  for ( ; found_client; found_client = found_client->hnext)
+  for (; found_client; found_client = found_client->hnext)
+  {
+    if (found_client == client_p)
     {
-      if (found_client == client_p)
-        {
-          if (prev)
-            prev->hnext = found_client->hnext;
-          else
-            clientTable[hashv].list = (void*) found_client->hnext;
-          found_client->hnext = NULL;
+      if (prev)
+        prev->hnext = found_client->hnext;
+      else
+        clientTable[hashv].list = (void *)found_client->hnext;
+      found_client->hnext = NULL;
 
-          assert(clientTable[hashv].links > 0);
-          if (clientTable[hashv].links > 0)
-            --clientTable[hashv].links;
-          return;
-        }
-      prev = found_client;
+      assert(clientTable[hashv].links > 0);
+      if (clientTable[hashv].links > 0)
+        --clientTable[hashv].links;
+      return;
     }
+    prev = found_client;
+  }
   Debug((DEBUG_ERROR, "%#x !in tab %s[%s] %#x %#x %#x %d %d %#x",
-         client_p, client_p->name, client_p->from ? client_p->from->host : "??host",
-         client_p->from, client_p->next, client_p->prev, client_p->fd, 
-         client_p->status, client_p->user));
+         client_p, client_p->name,
+         client_p->from ? client_p->from->host : "??host", client_p->from,
+         client_p->next, client_p->prev, client_p->fd, client_p->status,
+         client_p->user));
 }
 
 /*
  * del_from_channel_hash_table
  */
-void 
-del_from_channel_hash_table(const char* name, struct Channel* chptr)
+void
+del_from_channel_hash_table(const char *name, struct Channel *chptr)
 {
-  struct Channel* found_chptr;
-  struct Channel* prev = NULL;
-  unsigned int    hashv;
+  struct Channel *found_chptr;
+  struct Channel *prev = NULL;
+  unsigned int hashv;
   assert(name != NULL);
   assert(chptr != NULL);
 
   hashv = hash_channel_name(name);
-  found_chptr = (struct Channel*) channelTable[hashv].list;
+  found_chptr = (struct Channel *)channelTable[hashv].list;
 
-  for ( ; found_chptr; found_chptr = found_chptr->hnextch)
+  for (; found_chptr; found_chptr = found_chptr->hnextch)
+  {
+    if (found_chptr == chptr)
     {
-      if (found_chptr == chptr)
-        {
-          if (prev)
-            prev->hnextch = found_chptr->hnextch;
-          else
-            channelTable[hashv].list = (void*) found_chptr->hnextch;
-          found_chptr->hnextch = NULL;
+      if (prev)
+        prev->hnextch = found_chptr->hnextch;
+      else
+        channelTable[hashv].list = (void *)found_chptr->hnextch;
+      found_chptr->hnextch = NULL;
 
-          assert(channelTable[hashv].links > 0);
-          if (channelTable[hashv].links > 0)
-            --channelTable[hashv].links;
-          return;
-        }
-      prev = found_chptr;
+      assert(channelTable[hashv].links > 0);
+      if (channelTable[hashv].links > 0)
+        --channelTable[hashv].links;
+      return;
     }
+    prev = found_chptr;
+  }
 }
 
 /*
  * del_from_resv_hash_table()
  */
-void 
+void
 del_from_resv_hash_table(const char *name, struct ResvChannel *rptr)
 {
   struct ResvChannel *found_chptr;
-  struct ResvChannel *prev=NULL;
+  struct ResvChannel *prev = NULL;
   unsigned int hashv;
 
   assert(name != NULL);
@@ -470,18 +481,18 @@ del_from_resv_hash_table(const char *name, struct ResvChannel *rptr)
 
   hashv = hash_resv_channel(name);
 
-  found_chptr = (struct ResvChannel *) resvTable[hashv].list;
+  found_chptr = (struct ResvChannel *)resvTable[hashv].list;
 
-  for( ; found_chptr; found_chptr = found_chptr->hnext)
+  for (; found_chptr; found_chptr = found_chptr->hnext)
   {
-    if(found_chptr == rptr)
+    if (found_chptr == rptr)
     {
-      if(prev)
+      if (prev)
         prev->hnext = found_chptr->hnext;
       else
-        resvTable[hashv].list = (void*)found_chptr->hnext;
+        resvTable[hashv].list = (void *)found_chptr->hnext;
 
-      found_chptr->hnext=NULL;
+      found_chptr->hnext = NULL;
 
       assert(resvTable[hashv].links > 0);
       --resvTable[hashv].links;
@@ -489,8 +500,8 @@ del_from_resv_hash_table(const char *name, struct ResvChannel *rptr)
       return;
     }
   }
-}  
- 
+}
+
 /*
  * find_id
  */
@@ -499,7 +510,7 @@ find_id(const char *name)
 {
   struct Client *found_client;
   unsigned int hashv;
-	
+
   if (name == NULL)
     return NULL;
 
@@ -513,10 +524,10 @@ find_id(const char *name)
   {
     if (found_client->user && strcmp(name, found_client->user->id) == 0)
     {
-      return(found_client);
+      return (found_client);
     }
   }
-	
+
   return (NULL);
 }
 
@@ -528,32 +539,32 @@ find_id(const char *name)
  * output	- pointer to client pointer
  * side effects	- none
  */
-struct Client* 
-find_client(const char* name)
+struct Client *
+find_client(const char *name)
 {
-  struct Client* found_client;
-  unsigned int   hashv;
+  struct Client *found_client;
+  unsigned int hashv;
 
   assert(name != NULL);
 
-  if (*name == '.') /* it's an ID .. */
+  if (*name == '.')             /* it's an ID .. */
     return (find_id(name));
 
   hashv = hash_nick_name(name);
-  found_client = (struct Client*) clientTable[hashv].list;
+  found_client = (struct Client *)clientTable[hashv].list;
 
-  for ( ; found_client; found_client = found_client->hnext)
+  for (; found_client; found_client = found_client->hnext)
     if (irccmp(name, found_client->name) == 0)
-      {
+    {
 #ifdef DEBUGMODE
-        ++clhits;
+      ++clhits;
 #endif
-        return (found_client);
-      }
+      return (found_client);
+    }
 #ifdef DEBUGMODE
   ++clmiss;
 #endif
-  
+
   return (NULL);
 }
 
@@ -568,13 +579,13 @@ find_client(const char* name)
  * also made const correct
  * --Bleep
  */
-static struct Client* 
-hash_find_masked_server(const char* name)
+static struct Client *
+hash_find_masked_server(const char *name)
 {
-  char           buf[HOSTLEN + 1];
-  char*          p = buf;
-  char*          s;
-  struct Client* server;
+  char buf[HOSTLEN + 1];
+  char *p = buf;
+  char *s;
+  struct Client *server;
 
   if ('*' == *name || '.' == *name)
     return 0;
@@ -586,16 +597,16 @@ hash_find_masked_server(const char* name)
   buf[HOSTLEN] = '\0';
 
   while ((s = strchr(p, '.')) != 0)
-    {
-       *--s = '*';
-      /*
-       * Dont need to check IsServer() here since nicknames cant
-       * have *'s in them anyway.
-       */
-       if ((server = find_client(s)))
-	 return server;
-       p = s + 2;
-    }
+  {
+    *--s = '*';
+    /*
+     * Dont need to check IsServer() here since nicknames cant
+     * have *'s in them anyway.
+     */
+    if ((server = find_client(s)))
+      return server;
+    p = s + 2;
+  }
   return 0;
 }
 
@@ -607,31 +618,31 @@ hash_find_masked_server(const char* name)
  *		  given server not found
  * side effects	-
  */
-struct Client* 
-find_server(const char* name)
+struct Client *
+find_server(const char *name)
 {
-  struct Client* found_server;
-  unsigned int   hashv;
+  struct Client *found_server;
+  unsigned int hashv;
 
   if (name == NULL)
-    return(NULL);
+    return (NULL);
 
   hashv = hash_nick_name(name);
-  found_server = (struct Client*) clientTable[hashv].list;
+  found_server = (struct Client *)clientTable[hashv].list;
 
-  for ( ; found_server; found_server = found_server->hnext)
+  for (; found_server; found_server = found_server->hnext)
+  {
+    if (!IsServer(found_server) && !IsMe(found_server))
+      continue;
+    if (irccmp(name, found_server->name) == 0)
     {
-      if (!IsServer(found_server) && !IsMe(found_server))
-        continue;
-      if (irccmp(name, found_server->name) == 0)
-        {
 #ifdef DEBUGMODE
-          ++clhits;
+      ++clhits;
 #endif
-          return (found_server);
-        }
+      return (found_server);
     }
-  
+  }
+
 #ifndef DEBUGMODE
   return hash_find_masked_server(name);
 
@@ -648,30 +659,30 @@ find_server(const char* name)
  * output	- 
  * side effects	-
  */
-struct Channel* 
-hash_find_channel(const char* name)
+struct Channel *
+hash_find_channel(const char *name)
 {
-  struct Channel* found_chptr;
+  struct Channel *found_chptr;
   unsigned int hashv;
-  
+
   assert(name != NULL);
   hashv = hash_channel_name(name);
 
-  found_chptr = (struct Channel*) channelTable[hashv].list;
+  found_chptr = (struct Channel *)channelTable[hashv].list;
 
-  for ( ; found_chptr; found_chptr = found_chptr->hnextch)
-  
+  for (; found_chptr; found_chptr = found_chptr->hnextch)
+
     if (irccmp(name, found_chptr->chname) == 0)
-      {
+    {
 #ifdef DEBUGMODE
-        ++chhits;
+      ++chhits;
 #endif
-        return(found_chptr);
-      }
+      return (found_chptr);
+    }
 #ifdef DEBUGMODE
   ++chmiss;
 #endif
-  return(NULL);
+  return (NULL);
 }
 
 /*
@@ -698,44 +709,41 @@ get_or_create_channel(struct Client *client_p, char *chname, int *isnew)
 
   len = strlen(chname);
   if (len > CHANNELLEN)
+  {
+    if (IsServer(client_p))
     {
-      if (IsServer(client_p))
-	{
-	  sendto_realops_flags(FLAGS_DEBUG, L_ALL,
-			       "*** Long channel name from %s (%d > %d): %s",
-			       client_p->name,
-			       len,
-			       CHANNELLEN,
-			       chname);
-	}
-      len = CHANNELLEN;
-      *(chname + CHANNELLEN) = '\0';
+      sendto_realops_flags(FLAGS_DEBUG, L_ALL,
+                           "*** Long channel name from %s (%d > %d): %s",
+                           client_p->name, len, CHANNELLEN, chname);
     }
+    len = CHANNELLEN;
+    *(chname + CHANNELLEN) = '\0';
+  }
 
   hashv = hash_channel_name(chname);
 
-  for ( found_chptr = (struct Channel*) channelTable[hashv].list;
-	found_chptr; found_chptr = found_chptr->hnextch)
+  for (found_chptr = (struct Channel *)channelTable[hashv].list;
+       found_chptr; found_chptr = found_chptr->hnextch)
+  {
+    if (irccmp(chname, found_chptr->chname) == 0)
     {
-      if (irccmp(chname, found_chptr->chname) == 0)
-	{
 #ifdef DEBUGMODE
-	  ++chhits;
+      ++chhits;
 #endif
-	  if(isnew != NULL)
-	    *isnew = 0;
-	  return(found_chptr);
-	}
-#ifdef DEBUGMODE
-      ++chmiss;
-#endif
+      if (isnew != NULL)
+        *isnew = 0;
+      return (found_chptr);
     }
+#ifdef DEBUGMODE
+    ++chmiss;
+#endif
+  }
 
-  if(isnew != NULL)
+  if (isnew != NULL)
     *isnew = 1;
 
   chptr = BlockHeapAlloc(channel_heap);
-  memset(chptr, 0, sizeof(*chptr)-CHANNELLEN);
+  memset(chptr, 0, sizeof(*chptr) - CHANNELLEN);
   strcpy(chptr->chname, chname);
 
   if (GlobalChannelList)
@@ -744,10 +752,10 @@ get_or_create_channel(struct Client *client_p, char *chname, int *isnew)
   chptr->prevch = NULL;
   chptr->nextch = GlobalChannelList;
   GlobalChannelList = chptr;
-  chptr->channelts = CurrentTime;     /* doesn't hurt to set it here */
+  chptr->channelts = CurrentTime;       /* doesn't hurt to set it here */
 
-  chptr->hnextch = (struct Channel*) channelTable[hashv].list;
-  channelTable[hashv].list = (void*) chptr;
+  chptr->hnextch = (struct Channel *)channelTable[hashv].list;
+  channelTable[hashv].list = (void *)chptr;
   ++channelTable[hashv].links;
   ++channelTable[hashv].hits;
 
@@ -765,30 +773,24 @@ hash_find_resv(const char *name)
   unsigned int hashv;
 
   assert(name != NULL);
-  
+
   hashv = hash_resv_channel(name);
 
-  found_chptr = (struct ResvChannel *) resvTable[hashv].list;
+  found_chptr = (struct ResvChannel *)resvTable[hashv].list;
 
-  for( ; found_chptr; found_chptr = found_chptr->hnext)
+  for (; found_chptr; found_chptr = found_chptr->hnext)
   {
-    if(!irccmp(name, found_chptr->name))
+    if (!irccmp(name, found_chptr->name))
     {
 #ifdef DEBUGMODE
       ++rhits;
-#endif      
-      return(found_chptr);
+#endif
+      return (found_chptr);
     }
   }
 #ifdef DEBUGMODE
   ++rmiss;
 #endif
-  
-  return(NULL);
-}  
 
-
-
-
-
-
+  return (NULL);
+}

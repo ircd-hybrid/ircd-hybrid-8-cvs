@@ -16,7 +16,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: numeric.c,v 1.1 2002/01/04 09:14:21 a1kmm Exp $
+ *   $Id: numeric.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -31,7 +31,7 @@
 
 #include "numeric.h"
 #include "irc_string.h"
-#include "common.h"     /* NULL cripes */
+#include "common.h"             /* NULL cripes */
 #include "memory.h"
 
 #include "messages.tab"
@@ -43,7 +43,8 @@
  * output	- corresponding string
  * side effects	- NONE
  */
-const char* form_str(int numeric)
+const char *
+form_str(int numeric)
 {
   const char *num_ptr;
 
@@ -62,5 +63,3 @@ const char* form_str(int numeric)
 
   return (num_ptr);
 }
-
-

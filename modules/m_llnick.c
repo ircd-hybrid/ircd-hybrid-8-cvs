@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_llnick.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ * $Id: m_llnick.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "client.h"
@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void ms_llnick(struct Client*, struct Client*, int, char**);
+static void ms_llnick(struct Client *, struct Client *, int, char **);
 
 struct Message llnick_msgtab = {
   "LLNICK", 0, 0, 3, 0, MFLG_SLOW | MFLG_UNREG, 0L,
@@ -59,7 +59,7 @@ _moddeinit(void)
   mod_del_cmd(&llnick_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * m_llnick
@@ -69,10 +69,9 @@ char *_version = "$Revision: 1.1 $";
  *      parv[3] = old nick
  *
  */
-static void ms_llnick(struct Client *client_p,
-                      struct Client *source_p,
-                      int parc,
-                      char *parv[])
+static void
+ms_llnick(struct Client *client_p,
+          struct Client *source_p, int parc, char *parv[])
 {
   char *nick;
   char *nick_old = NULL;
@@ -80,21 +79,21 @@ static void ms_llnick(struct Client *client_p,
   int exists = 0;
   int new = 0;
   dlink_node *ptr;
-  
-  if(!IsCapable(client_p,CAP_LL) || !IsCapable(client_p, CAP_HUB))
-    {
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-			   "*** LLNICK requested from non LL server %s",
-			   client_p->name);
-      return;
-    }
+
+  if (!IsCapable(client_p, CAP_LL) || !IsCapable(client_p, CAP_HUB))
+  {
+    sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "*** LLNICK requested from non LL server %s",
+                         client_p->name);
+    return;
+  }
 
   if (parc < 4)
     return;
 
   if (*parv[1] == 'Y')
     exists = 1;
-  
+
   nick = parv[2];
   nick_old = parv[3];
 
@@ -103,43 +102,42 @@ static void ms_llnick(struct Client *client_p,
 
   if (new)
   {
-    nick_old++; /* skip '!' */
+    nick_old++;                 /* skip '!' */
     /* New user -- find them */
-    for( ptr = unknown_list.head; ptr; ptr = ptr->next )
+    for (ptr = unknown_list.head; ptr; ptr = ptr->next)
     {
-      if( !strcmp(nick_old, ((struct Client *)ptr->data)->llname) )
+      if (!strcmp(nick_old, ((struct Client *)ptr->data)->llname))
       {
         target_p = ptr->data;
-        *target_p->llname = '\0'; /* unset their temp-nick */
+        *target_p->llname = '\0';       /* unset their temp-nick */
         break;
       }
     }
-    if (!target_p) /* Can't find them -- maybe they got a different nick */
+    if (!target_p)              /* Can't find them -- maybe they got a different nick */
       return;
   }
   else
   {
     /* Existing user changing nickname */
     target_p = find_client(nick_old);
-  
-    if (!target_p) /* Can't find them -- maybe they got a different nick */
+
+    if (!target_p)              /* Can't find them -- maybe they got a different nick */
       return;
   }
 
   /* Don't try this on a remote client... */
   if (!MyConnect(target_p))
     return;
-  
-  if(find_client(nick) || exists)
+
+  if (find_client(nick) || exists)
   {
     /* The nick they want is in use. complain */
     sendto_one(target_p, form_str(ERR_NICKNAMEINUSE), me.name,
-               new ? "*" : nick_old,
-               nick);
+               new ? "*" : nick_old, nick);
     return;
   }
 
-  if(new)
+  if (new)
     set_initial_nick(target_p, target_p, nick);
   else
     change_local_nick(target_p, target_p, nick);

@@ -1,7 +1,7 @@
 /*
  * restart.c
  *
- * $Id: restart.c,v 1.1 2002/01/04 09:14:23 a1kmm Exp $
+ * $Id: restart.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
  */
 #include "tools.h"
 #include "restart.h"
@@ -11,7 +11,7 @@
 #include "send.h"
 #include "s_debug.h"
 #include "s_log.h"
-#include "client.h"     /* for FLAGS_ALL */
+#include "client.h"             /* for FLAGS_ALL */
 #include "memory.h"
 
 #include <unistd.h>
@@ -19,28 +19,29 @@
 
 
 /* external var */
-extern char** myargv;
+extern char **myargv;
 
-void restart(char *mesg)
+void
+restart(char *mesg)
 {
-  static int was_here = NO; /* redundant due to restarting flag below */
+  static int was_here = NO;     /* redundant due to restarting flag below */
 
   if (was_here)
     abort();
   was_here = YES;
 
   ilog(L_NOTICE, "Restarting Server because: %s, memory data limit: %ld",
-         mesg, get_maxrss());
+       mesg, get_maxrss());
 
   server_reboot();
 }
 
-void server_reboot(void)
+void
+server_reboot(void)
 {
   int i;
 
-  sendto_realops_flags(FLAGS_ALL, L_ALL,
-                       "Restarting server...");
+  sendto_realops_flags(FLAGS_ALL, L_ALL, "Restarting server...");
 
   ilog(L_NOTICE, "Restarting server...");
   /*
@@ -59,5 +60,3 @@ void server_reboot(void)
 
   exit(-1);
 }
-
-

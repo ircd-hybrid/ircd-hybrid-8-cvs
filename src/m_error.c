@@ -20,11 +20,11 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_error.c,v 1.1 2002/01/04 09:14:18 a1kmm Exp $
+ *   $Id: m_error.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
-#include "common.h"   /* FALSE */
+#include "common.h"             /* FALSE */
 #include "ircd.h"
 #include "numeric.h"
 #include "send.h"
@@ -35,7 +35,7 @@
 
 
 struct Message error_msgtab = {
- "ERROR", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0,
+  "ERROR", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0,
   {m_error, m_ignore, ms_error, m_ignore}
 };
 
@@ -48,51 +48,55 @@ struct Message error_msgtab = {
  *      parv[0] = sender prefix
  *      parv[*] = parameters
  */
-void m_error(struct Client *client_p, struct Client *source_p,
-             int parc, char *parv[])
+void
+m_error(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
-  char* para;
+  char *para;
 
   para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
-  
+
   deprintf("error", "Received ERROR message from %s: %s",
-	   source_p->name, para);
+           source_p->name, para);
 
   if (client_p == source_p)
-    {
-      sendto_realops_flags(FLAGS_ALL, L_ADMIN,
-            "ERROR :from %s -- %s",
-	    get_client_name(client_p, HIDE_IP), para);
-      sendto_realops_flags(FLAGS_ALL, L_OPER,
-            "ERROR :from %s -- %s",
-	    get_client_name(client_p, MASK_IP), para);
-    }
+  {
+    sendto_realops_flags(FLAGS_ALL, L_ADMIN,
+                         "ERROR :from %s -- %s",
+                         get_client_name(client_p, HIDE_IP), para);
+    sendto_realops_flags(FLAGS_ALL, L_OPER,
+                         "ERROR :from %s -- %s",
+                         get_client_name(client_p, MASK_IP), para);
+  }
   else
-    {
-      sendto_realops_flags(FLAGS_ALL, L_OPER,
-            "ERROR :from %s via %s -- %s",
-	    source_p->name, get_client_name(client_p, MASK_IP), para);
-      sendto_realops_flags(FLAGS_ALL, L_ADMIN,"ERROR :from %s via %s -- %s",
-			   source_p->name,
-			   get_client_name(client_p, HIDE_IP), para);
-    }
+  {
+    sendto_realops_flags(FLAGS_ALL, L_OPER,
+                         "ERROR :from %s via %s -- %s",
+                         source_p->name, get_client_name(client_p, MASK_IP),
+                         para);
+    sendto_realops_flags(FLAGS_ALL, L_ADMIN, "ERROR :from %s via %s -- %s",
+                         source_p->name, get_client_name(client_p, HIDE_IP),
+                         para);
+  }
   exit_client(client_p, source_p, source_p, "ERROR");
 }
 
-void ms_error(struct Client *client_p, struct Client *source_p,
-              int parc, char *parv[])
+void
+ms_error(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
-  char* para;
+  char *para;
 
   para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
-  
+
   deprintf("error", "Received ERROR message from %s: %s",
-	   source_p->name, para);
+           source_p->name, para);
 
   if (client_p == source_p)
-    sendto_realops_flags(FLAGS_ALL, L_ALL,"ERROR :from %s -- %s",
-			 get_client_name(client_p, MASK_IP), para);
+    sendto_realops_flags(FLAGS_ALL, L_ALL, "ERROR :from %s -- %s",
+                         get_client_name(client_p, MASK_IP), para);
   else
-    sendto_realops_flags(FLAGS_ALL, L_ALL,"ERROR :from %s via %s -- %s", source_p->name,
-			 get_client_name(client_p, MASK_IP), para);
+    sendto_realops_flags(FLAGS_ALL, L_ALL, "ERROR :from %s via %s -- %s",
+                         source_p->name, get_client_name(client_p, MASK_IP),
+                         para);
 }

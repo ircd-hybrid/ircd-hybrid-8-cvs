@@ -18,8 +18,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *
- *   $Id: packet.c,v 1.1 2002/01/04 09:14:23 a1kmm Exp $
- */ 
+ *   $Id: packet.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -40,7 +40,7 @@
 #include "memory.h"
 #include "hook.h"
 
-static char               readBuf[READBUF_SIZE];
+static char readBuf[READBUF_SIZE];
 
 
 /*
@@ -48,49 +48,51 @@ static char               readBuf[READBUF_SIZE];
  */
 static void
 parse_client_queued(struct Client *client_p)
-{ 
- int dolen = 0, checkflood = 1;
- struct LocalUser *lclient_p = client_p->localClient;
+{
+  int dolen = 0, checkflood = 1;
+  struct LocalUser *lclient_p = client_p->localClient;
 
- if (IsServer(client_p))
- {
-  while ((dolen = linebuf_get(&client_p->localClient->buf_recvq,
-                              readBuf, READBUF_SIZE, LINEBUF_COMPLETE,
-                              LINEBUF_PARSED)) > 0)
+  if (IsServer(client_p))
   {
-   if (!IsDead(client_p))
-    client_dopacket(client_p, readBuf, dolen);
-   if (IsDead(client_p))
-   {
-    if (client_p->localClient)
+    while ((dolen = linebuf_get(&client_p->localClient->buf_recvq,
+                                readBuf, READBUF_SIZE, LINEBUF_COMPLETE,
+                                LINEBUF_PARSED)) > 0)
     {
-     linebuf_donebuf(&client_p->localClient->buf_recvq);
-     linebuf_donebuf(&client_p->localClient->buf_sendq);
+      if (!IsDead(client_p))
+        client_dopacket(client_p, readBuf, dolen);
+      if (IsDead(client_p))
+      {
+        if (client_p->localClient)
+        {
+          linebuf_donebuf(&client_p->localClient->buf_recvq);
+          linebuf_donebuf(&client_p->localClient->buf_sendq);
+        }
+        return;
+      }
     }
-    return;
-   }
   }
- } else {
-  checkflood = 0;
-  if (ConfigFileEntry.no_oper_flood && IsOper(client_p))
-   checkflood = 0;
+  else
+  {
+    checkflood = 0;
+    if (ConfigFileEntry.no_oper_flood && IsOper(client_p))
+      checkflood = 0;
     /*
      * Handle flood protection here - if we exceed our flood limit on
      * messages in this loop, we simply drop out of the loop prematurely.
      *   -- adrian
      */
-  for (;;)
-  {
-   if (checkflood && (lclient_p->sent_parsed > lclient_p->allow_read))
-    break;
-   dolen = linebuf_get(&client_p->localClient->buf_recvq, readBuf,
-                       READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
-   if (!dolen)
-    break;
-   client_dopacket(client_p, readBuf, dolen);
-   lclient_p->sent_parsed++;
+    for (;;)
+    {
+      if (checkflood && (lclient_p->sent_parsed > lclient_p->allow_read))
+        break;
+      dolen = linebuf_get(&client_p->localClient->buf_recvq, readBuf,
+                          READBUF_SIZE, LINEBUF_COMPLETE, LINEBUF_PARSED);
+      if (!dolen)
+        break;
+      client_dopacket(client_p, readBuf, dolen);
+      lclient_p->sent_parsed++;
+    }
   }
- }
 }
 
 /*
@@ -102,53 +104,53 @@ parse_client_queued(struct Client *client_p)
 void
 flood_recalc(int fd, void *data)
 {
- struct Client *client_p = data;
- struct LocalUser *lclient_p = client_p->localClient;
- int max_flood_per_sec = MAX_FLOOD_PER_SEC;
- 
- /* This can happen in the event that the client detached. */
- if (!lclient_p)
-  return;
- /* If we're a server, skip to the end. Realising here that this call is
-  * cheap and it means that if a op is downgraded they still get considered
-  * for anti-flood protection ..
-  */
- if (!IsPrivileged(client_p))
- {
-  /* Is the grace period still active? */
-  if (client_p->user && !IsFloodDone(client_p))
-   max_flood_per_sec = MAX_FLOOD_PER_SEC_I;
-  /* ok, we have to recalculate the number of messages we can receive
-   * in this second, based upon what happened in the last second.
-   * If we still exceed the flood limit, don't move the parsed limit.
-   * If we are below the flood limit, increase the flood limit.
-   *   -- adrian
+  struct Client *client_p = data;
+  struct LocalUser *lclient_p = client_p->localClient;
+  int max_flood_per_sec = MAX_FLOOD_PER_SEC;
+
+  /* This can happen in the event that the client detached. */
+  if (!lclient_p)
+    return;
+  /* If we're a server, skip to the end. Realising here that this call is
+   * cheap and it means that if a op is downgraded they still get considered
+   * for anti-flood protection ..
    */
-  /* Set to 1 to start with, let it rise/fall after that... */
-  if (lclient_p->allow_read == 0)
-   lclient_p->allow_read = 1;
-  else if (lclient_p->actually_read < lclient_p->allow_read)
-   /* Raise the allowed messages if we flooded under the limit */
-   lclient_p->allow_read++;
-  else
-   /* Drop the limit to avoid flooding .. */
-   lclient_p->allow_read--;
-  /* Enforce floor/ceiling restrictions */
-  if (lclient_p->allow_read < 1)
-   lclient_p->allow_read = 1;
-  else if (lclient_p->allow_read > max_flood_per_sec)
-   lclient_p->allow_read = max_flood_per_sec;
- }
- /* Reset the sent-per-second count */
- lclient_p->sent_parsed = 0;
- lclient_p->actually_read = 0;
- parse_client_queued(client_p);
- /* And now, try flushing .. */
- if (!IsDead(client_p))
- {
-  /* and finally, reset the flood check */
-  comm_setflush(fd, 1000, flood_recalc, client_p);
- }
+  if (!IsPrivileged(client_p))
+  {
+    /* Is the grace period still active? */
+    if (client_p->user && !IsFloodDone(client_p))
+      max_flood_per_sec = MAX_FLOOD_PER_SEC_I;
+    /* ok, we have to recalculate the number of messages we can receive
+     * in this second, based upon what happened in the last second.
+     * If we still exceed the flood limit, don't move the parsed limit.
+     * If we are below the flood limit, increase the flood limit.
+     *   -- adrian
+     */
+    /* Set to 1 to start with, let it rise/fall after that... */
+    if (lclient_p->allow_read == 0)
+      lclient_p->allow_read = 1;
+    else if (lclient_p->actually_read < lclient_p->allow_read)
+      /* Raise the allowed messages if we flooded under the limit */
+      lclient_p->allow_read++;
+    else
+      /* Drop the limit to avoid flooding .. */
+      lclient_p->allow_read--;
+    /* Enforce floor/ceiling restrictions */
+    if (lclient_p->allow_read < 1)
+      lclient_p->allow_read = 1;
+    else if (lclient_p->allow_read > max_flood_per_sec)
+      lclient_p->allow_read = max_flood_per_sec;
+  }
+  /* Reset the sent-per-second count */
+  lclient_p->sent_parsed = 0;
+  lclient_p->actually_read = 0;
+  parse_client_queued(client_p);
+  /* And now, try flushing .. */
+  if (!IsDead(client_p))
+  {
+    /* and finally, reset the flood check */
+    comm_setflush(fd, 1000, flood_recalc, client_p);
+  }
 }
 
 /*
@@ -173,11 +175,11 @@ read_ctrl_packet(int fd, void *data)
   reply = &lserver->slinkrpl;
 
   /* if the server died, kill it off now -davidt */
-  if(IsDead(server))
+  if (IsDead(server))
   {
     exit_client(server, server, &me,
                 (server->flags & FLAGS_SENDQEX) ?
-                  "SendQ exceeded" : "Dead socket");
+                "SendQ exceeded" : "Dead socket");
     return;
   }
 
@@ -191,7 +193,7 @@ read_ctrl_packet(int fd, void *data)
 
     if (length <= 0)
     {
-      if((length == -1) && ignoreErrno(errno))
+      if ((length == -1) && ignoreErrno(errno))
         goto nodata;
       error_exit_client(server, length);
       return;
@@ -216,7 +218,7 @@ read_ctrl_packet(int fd, void *data)
     length = read(fd, len, (2 - reply->gotdatalen));
     if (length <= 0)
     {
-      if((length == -1) && ignoreErrno(errno))
+      if ((length == -1) && ignoreErrno(errno))
         goto nodata;
       error_exit_client(server, length);
       return;
@@ -238,7 +240,7 @@ read_ctrl_packet(int fd, void *data)
     }
 
     if (reply->gotdatalen < 2)
-      return; /* wait for more data */
+      return;                   /* wait for more data */
   }
 
   if (reply->readdata < reply->datalen) /* try to get any remaining data */
@@ -247,7 +249,7 @@ read_ctrl_packet(int fd, void *data)
                   (reply->datalen - reply->readdata));
     if (length <= 0)
     {
-      if((length == -1) && ignoreErrno(errno))
+      if ((length == -1) && ignoreErrno(errno))
         goto nodata;
       error_exit_client(server, length);
       return;
@@ -255,7 +257,7 @@ read_ctrl_packet(int fd, void *data)
 
     reply->readdata += length;
     if (reply->readdata < reply->datalen)
-      return; /* wait for more data */
+      return;                   /* wait for more data */
   }
 
 #ifndef NDEBUG
@@ -264,11 +266,11 @@ read_ctrl_packet(int fd, void *data)
   hdata.data = NULL;
   hook_call_event("iorecvctrl", &hdata);
 #endif
-  
-  /* we now have the command and any data, pass it off to the handler */
-  (*replydef->handler)(reply->command, reply->datalen, reply->data, server);
 
-  /* reset SlinkRpl */                      
+  /* we now have the command and any data, pass it off to the handler */
+  (*replydef->handler) (reply->command, reply->datalen, reply->data, server);
+
+  /* reset SlinkRpl */
   if (reply->datalen > 0)
     MyFree(reply->data);
   reply->command = 0;
@@ -281,7 +283,7 @@ nodata:
   comm_setselect(fd, FDLIST_SERVER, COMM_SELECT_READ,
                  read_ctrl_packet, server, 0);
 }
-  
+
 /*
  * read_packet - Read a 'packet' of data from a connection and process it.
  */
@@ -298,11 +300,11 @@ read_packet(int fd, void *data)
   struct hook_io_data hdata;
 #endif
   /* if the client is dead, kill it off now -davidt */
-  if(IsDead(client_p))
+  if (IsDead(client_p))
   {
     exit_client(client_p, client_p, &me,
                 (client_p->flags & FLAGS_SENDQEX) ?
-                  "SendQ exceeded" : "Dead socket");
+                "SendQ exceeded" : "Dead socket");
     return;
   }
 
@@ -324,12 +326,12 @@ read_packet(int fd, void *data)
 
   if (length <= 0)
   {
-    if((length == -1) && ignoreErrno(errno))
+    if ((length == -1) && ignoreErrno(errno))
     {
       comm_setselect(fd_r, FDLIST_IDLECLIENT, COMM_SELECT_READ,
-      		read_packet, client_p, 0);
+                     read_packet, client_p, 0);
       return;
-    }  	
+    }
     error_exit_client(client_p, length);
     return;
   }
@@ -340,7 +342,7 @@ read_packet(int fd, void *data)
   hdata.len = length;
   hook_call_event("iorecv", &hdata);
 #endif
-  
+
   if (client_p->lasttime < CurrentTime)
     client_p->lasttime = CurrentTime;
   if (client_p->lasttime > client_p->since)
@@ -356,7 +358,7 @@ read_packet(int fd, void *data)
     binary = 1;
 
   lbuf_len = linebuf_parse(&client_p->localClient->buf_recvq,
-      readBuf, length, binary);
+                           readBuf, length, binary);
 
   if (lbuf_len < 0)
   {
@@ -365,17 +367,18 @@ read_packet(int fd, void *data)
   }
 
   lclient_p->actually_read += lbuf_len;
-  
+
   /* Check to make sure we're not flooding */
   if (IsPerson(client_p) &&
-     (linebuf_alloclen(&client_p->localClient->buf_recvq) >
-      ConfigFileEntry.client_flood)) {
-      if (!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
-      {
-       exit_client(client_p, client_p, client_p, "Excess Flood");
-       return;
-      }
+      (linebuf_alloclen(&client_p->localClient->buf_recvq) >
+       ConfigFileEntry.client_flood))
+  {
+    if (!(ConfigFileEntry.no_oper_flood && IsOper(client_p)))
+    {
+      exit_client(client_p, client_p, client_p, "Excess Flood");
+      return;
     }
+  }
 
   /* Attempt to parse what we have */
   parse_client_queued(client_p);
@@ -393,12 +396,15 @@ read_packet(int fd, void *data)
   if (!IsDead(client_p))
   {
     /* If we get here, we need to register for another COMM_SELECT_READ */
-    if (PARSE_AS_SERVER(client_p)) {
+    if (PARSE_AS_SERVER(client_p))
+    {
       comm_setselect(fd_r, FDLIST_SERVER, COMM_SELECT_READ,
-        read_packet, client_p, 0);
-    } else {
+                     read_packet, client_p, 0);
+    }
+    else
+    {
       comm_setselect(fd_r, FDLIST_IDLECLIENT, COMM_SELECT_READ,
-        read_packet, client_p, 0);
+                     read_packet, client_p, 0);
     }
   }
 }
@@ -418,7 +424,8 @@ read_packet(int fd, void *data)
  *      with client_p of "local" variation, which contains all the
  *      necessary fields (buffer etc..)
  */
-void client_dopacket(struct Client *client_p, char *buffer, size_t length)
+void
+client_dopacket(struct Client *client_p, char *buffer, size_t length)
 {
   assert(client_p != NULL);
   assert(buffer != NULL);
@@ -434,20 +441,20 @@ void client_dopacket(struct Client *client_p, char *buffer, size_t length)
    */
   client_p->localClient->receiveB += length;
 
-  if (client_p->localClient->receiveB > 1023) {
-    client_p->localClient->receiveK += (client_p->localClient->receiveB >> 10);
-    client_p->localClient->receiveB &= 0x03ff; /* 2^10 = 1024, 3ff = 1023 */
+  if (client_p->localClient->receiveB > 1023)
+  {
+    client_p->localClient->receiveK +=
+      (client_p->localClient->receiveB >> 10);
+    client_p->localClient->receiveB &= 0x03ff;  /* 2^10 = 1024, 3ff = 1023 */
   }
 
   me.localClient->receiveB += length;
 
   if (me.localClient->receiveB > 1023)
-    {
-      me.localClient->receiveK += (me.localClient->receiveB >> 10);
-      me.localClient->receiveB &= 0x03ff;
-    }
+  {
+    me.localClient->receiveK += (me.localClient->receiveB >> 10);
+    me.localClient->receiveB &= 0x03ff;
+  }
 
   parse(client_p, buffer, buffer + length);
 }
-
-

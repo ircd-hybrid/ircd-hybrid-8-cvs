@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_ison.c,v 1.1 2002/01/04 09:13:19 a1kmm Exp $
+ *   $Id: m_ison.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -31,16 +31,16 @@
 #include "msg.h"
 #include "parse.h"
 #include "modules.h"
-#include "s_conf.h" /* ConfigFileEntry */
-#include "s_serv.h" /* uplink/IsCapable */
+#include "s_conf.h"             /* ConfigFileEntry */
+#include "s_serv.h"             /* uplink/IsCapable */
 
 #include <string.h>
 
 static int do_ison(struct Client *up, struct Client *source_p,
                    int parc, char *parv[]);
 
-static void m_ison(struct Client*, struct Client*, int, char**);
-static void ms_ison(struct Client*, struct Client*, int, char**);
+static void m_ison(struct Client *, struct Client *, int, char **);
+static void ms_ison(struct Client *, struct Client *, int, char **);
 
 struct Message ison_msgtab = {
   "ISON", 0, 0, 1, 1, MFLG_SLOW, 0,
@@ -49,18 +49,19 @@ struct Message ison_msgtab = {
 
 #ifndef STATIC_MODULES
 
-  void
+void
 _modinit(void)
 {
   mod_add_cmd(&ison_msgtab);
 }
 
-  void
+void
 _moddeinit(void)
 {
   mod_del_cmd(&ison_msgtab);
 }
-char *_version = "$Revision: 1.1 $";
+
+char *_version = "$Revision: 1.2 $";
 #endif
 
 static char buf[BUFSIZE];
@@ -76,8 +77,9 @@ static char buf2[BUFSIZE];
  * format:
  * ISON :nicklist
  */
-static void m_ison(struct Client *client_p, struct Client *source_p,
-                  int parc, char *parv[])
+static void
+m_ison(struct Client *client_p, struct Client *source_p,
+       int parc, char *parv[])
 {
   struct Client *up = NULL;
 
@@ -95,15 +97,16 @@ static void m_ison(struct Client *client_p, struct Client *source_p,
  * exists...
  * ISON :nicklist
  */
-static void ms_ison(struct Client *client_p, struct Client *source_p,
-                   int parc, char *parv[])
+static void
+ms_ison(struct Client *client_p, struct Client *source_p,
+        int parc, char *parv[])
 {
   if (ServerInfo.hub && IsCapable(client_p, CAP_LL))
     do_ison(NULL, source_p, parc, parv);
 }
 
-static int do_ison(struct Client *up, struct Client *source_p,
-                   int parc, char *parv[])
+static int
+do_ison(struct Client *up, struct Client *source_p, int parc, char *parv[])
 {
   struct Client *target_p;
   char *nick;
@@ -132,10 +135,9 @@ static int do_ison(struct Client *up, struct Client *source_p,
       if ((target_p = find_person(nick)))
       {
         len = strlen(target_p->name);
-        if( (current_insert_point + (len + 5)) < (buf + sizeof(buf)) )
+        if ((current_insert_point + (len + 5)) < (buf + sizeof(buf)))
         {
-          memcpy((void *)current_insert_point,
-                 (void *)target_p->name, len);
+          memcpy((void *)current_insert_point, (void *)target_p->name, len);
           current_insert_point += len;
           *current_insert_point++ = ' ';
         }
@@ -149,10 +151,9 @@ static int do_ison(struct Client *up, struct Client *source_p,
       {
         /* Build up a single list, for use if we relay.. */
         len = strlen(nick);
-        if((current_insert_point2 + len + 5) < (buf2 + sizeof(buf2)))
+        if ((current_insert_point2 + len + 5) < (buf2 + sizeof(buf2)))
         {
-          memcpy((void *)current_insert_point2,
-                 (void *)nick, len);
+          memcpy((void *)current_insert_point2, (void *)nick, len);
           current_insert_point2 += len;
           *current_insert_point2++ = ' ';
         }
@@ -171,7 +172,7 @@ static int do_ison(struct Client *up, struct Client *source_p,
         }
       }
     }
-    if(done)
+    if (done)
       break;
   }
 
@@ -180,8 +181,8 @@ static int do_ison(struct Client *up, struct Client *source_p,
    *  --Rodder */
 
   *current_insert_point = '\0';
-  *current_insert_point2 = '\0'; 
-  
+  *current_insert_point2 = '\0';
+
   if (relay_to_hub)
     sendto_one(up, ":%s ISON :%s", source_p->name, buf2);
   else

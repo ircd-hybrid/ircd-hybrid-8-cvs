@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_drop.c,v 1.1 2002/01/04 09:13:16 a1kmm Exp $
+ * $Id: m_drop.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "tools.h"
 #include "channel.h"
@@ -28,7 +28,7 @@
 #include "ircd.h"
 #include "list.h"
 #include "numeric.h"
-#include "s_serv.h"       /* captab */
+#include "s_serv.h"             /* captab */
 #include "s_user.h"
 #include "send.h"
 #include "handlers.h"
@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void ms_drop(struct Client *,struct Client *,int,char **);
+static void ms_drop(struct Client *, struct Client *, int, char **);
 
 struct Message drop_msgtab = {
   "DROP", 0, 0, 2, 0, MFLG_SLOW | MFLG_UNREG, 0L,
@@ -58,7 +58,7 @@ _moddeinit(void)
   mod_del_cmd(&drop_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** ms_drop
@@ -68,27 +68,26 @@ char *_version = "$Revision: 1.1 $";
 **
 **      "drop" a channel from consideration on a lazy link
 */
-static void ms_drop(struct Client *client_p,
-                   struct Client *source_p,
-                  int parc,
-                  char *parv[])
+static void
+ms_drop(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   char *name;
   struct Channel *chptr;
 
-  if(parc < 2 || *parv[1] == '\0')
+  if (parc < 2 || *parv[1] == '\0')
     return;
 
   name = parv[1];
 
 #ifdef DEBUGLL
-  sendto_realops(FLAGS_ALL, "DROP called by %s for %s", client_p->name, name );
+  sendto_realops(FLAGS_ALL, "DROP called by %s for %s", client_p->name, name);
 #endif
 
-  if((chptr=hash_find_channel(name)) == NULL)
+  if ((chptr = hash_find_channel(name)) == NULL)
     return;
 
-  if(client_p->localClient->serverMask) /* JIC */
+  if (client_p->localClient->serverMask)        /* JIC */
     chptr->lazyLinkChannelExists &= ~client_p->localClient->serverMask;
   return;
 }

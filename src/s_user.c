@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *  $Id: s_user.c,v 1.1 2002/01/04 09:14:46 a1kmm Exp $
+ *  $Id: s_user.c,v 1.2 2002/01/04 11:06:43 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -65,14 +65,14 @@
 #include "memory.h"
 #include "packet.h"
 
-static int valid_hostname(const char* hostname);
-static int valid_username(const char* username);
-static void report_and_set_user_flags( struct Client *, struct ConfItem * );
+static int valid_hostname(const char *hostname);
+static int valid_username(const char *username);
+static void report_and_set_user_flags(struct Client *, struct ConfItem *);
 static int check_X_line(struct Client *client_p, struct Client *source_p);
 void user_welcome(struct Client *source_p);
 static int introduce_client(struct Client *client_p, struct Client *source_p,
-			    struct User *user, char *nick);
-int oper_up( struct Client *source_p, struct ConfItem *aconf );
+                            struct User *user, char *nick);
+int oper_up(struct Client *source_p, struct ConfItem *aconf);
 
 
 /* table of ascii char letters to corresponding bitmask */
@@ -83,13 +83,12 @@ struct flag_item
   char letter;
 };
 
-static struct flag_item user_modes[] =
-{
+static struct flag_item user_modes[] = {
   {FLAGS_ADMIN, 'a'},
-  {FLAGS_BOTS,  'b'},
+  {FLAGS_BOTS, 'b'},
   {FLAGS_CCONN, 'c'},
   {FLAGS_DEBUG, 'd'},
-  {FLAGS_FULL,  'f'},
+  {FLAGS_FULL, 'f'},
   {FLAGS_CALLERID, 'g'},
   {FLAGS_INVISIBLE, 'i'},
   {FLAGS_SKILL, 'k'},
@@ -108,77 +107,88 @@ static struct flag_item user_modes[] =
 
 /* memory is cheap. map 0-255 to equivalent mode */
 
-int user_modes_from_c_to_bitmask[] =
-{ 
-  /* 0x00 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x0F */
-  /* 0x10 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x1F */
-  /* 0x20 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x2F */
-  /* 0x30 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x3F */
-  0,            /* @ */
-  0,            /* A */
-  0,            /* B */
-  0,            /* C */
-  0,            /* D */
-  0,            /* E */
-  0,            /* F */
-  0,            /* G */
-  0,            /* H */
-  0,            /* I */
-  0,            /* J */
-  0,            /* K */
-  0,            /* L */
-  0,            /* M */
-  0,            /* N */
-  0,            /* O */
-  0,            /* P */
-  0,            /* Q */
-  0,            /* R */
-  0,            /* S */
-  0,            /* T */
-  0,            /* U */
-  0,            /* V */
-  0,            /* W */
-  0,            /* X */
-  0,            /* Y */
-  0,            /* Z 0x5A */
-  0, 0, 0, 0, 0, /* 0x5F */ 
-  /* 0x60 */       0,
-  FLAGS_ADMIN,  /* a */
-  FLAGS_BOTS,   /* b */
-  FLAGS_CCONN,  /* c */
-  FLAGS_DEBUG,  /* d */
-  0,            /* e */
-  FLAGS_FULL,   /* f */
-  FLAGS_CALLERID,  /* g */
-  0,            /* h */
-  FLAGS_INVISIBLE, /* i */
-  0,            /* j */
-  FLAGS_SKILL,  /* k */
-  FLAGS_LOCOPS, /* l */
-  0,            /* m */
-  FLAGS_NCHANGE, /* n */
-  FLAGS_OPER,   /* o */
-  0,               /* p */
-  0,            /* q */
-  FLAGS_REJ,    /* r */
-  FLAGS_SERVNOTICE, /* s */
-  0,            /* t */
-  FLAGS_UNAUTH, /* u */
-  0,            /* v */
-  FLAGS_WALLOP, /* w */
-  FLAGS_EXTERNAL, /* x */
-  FLAGS_SPY,    /* y */
-  FLAGS_OPERWALL, /* z 0x7A */
-  0,0,0,0,0,     /* 0x7B - 0x7F */
+int user_modes_from_c_to_bitmask[] = {
+                                                                /* 0x00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x0F */
+                                                                /* 0x10 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x1F */
+                                                                /* 0x20 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x2F */
+                                                                /* 0x30 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x3F */
+  0,                            /* @ */
+  0,                            /* A */
+  0,                            /* B */
+  0,                            /* C */
+  0,                            /* D */
+  0,                            /* E */
+  0,                            /* F */
+  0,                            /* G */
+  0,                            /* H */
+  0,                            /* I */
+  0,                            /* J */
+  0,                            /* K */
+  0,                            /* L */
+  0,                            /* M */
+  0,                            /* N */
+  0,                            /* O */
+  0,                            /* P */
+  0,                            /* Q */
+  0,                            /* R */
+  0,                            /* S */
+  0,                            /* T */
+  0,                            /* U */
+  0,                            /* V */
+  0,                            /* W */
+  0,                            /* X */
+  0,                            /* Y */
+  0,                            /* Z 0x5A */
+  0, 0, 0, 0, 0,                /* 0x5F */
+  /* 0x60 */ 0,
+  FLAGS_ADMIN,                  /* a */
+  FLAGS_BOTS,                   /* b */
+  FLAGS_CCONN,                  /* c */
+  FLAGS_DEBUG,                  /* d */
+  0,                            /* e */
+  FLAGS_FULL,                   /* f */
+  FLAGS_CALLERID,               /* g */
+  0,                            /* h */
+  FLAGS_INVISIBLE,              /* i */
+  0,                            /* j */
+  FLAGS_SKILL,                  /* k */
+  FLAGS_LOCOPS,                 /* l */
+  0,                            /* m */
+  FLAGS_NCHANGE,                /* n */
+  FLAGS_OPER,                   /* o */
+  0,                            /* p */
+  0,                            /* q */
+  FLAGS_REJ,                    /* r */
+  FLAGS_SERVNOTICE,             /* s */
+  0,                            /* t */
+  FLAGS_UNAUTH,                 /* u */
+  0,                            /* v */
+  FLAGS_WALLOP,                 /* w */
+  FLAGS_EXTERNAL,               /* x */
+  FLAGS_SPY,                    /* y */
+  FLAGS_OPERWALL,               /* z 0x7A */
+  0, 0, 0, 0, 0,                /* 0x7B - 0x7F */
 
-  /* 0x80 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x9F */
-  /* 0x90 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0x9F */
-  /* 0xA0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xAF */
-  /* 0xB0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xBF */
-  /* 0xC0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xCF */
-  /* 0xD0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xDF */
-  /* 0xE0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 0xEF */
-  /* 0xF0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0  /* 0xFF */
+                                                                /* 0x80 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x9F */
+                                                                /* 0x90 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0x9F */
+                                                                /* 0xA0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0xAF */
+                                                                /* 0xB0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0xBF */
+                                                                /* 0xC0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0xCF */
+                                                                /* 0xD0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0xDF */
+                                                                /* 0xE0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                                /* 0xEF */
+                                                                /* 0xF0 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                                                /* 0xFF */
 };
 
 /*
@@ -188,14 +198,15 @@ int user_modes_from_c_to_bitmask[] =
  * output	-
  * side effects	- display to client user counts etc.
  */
-int show_lusers(struct Client *source_p) 
+int
+show_lusers(struct Client *source_p)
 {
-  if(!ConfigServerHide.hide_servers || IsOper(source_p))
+  if (!ConfigServerHide.hide_servers || IsOper(source_p))
     sendto_one(source_p, form_str(RPL_LUSERCLIENT), me.name, source_p->name,
-              (Count.total-Count.invisi), Count.invisi, Count.server);
+               (Count.total - Count.invisi), Count.invisi, Count.server);
   else
     sendto_one(source_p, form_str(RPL_LUSERCLIENT), me.name, source_p->name,
-              (Count.total-Count.invisi), Count.invisi, 1);
+               (Count.total - Count.invisi), Count.invisi, 1);
   if (Count.oper > 0)
     sendto_one(source_p, form_str(RPL_LUSEROP), me.name, source_p->name,
                Count.oper);
@@ -208,25 +219,25 @@ int show_lusers(struct Client *source_p)
     sendto_one(source_p, form_str(RPL_LUSERCHANNELS),
                me.name, source_p->name, Count.chan);
 
-  if(!ConfigServerHide.hide_servers || IsOper(source_p))
-    {
-      sendto_one(source_p, form_str(RPL_LUSERME),
-                 me.name, source_p->name, Count.local, Count.myserver);
-      sendto_one(source_p, form_str(RPL_LOCALUSERS), me.name, source_p->name,
-                 Count.local, Count.max_loc);
-    }
+  if (!ConfigServerHide.hide_servers || IsOper(source_p))
+  {
+    sendto_one(source_p, form_str(RPL_LUSERME),
+               me.name, source_p->name, Count.local, Count.myserver);
+    sendto_one(source_p, form_str(RPL_LOCALUSERS), me.name, source_p->name,
+               Count.local, Count.max_loc);
+  }
   else
-    {
-      sendto_one(source_p, form_str(RPL_LUSERME),
-                 me.name, source_p->name, Count.total, 0);
-      sendto_one(source_p, form_str(RPL_LOCALUSERS), 
-                 me.name, source_p->name, Count.total, Count.max_tot);
-    }
+  {
+    sendto_one(source_p, form_str(RPL_LUSERME),
+               me.name, source_p->name, Count.total, 0);
+    sendto_one(source_p, form_str(RPL_LOCALUSERS),
+               me.name, source_p->name, Count.total, Count.max_tot);
+  }
 
   sendto_one(source_p, form_str(RPL_GLOBALUSERS), me.name, source_p->name,
              Count.total, Count.max_tot);
 
-  if(!ConfigServerHide.hide_servers || IsOper(source_p))
+  if (!ConfigServerHide.hide_servers || IsOper(source_p))
     sendto_one(source_p, form_str(RPL_STATSCONN), me.name, source_p->name,
                MaxConnectionCount, MaxClientCount, Count.totalrestartcount);
 
@@ -234,7 +245,7 @@ int show_lusers(struct Client *source_p)
     MaxClientCount = Count.local;
 
   if ((Count.local + Count.myserver) > MaxConnectionCount)
-    MaxConnectionCount = Count.local + Count.myserver; 
+    MaxConnectionCount = Count.local + Count.myserver;
 
   return 0;
 }
@@ -246,13 +257,14 @@ int show_lusers(struct Client *source_p)
  * output	- 
  * side effects	- display to client what we support (for them)
  */
-void show_isupport(struct Client *source_p) 
+void
+show_isupport(struct Client *source_p)
 {
   char isupportbuffer[512];
 
-  ircsprintf(isupportbuffer,FEATURES,FEATURESVALUES);
-  sendto_one(source_p, form_str(RPL_ISUPPORT), me.name, source_p->name, 
-  	     isupportbuffer);
+  ircsprintf(isupportbuffer, FEATURES, FEATURESVALUES);
+  sendto_one(source_p, form_str(RPL_ISUPPORT), me.name, source_p->name,
+             isupportbuffer);
   return;
 }
 
@@ -281,14 +293,15 @@ void show_isupport(struct Client *source_p)
 **         nick from local user or kill him/her...
 */
 
-int register_local_user(struct Client *client_p, struct Client *source_p, 
-			char *nick, char *username)
+int
+register_local_user(struct Client *client_p, struct Client *source_p,
+                    char *nick, char *username)
 {
-  struct ConfItem*  aconf;
-  struct User*     user = source_p->user;
-  char        tmpstr2[IRCD_BUFSIZE];
-  char	      ipaddr[HOSTIPLEN];
-  int  status;
+  struct ConfItem *aconf;
+  struct User *user = source_p->user;
+  char tmpstr2[IRCD_BUFSIZE];
+  char ipaddr[HOSTIPLEN];
+  int status;
   dlink_node *ptr;
   dlink_node *m;
   char *id;
@@ -298,83 +311,86 @@ int register_local_user(struct Client *client_p, struct Client *source_p,
 
 
   /* If the user  */
-  if(ConfigFileEntry.ping_cookie && !(source_p->flags2 & FLAGS2_PING_COOKIE) && !source_p->random_ping)
+  if (ConfigFileEntry.ping_cookie && !(source_p->flags2 & FLAGS2_PING_COOKIE)
+      && !source_p->random_ping)
   {
     source_p->random_ping = (unsigned long)random();
     sendto_one(source_p, "PING :%lu", (unsigned long)source_p->random_ping);
     source_p->flags |= FLAGS_PINGSENT;
     return 0;
-  } 
+  }
 
   user->last = CurrentTime;
   /* Straight up the maximum rate of flooding... */
   source_p->localClient->allow_read = MAX_FLOOD_PER_SEC_I;
 
   /* pointed out by Mortiis, never be too careful */
-  if(strlen(username) > USERLEN)
+  if (strlen(username) > USERLEN)
     username[USERLEN] = '\0';
 
-  if( ( status = check_client(client_p, source_p, username )) < 0 )
-    return(CLIENT_EXITED);
+  if ((status = check_client(client_p, source_p, username)) < 0)
+    return (CLIENT_EXITED);
 
-  if(!valid_hostname(source_p->host))
-    {
-      sendto_one(source_p,":%s NOTICE %s :*** Notice -- You have an illegal character in your hostname", 
-		 me.name, source_p->name );
+  if (!valid_hostname(source_p->host))
+  {
+    sendto_one(source_p,
+               ":%s NOTICE %s :*** Notice -- You have an illegal character in your hostname",
+               me.name, source_p->name);
 
-      strncpy(source_p->host,source_p->localClient->sockhost,HOSTIPLEN+1);
-    }
+    strncpy(source_p->host, source_p->localClient->sockhost, HOSTIPLEN + 1);
+  }
 
   ptr = source_p->localClient->confs.head;
   aconf = ptr->data;
 
   if (aconf == NULL)
-    {
-      (void)exit_client(client_p, source_p, &me, "*** Not Authorized");
-      return(CLIENT_EXITED);
-    }
+  {
+    (void)exit_client(client_p, source_p, &me, "*** Not Authorized");
+    return (CLIENT_EXITED);
+  }
 
   if (!IsGotId(source_p))
+  {
+    if (IsNeedIdentd(aconf))
     {
-      if (IsNeedIdentd(aconf))
-	{
-	  ServerStats->is_ref++;
-	  sendto_one(source_p,
-		     ":%s NOTICE %s :*** Notice -- You need to install identd to use this server",
-		     me.name, client_p->name);
-	  (void)exit_client(client_p, source_p, &me, "Install identd");
-	  return(CLIENT_EXITED);
-	}
-      else
-	strncpy_irc(source_p->username, username, USERLEN);
-
-      if (IsNoTilde(aconf))
-	{
-	  strncpy_irc(source_p->username, username, USERLEN);
-	}
-      else
-	{
-	  *source_p->username = '~';
-	  strncpy_irc(&source_p->username[1], username, USERLEN - 1);
-	}
-      source_p->username[USERLEN] = '\0';
+      ServerStats->is_ref++;
+      sendto_one(source_p,
+                 ":%s NOTICE %s :*** Notice -- You need to install identd to use this server",
+                 me.name, client_p->name);
+      (void)exit_client(client_p, source_p, &me, "Install identd");
+      return (CLIENT_EXITED);
     }
+    else
+      strncpy_irc(source_p->username, username, USERLEN);
+
+    if (IsNoTilde(aconf))
+    {
+      strncpy_irc(source_p->username, username, USERLEN);
+    }
+    else
+    {
+      *source_p->username = '~';
+      strncpy_irc(&source_p->username[1], username, USERLEN - 1);
+    }
+    source_p->username[USERLEN] = '\0';
+  }
 
   /* password check */
   if (!BadPtr(aconf->passwd) &&
       strcmp(source_p->localClient->passwd, aconf->passwd))
-    {
-      ServerStats->is_ref++;
-      sendto_one(source_p, form_str(ERR_PASSWDMISMATCH),
-		 me.name, source_p->name);
-      (void)exit_client(client_p, source_p, &me, "Bad Password");
-      return(CLIENT_EXITED);
-    }
-  memset(source_p->localClient->passwd,0, sizeof(source_p->localClient->passwd));
+  {
+    ServerStats->is_ref++;
+    sendto_one(source_p, form_str(ERR_PASSWDMISMATCH),
+               me.name, source_p->name);
+    (void)exit_client(client_p, source_p, &me, "Bad Password");
+    return (CLIENT_EXITED);
+  }
+  memset(source_p->localClient->passwd, 0,
+         sizeof(source_p->localClient->passwd));
 
   /* report if user has &^>= etc. and set flags as needed in source_p */
   report_and_set_user_flags(source_p, aconf);
-  
+
   /* Limit clients */
   /*
    * We want to be able to have servers and F-line clients
@@ -384,66 +400,63 @@ int register_local_user(struct Client *client_p, struct Client *source_p,
    *   -Taner
    */
   /* Except "F:" clients */
-  if ( ( (Count.local + 1) >= (GlobalSetOptions.maxclients+MAX_BUFFER)
-	 ||
-	 (Count.local +1) >= (GlobalSetOptions.maxclients - 5) )
-       &&
-       !(IsExemptLimits(source_p)) )
-    {
-      sendto_realops_flags(FLAGS_FULL, L_ALL,
-			   "Too many clients, rejecting %s[%s].",
-			   nick, source_p->host);
-			   
-      ServerStats->is_ref++;
-      (void)exit_client(client_p, source_p, &me,
-			"Sorry, server is full - try later");
-      return(CLIENT_EXITED);
-    }
+  if (((Count.local + 1) >= (GlobalSetOptions.maxclients + MAX_BUFFER)
+       ||
+       (Count.local + 1) >= (GlobalSetOptions.maxclients - 5))
+      && !(IsExemptLimits(source_p)))
+  {
+    sendto_realops_flags(FLAGS_FULL, L_ALL,
+                         "Too many clients, rejecting %s[%s].",
+                         nick, source_p->host);
+
+    ServerStats->is_ref++;
+    (void)exit_client(client_p, source_p, &me,
+                      "Sorry, server is full - try later");
+    return (CLIENT_EXITED);
+  }
 
   /* valid user name check */
 
   if (!valid_username(source_p->username))
-    {
-      sendto_realops_flags(FLAGS_REJ, L_ALL,
-                           "Invalid username: %s (%s@%s)",
-			   nick, source_p->username, source_p->host);
-      ServerStats->is_ref++;
-      ircsprintf(tmpstr2, "Invalid username [%s]", source_p->username);
-      (void)exit_client(client_p, source_p, &me, tmpstr2);
-      return(CLIENT_EXITED);
-    }
+  {
+    sendto_realops_flags(FLAGS_REJ, L_ALL,
+                         "Invalid username: %s (%s@%s)",
+                         nick, source_p->username, source_p->host);
+    ServerStats->is_ref++;
+    ircsprintf(tmpstr2, "Invalid username [%s]", source_p->username);
+    (void)exit_client(client_p, source_p, &me, tmpstr2);
+    return (CLIENT_EXITED);
+  }
 
   /* end of valid user name check */
-  
-  if ((status = check_X_line(client_p,source_p)) < 0)
+
+  if ((status = check_X_line(client_p, source_p)) < 0)
     return status;
 
-  if (source_p->user->id[0] == '\0') 
-    {
-      for (id = id_get(); find_id(id); id = id_get())
-        ;
-      strcpy(source_p->user->id, id);
-      add_to_id_hash_table(id, source_p);
-      id = id_get();
-      strcpy(user->id_key, id);
-    }
+  if (source_p->user->id[0] == '\0')
+  {
+    for (id = id_get(); find_id(id); id = id_get())
+      ;
+    strcpy(source_p->user->id, id);
+    add_to_id_hash_table(id, source_p);
+    id = id_get();
+    strcpy(user->id_key, id);
+  }
 
-  inetntop(source_p->localClient->aftype, &IN_ADDR(source_p->localClient->ip), 
-  				ipaddr, HOSTIPLEN);
+  inetntop(source_p->localClient->aftype, &IN_ADDR(source_p->localClient->ip),
+           ipaddr, HOSTIPLEN);
   sendto_realops_flags(FLAGS_CCONN, L_ALL,
-		       "Client connecting: %s (%s@%s) [%s] {%s} [%s]",
-		       nick, source_p->username, source_p->host,
-		       ipaddr,
-		       get_client_class(source_p), source_p->info);
-  
+                       "Client connecting: %s (%s@%s) [%s] {%s} [%s]",
+                       nick, source_p->username, source_p->host,
+                       ipaddr, get_client_class(source_p), source_p->info);
+
   if ((++Count.local) > Count.max_loc)
-    {
-      Count.max_loc = Count.local;
-      if (!(Count.max_loc % 10))
-	sendto_realops_flags(FLAGS_ALL, L_ALL,
-	                     "New Max Local Clients: %d",
-			     Count.max_loc);
-    }
+  {
+    Count.max_loc = Count.local;
+    if (!(Count.max_loc % 10))
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "New Max Local Clients: %d", Count.max_loc);
+  }
 
   SetClient(source_p);
 
@@ -476,19 +489,20 @@ int register_local_user(struct Client *client_p, struct Client *source_p,
  * side effects	- This function is called when a remote client
  *		  is introduced by a server.
  */
-int register_remote_user(struct Client *client_p, struct Client *source_p, 
-			 char *nick, char *username)
+int
+register_remote_user(struct Client *client_p, struct Client *source_p,
+                     char *nick, char *username)
 {
-  struct User*     user = source_p->user;
+  struct User *user = source_p->user;
   struct Client *target_p;
-  
+
   assert(0 != source_p);
   assert(source_p->username != username);
 
   user->last = CurrentTime;
 
   /* pointed out by Mortiis, never be too careful */
-  if(strlen(username) > USERLEN)
+  if (strlen(username) > USERLEN)
     username[USERLEN] = '\0';
 
   strncpy_irc(source_p->username, username, USERLEN);
@@ -502,52 +516,51 @@ int register_remote_user(struct Client *client_p, struct Client *source_p,
   source_p->servptr = find_server(user->server);
 
   if (source_p->servptr == NULL)
-    {
-      sendto_realops_flags(FLAGS_ALL, L_ALL,"Ghost killed: %s on invalid server %s",
-			   source_p->name, source_p->user->server);
+  {
+    sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "Ghost killed: %s on invalid server %s",
+                         source_p->name, source_p->user->server);
 
-      kill_client(client_p, source_p, "%s (Server doesn't exist)",
-		  me.name);
+    kill_client(client_p, source_p, "%s (Server doesn't exist)", me.name);
 
-      source_p->flags |= FLAGS_KILLED;
-      return exit_client(NULL, source_p, &me, "Ghost");
-    }
+    source_p->flags |= FLAGS_KILLED;
+    return exit_client(NULL, source_p, &me, "Ghost");
+  }
 
   add_client_to_llist(&(source_p->servptr->serv->users), source_p);
 
-  if ((target_p = find_server(user->server)) && target_p->from != source_p->from)
-    {
-      sendto_realops_flags(FLAGS_DEBUG, L_ALL,
-			   "Bad User [%s] :%s USER %s@%s %s, != %s[%s]",
-			   client_p->name, nick, source_p->username,
-			   source_p->host, user->server,
-			   target_p->name, target_p->from->name);
-      kill_client(client_p, source_p,
-		 "%s (NICK from wrong direction (%s != %s))",
-		  me.name,
-		  user->server,
-		  target_p->from->name);
+  if ((target_p = find_server(user->server))
+      && target_p->from != source_p->from)
+  {
+    sendto_realops_flags(FLAGS_DEBUG, L_ALL,
+                         "Bad User [%s] :%s USER %s@%s %s, != %s[%s]",
+                         client_p->name, nick, source_p->username,
+                         source_p->host, user->server,
+                         target_p->name, target_p->from->name);
+    kill_client(client_p, source_p,
+                "%s (NICK from wrong direction (%s != %s))",
+                me.name, user->server, target_p->from->name);
 
-      source_p->flags |= FLAGS_KILLED;
-      return exit_client(source_p, source_p, &me,
-			 "USER server wrong direction");
-      
-    }
+    source_p->flags |= FLAGS_KILLED;
+    return exit_client(source_p, source_p, &me,
+                       "USER server wrong direction");
+
+  }
   /*
    * Super GhostDetect:
    * If we can't find the server the user is supposed to be on,
    * then simply blow the user away.        -Taner
    */
   if (!target_p)
-    {
-      kill_client(client_p, source_p, "%s GHOST (no server found)",
-                  me.name);
-      sendto_realops_flags(FLAGS_ALL, L_ALL, "No server %s for user %s[%s@%s] from %s",
-			   user->server, source_p->name, source_p->username,
-			   source_p->host, source_p->from->name);
-      source_p->flags |= FLAGS_KILLED;
-      return exit_client(source_p, source_p, &me, "Ghosted Client");
-    }
+  {
+    kill_client(client_p, source_p, "%s GHOST (no server found)", me.name);
+    sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "No server %s for user %s[%s@%s] from %s",
+                         user->server, source_p->name, source_p->username,
+                         source_p->host, source_p->from->name);
+    source_p->flags |= FLAGS_KILLED;
+    return exit_client(source_p, source_p, &me, "Ghosted Client");
+  }
 
   return (introduce_client(client_p, source_p, user, nick));
 }
@@ -563,7 +576,7 @@ int register_remote_user(struct Client *client_p, struct Client *source_p,
  */
 static int
 introduce_client(struct Client *client_p, struct Client *source_p,
-		 struct User *user, char *nick)
+                 struct User *user, char *nick)
 {
   dlink_node *server_node;
   struct Client *server;
@@ -572,10 +585,10 @@ introduce_client(struct Client *client_p, struct Client *source_p,
   send_umode(NULL, source_p, 0, SEND_UMODES, ubuf);
 
   if (!*ubuf)
-    {
-      ubuf[0] = '+';
-      ubuf[1] = '\0';
-    }
+  {
+    ubuf[0] = '+';
+    ubuf[1] = '\0';
+  }
 
 
   /* arghhh one could try not introducing new nicks to ll leafs
@@ -594,59 +607,60 @@ introduce_client(struct Client *client_p, struct Client *source_p,
    * -davidt
    * rewritten to cope with UIDs .. eww eww eww --is
    */
-  
-  if (!ServerInfo.hub && uplink && IsCapable(uplink,CAP_LL)
-      && client_p != uplink) 
+
+  if (!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL)
+      && client_p != uplink)
+  {
+    if (IsCapable(uplink, CAP_UID) && HasID(source_p))
     {
-      if (IsCapable(uplink, CAP_UID) && HasID(source_p))
-	{
-	  sendto_one(uplink, "CLIENT %s %d %lu %s %s %s %s %s :%s",
-		     nick,
-		     source_p->hopcount+1,
-		     (unsigned long) source_p->tsinfo,
-		     ubuf,
-		     source_p->username, source_p->host, user->server,
-		     user->id, source_p->info);
-	}
-      else
-	{
-	  sendto_one(uplink, "NICK %s %d %lu %s %s %s %s :%s",
-		     nick,
-		     source_p->hopcount+1,
-		     (unsigned long) source_p->tsinfo,
-		     ubuf,
-		     source_p->username, source_p->host, user->server,
-		     source_p->info);
-	}
+      sendto_one(uplink, "CLIENT %s %d %lu %s %s %s %s %s :%s",
+                 nick,
+                 source_p->hopcount + 1,
+                 (unsigned long)source_p->tsinfo,
+                 ubuf,
+                 source_p->username, source_p->host, user->server,
+                 user->id, source_p->info);
     }
+    else
+    {
+      sendto_one(uplink, "NICK %s %d %lu %s %s %s %s :%s",
+                 nick,
+                 source_p->hopcount + 1,
+                 (unsigned long)source_p->tsinfo,
+                 ubuf,
+                 source_p->username, source_p->host, user->server,
+                 source_p->info);
+    }
+  }
   else
+  {
+    for (server_node = serv_list.head; server_node;
+         server_node = server_node->next)
     {
-      for (server_node = serv_list.head; server_node; server_node = server_node->next)
-	{
-	  server = (struct Client *) server_node->data;
-		  
-	  if (IsCapable(server, CAP_LL) || server == client_p)
-	    continue;
-		  
-	  if (IsCapable(server, CAP_UID) && HasID(source_p))
-	    sendto_one(server, "CLIENT %s %d %lu %s %s %s %s %s :%s",
-		       nick,
-		       source_p->hopcount+1,
-		       (unsigned long) source_p->tsinfo,
-		       ubuf,
-		       source_p->username, source_p->host, user->server,
-		       user->id, source_p->info);
-	  else
-	    sendto_one(server, "NICK %s %d %lu %s %s %s %s :%s",
-		       nick,
-		       source_p->hopcount+1,
-		       (unsigned long) source_p->tsinfo,
-		       ubuf,
-		       source_p->username, source_p->host, user->server,
-		       source_p->info);
-	}
+      server = (struct Client *)server_node->data;
+
+      if (IsCapable(server, CAP_LL) || server == client_p)
+        continue;
+
+      if (IsCapable(server, CAP_UID) && HasID(source_p))
+        sendto_one(server, "CLIENT %s %d %lu %s %s %s %s %s :%s",
+                   nick,
+                   source_p->hopcount + 1,
+                   (unsigned long)source_p->tsinfo,
+                   ubuf,
+                   source_p->username, source_p->host, user->server,
+                   user->id, source_p->info);
+      else
+        sendto_one(server, "NICK %s %d %lu %s %s %s %s :%s",
+                   nick,
+                   source_p->hopcount + 1,
+                   (unsigned long)source_p->tsinfo,
+                   ubuf,
+                   source_p->username, source_p->host, user->server,
+                   source_p->info);
     }
-  
+  }
+
   if (ubuf[1])
     send_umode_out(client_p, source_p, 0);
   return 0;
@@ -662,9 +676,10 @@ introduce_client(struct Client *client_p, struct Client *source_p,
  * NOTE: this doesn't allow a hostname to begin with a dot and
  * will not allow more dots than chars.
  */
-static int valid_hostname(const char* hostname)
+static int
+valid_hostname(const char *hostname)
 {
-  const char* p     = hostname;
+  const char *p = hostname;
 
   assert(0 != p);
 
@@ -672,11 +687,11 @@ static int valid_hostname(const char* hostname)
     return NO;
 
   while (*p)
-    {
-      if (!IsHostChar(*p))
-        return NO;
-      p++;
-    }
+  {
+    if (!IsHostChar(*p))
+      return NO;
+    p++;
+  }
   return (YES);
 }
 
@@ -692,7 +707,8 @@ static int valid_hostname(const char* hostname)
  * Allow '.' in username to allow for "first.last"
  * style of username
  */
-static int valid_username(const char* username)
+static int
+valid_username(const char *username)
 {
   int dots = 0;
   const char *p = username;
@@ -710,18 +726,18 @@ static int valid_username(const char* username)
     return NO;
 
   while (*++p)
+  {
+    if ((*p == '.') && ConfigFileEntry.dots_in_ident)
     {
-      if((*p == '.') && ConfigFileEntry.dots_in_ident)
-        {
-          dots++;
-          if(dots > ConfigFileEntry.dots_in_ident)
-            return NO;
-          if(!IsUserChar(p[1]))
-            return NO;
-        }
-      else if (!IsUserChar(*p))
+      dots++;
+      if (dots > ConfigFileEntry.dots_in_ident)
+        return NO;
+      if (!IsUserChar(p[1]))
         return NO;
     }
+    else if (!IsUserChar(*p))
+      return NO;
+  }
   return YES;
 }
 
@@ -734,43 +750,43 @@ static int valid_username(const char* username)
  * Report to user any special flags they are getting, and set them.
  */
 
-static void 
-report_and_set_user_flags(struct Client *source_p,struct ConfItem *aconf)
+static void
+report_and_set_user_flags(struct Client *source_p, struct ConfItem *aconf)
 {
   /* If this user is being spoofed, tell them so */
-  if(IsConfDoSpoofIp(aconf))
-    {
-      sendto_one(source_p,
-                 ":%s NOTICE %s :*** Spoofing your IP. congrats.",
-                 me.name,source_p->name);
-    }
+  if (IsConfDoSpoofIp(aconf))
+  {
+    sendto_one(source_p,
+               ":%s NOTICE %s :*** Spoofing your IP. congrats.",
+               me.name, source_p->name);
+  }
 
   /* If this user is in the exception class, Set it "E lined" */
-  if(IsConfExemptKline(aconf))
-    {
-      SetExemptKline(source_p);
-      sendto_one(source_p,
-         ":%s NOTICE %s :*** You are exempt from K/D/G lines. congrats.",
-                 me.name,source_p->name);
-    }
+  if (IsConfExemptKline(aconf))
+  {
+    SetExemptKline(source_p);
+    sendto_one(source_p,
+               ":%s NOTICE %s :*** You are exempt from K/D/G lines. congrats.",
+               me.name, source_p->name);
+  }
 
   /* If this user is exempt from user limits set it F lined" */
-  if(IsConfExemptLimits(aconf))
-    {
-      SetExemptLimits(source_p);
-      sendto_one(source_p,
-                 ":%s NOTICE %s :*** You are exempt from user limits. congrats.",
-                 me.name,source_p->name);
-    }
+  if (IsConfExemptLimits(aconf))
+  {
+    SetExemptLimits(source_p);
+    sendto_one(source_p,
+               ":%s NOTICE %s :*** You are exempt from user limits. congrats.",
+               me.name, source_p->name);
+  }
 
   /* If this user is exempt from idle time outs */
-  if(IsConfIdlelined(aconf))
-    {
-      SetIdlelined(source_p);
-      sendto_one(source_p,
-         ":%s NOTICE %s :*** You are exempt from idle limits. congrats.",
-                 me.name,source_p->name);
-    }
+  if (IsConfIdlelined(aconf))
+  {
+    SetIdlelined(source_p);
+    sendto_one(source_p,
+               ":%s NOTICE %s :*** You are exempt from idle limits. congrats.",
+               me.name, source_p->name);
+  }
 }
 
 
@@ -781,11 +797,12 @@ report_and_set_user_flags(struct Client *source_p,struct ConfItem *aconf)
  * output	-
  * side effects -
  */
-int do_local_user(char* nick, struct Client* client_p, struct Client* source_p,
-		  char* username, char *host, char *server, char *realname)
+int
+do_local_user(char *nick, struct Client *client_p, struct Client *source_p,
+              char *username, char *host, char *server, char *realname)
 {
   unsigned int oflags;
-  struct User* user;
+  struct User *user;
 
   assert(0 != source_p);
   assert(source_p->username != username);
@@ -795,10 +812,10 @@ int do_local_user(char* nick, struct Client* client_p, struct Client* source_p,
   oflags = source_p->flags;
 
   if (!IsUnknown(source_p))
-    {
-      sendto_one(source_p, form_str(ERR_ALREADYREGISTRED), me.name, nick);
-      return 0;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_ALREADYREGISTRED), me.name, nick);
+    return 0;
+  }
   source_p->flags |= FLAGS_INVISIBLE;
 
   if (!(oflags & FLAGS_INVISIBLE) && IsInvisible(source_p))
@@ -810,22 +827,22 @@ int do_local_user(char* nick, struct Client* client_p, struct Client* source_p,
   user->server = me.name;
 
   strncpy_irc(source_p->info, realname, REALLEN);
- 
+
   if (source_p->name[0])
-  { 
+  {
     /* NICK already received, now I have USER... */
-    	return register_local_user(client_p, source_p, source_p->name, username);
+    return register_local_user(client_p, source_p, source_p->name, username);
   }
   else
+  {
+    if (!IsGotId(source_p))
     {
-      if (!IsGotId(source_p)) 
-        {
-          /*
-           * save the username in the client
-           */
-          strncpy_irc(source_p->username, username, USERLEN);
-        }
+      /*
+       * save the username in the client
+       */
+      strncpy_irc(source_p->username, username, USERLEN);
     }
+  }
   return 0;
 }
 
@@ -836,12 +853,13 @@ int do_local_user(char* nick, struct Client* client_p, struct Client* source_p,
  * output	-
  * side effects -
  */
-int do_remote_user(char* nick, struct Client* client_p, struct Client* source_p,
-		   char* username, char *host, char *server, char *realname,
-		   char *id)
+int
+do_remote_user(char *nick, struct Client *client_p, struct Client *source_p,
+               char *username, char *host, char *server, char *realname,
+               char *id)
 {
   unsigned int oflags;
-  struct User* user;
+  struct User *user;
 
   assert(0 != source_p);
   assert(source_p->username != username);
@@ -854,11 +872,11 @@ int do_remote_user(char* nick, struct Client* client_p, struct Client* source_p,
    * coming from another server, take the servers word for it
    */
   user->server = find_or_add(server);
-  strncpy_irc(source_p->host, host, HOSTLEN); 
+  strncpy_irc(source_p->host, host, HOSTLEN);
   strncpy_irc(source_p->info, realname, REALLEN);
   if (id)
-	  strcpy(source_p->user->id, id);
-  
+    strcpy(source_p->user->id, id);
+
   return register_remote_user(client_p, source_p, source_p->name, username);
 }
 
@@ -870,189 +888,191 @@ int do_remote_user(char* nick, struct Client* client_p, struct Client* source_p,
  * parv[1] - username to change mode for
  * parv[2] - modes to change
  */
-int user_mode(struct Client *client_p, struct Client *source_p, int parc, char *parv[])
+int
+user_mode(struct Client *client_p, struct Client *source_p, int parc,
+          char *parv[])
 {
-  int   flag;
-  int   i;
-  char  **p, *m;
+  int flag;
+  int i;
+  char **p, *m;
   struct Client *target_p;
-  int   what, setflags;
-  int   badflag = NO;		/* Only send one bad flag notice */
-  char  buf[BUFSIZE];
+  int what, setflags;
+  int badflag = NO;             /* Only send one bad flag notice */
+  char buf[BUFSIZE];
   dlink_node *ptr;
   struct ConfItem *aconf;
 
   what = MODE_ADD;
 
   if (parc < 2)
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "MODE");
-      return 0;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "MODE");
+    return 0;
+  }
 
   if ((target_p = find_person(parv[1])) == NULL)
-    {
-      if (MyConnect(source_p))
-        sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
-                   me.name, parv[0], parv[1]);
-      return 0;
-    }
+  {
+    if (MyConnect(source_p))
+      sendto_one(source_p, form_str(ERR_NOSUCHCHANNEL),
+                 me.name, parv[0], parv[1]);
+    return 0;
+  }
 
   /* Dont know why these were commented out..
    * put them back using new sendto() funcs
    */
 
   if (IsServer(source_p))
-    {
-       sendto_realops_flags(FLAGS_ALL, L_ADMIN, "*** Mode for User %s from %s",
-                            parv[1], source_p->name);
-       return 0;
-    }
+  {
+    sendto_realops_flags(FLAGS_ALL, L_ADMIN, "*** Mode for User %s from %s",
+                         parv[1], source_p->name);
+    return 0;
+  }
 
   if (source_p != target_p || target_p->from != source_p->from)
-    {
-       sendto_one(source_p, form_str(ERR_USERSDONTMATCH), me.name, parv[0]);
-       return 0;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_USERSDONTMATCH), me.name, parv[0]);
+    return 0;
+  }
 
 
   if (parc < 3)
-    {
-      m = buf;
-      *m++ = '+';
+  {
+    m = buf;
+    *m++ = '+';
 
-      for (i = 0; user_modes[i].letter && (m - buf < BUFSIZE - 4);i++)
-        if (source_p->umodes & user_modes[i].mode)
-          *m++ = user_modes[i].letter;
-      *m = '\0';
-      sendto_one(source_p, form_str(RPL_UMODEIS), me.name, parv[0], buf);
-      return 0;
-    }
+    for (i = 0; user_modes[i].letter && (m - buf < BUFSIZE - 4); i++)
+      if (source_p->umodes & user_modes[i].mode)
+        *m++ = user_modes[i].letter;
+    *m = '\0';
+    sendto_one(source_p, form_str(RPL_UMODEIS), me.name, parv[0], buf);
+    return 0;
+  }
 
   /* find flags already set for user */
   setflags = source_p->umodes;
-  
+
   /*
    * parse mode change string(s)
    */
-  for (p = &parv[2]; p && *p; p++ )
+  for (p = &parv[2]; p && *p; p++)
     for (m = *p; *m; m++)
-      switch(*m)
-        {
-        case '+' :
+      switch (*m)
+      {
+        case '+':
           what = MODE_ADD;
           break;
-        case '-' :
+        case '-':
           what = MODE_DEL;
-          break;        
+          break;
 
-        case 'o' :
-          if(what == MODE_ADD)
+        case 'o':
+          if (what == MODE_ADD)
+          {
+            if (IsServer(client_p) && !IsOper(source_p))
             {
-              if(IsServer(client_p) && !IsOper(source_p))
-                {
-                  ++Count.oper;
-                  SetOper(source_p);
-                }
+              ++Count.oper;
+              SetOper(source_p);
             }
+          }
           else
+          {
+            /* Only decrement the oper counts if an oper to begin with
+             * found by Pat Szuta, Perly , perly@xnet.com 
+             */
+
+            if (!IsOper(source_p))
+              break;
+
+            ClearOper(source_p);
+            source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
+
+            Count.oper--;
+
+            if (MyConnect(source_p))
             {
-	      /* Only decrement the oper counts if an oper to begin with
-               * found by Pat Szuta, Perly , perly@xnet.com 
+              dlink_node *dm;
+
+              ptr = source_p->localClient->confs.head;
+              aconf = ptr->data;
+              detach_conf(source_p, aconf);
+
+              source_p->flags2 &= ~(FLAGS2_OPER_GLOBAL_KILL |
+                                    FLAGS2_OPER_REMOTE |
+                                    FLAGS2_OPER_UNKLINE |
+                                    FLAGS2_OPER_GLINE |
+                                    FLAGS2_OPER_N |
+                                    FLAGS2_OPER_K | FLAGS2_OPER_ADMIN);
+
+              dm = dlinkFind(&oper_list, source_p);
+              if (dm != NULL)
+              {
+                dlinkDelete(dm, &oper_list);
+                free_dlink_node(dm);
+              }
+
+              /*
+                 20001216:
+                 reattach to "old" iline
+                 - einride
                */
-
-              if(!IsOper(source_p))
-                break;
-
-              ClearOper(source_p);
-	      source_p->umodes &= ~ConfigFileEntry.oper_only_umodes;
-			  
-              Count.oper--;
-
-              if (MyConnect(source_p))
-                {
-                  dlink_node *dm;
-
-		  ptr = source_p->localClient->confs.head;
-		  aconf = ptr->data;
-                  detach_conf(source_p,aconf);
-
-                  source_p->flags2 &= ~(FLAGS2_OPER_GLOBAL_KILL|
-                                    FLAGS2_OPER_REMOTE|
-                                    FLAGS2_OPER_UNKLINE|
-                                    FLAGS2_OPER_GLINE|
-                                    FLAGS2_OPER_N|
-                                    FLAGS2_OPER_K|
-                                    FLAGS2_OPER_ADMIN);
-
-		  dm = dlinkFind(&oper_list,source_p);
-		  if(dm != NULL)
-		    {
-		      dlinkDelete(dm,&oper_list);
-		      free_dlink_node(dm);
-		    }
-
-		  /*
-		    20001216:
-		    reattach to "old" iline
-		    - einride
-		  */
-		  remove_one_ip(&source_p->localClient->ip);
-		  check_client(source_p->servptr, source_p, source_p->username);
-                }
+              remove_one_ip(&source_p->localClient->ip);
+              check_client(source_p->servptr, source_p, source_p->username);
             }
+          }
           break;
 
           /* we may not get these,
            * but they shouldnt be in default
            */
-        case ' ' :
-        case '\n' :
-        case '\r' :
-        case '\t' :
+        case ' ':
+        case '\n':
+        case '\r':
+        case '\t':
           break;
 
-        default :
-          if( (flag = user_modes_from_c_to_bitmask[(unsigned char)*m]))
+        default:
+          if ((flag = user_modes_from_c_to_bitmask[(unsigned char)*m]))
+          {
+            if (MyConnect(source_p) && !IsOper(source_p) &&
+                (ConfigFileEntry.oper_only_umodes & flag))
             {
-              if (MyConnect(source_p) && !IsOper(source_p) &&
-                 (ConfigFileEntry.oper_only_umodes & flag))
-                {
-                  badflag = YES;
-                }
+              badflag = YES;
+            }
+            else
+            {
+              if (what == MODE_ADD)
+                source_p->umodes |= flag;
               else
-                {
-                  if (what == MODE_ADD)
-                    source_p->umodes |= flag;
-                  else
-                    source_p->umodes &= ~flag;  
-                }
+                source_p->umodes &= ~flag;
             }
+          }
           else
-            {
-              if (MyConnect(source_p))
-                badflag = YES;
-            }
+          {
+            if (MyConnect(source_p))
+              badflag = YES;
+          }
           break;
-        }
+      }
 
-  if(badflag)
+  if (badflag)
     sendto_one(source_p, form_str(ERR_UMODEUNKNOWNFLAG), me.name, parv[0]);
 
   if ((source_p->umodes & FLAGS_NCHANGE) && !IsOperN(source_p))
-    {
-      sendto_one(source_p,":%s NOTICE %s :*** You need oper and N flag for +n",
-                 me.name,parv[0]);
-      source_p->umodes &= ~FLAGS_NCHANGE; /* only tcm's really need this */
-    }
+  {
+    sendto_one(source_p, ":%s NOTICE %s :*** You need oper and N flag for +n",
+               me.name, parv[0]);
+    source_p->umodes &= ~FLAGS_NCHANGE; /* only tcm's really need this */
+  }
 
-  if (MyConnect(source_p) && (source_p->umodes & FLAGS_ADMIN) && !IsOperAdmin(source_p))
-    {
-      sendto_one(source_p,":%s NOTICE %s :*** You need oper and A flag for +a",
-                 me.name, parv[0]);
-      source_p->umodes &= ~FLAGS_ADMIN;
-    }
+  if (MyConnect(source_p) && (source_p->umodes & FLAGS_ADMIN)
+      && !IsOperAdmin(source_p))
+  {
+    sendto_one(source_p, ":%s NOTICE %s :*** You need oper and A flag for +a",
+               me.name, parv[0]);
+    source_p->umodes &= ~FLAGS_ADMIN;
+  }
 
 
   if (!(setflags & FLAGS_INVISIBLE) && IsInvisible(source_p))
@@ -1067,18 +1087,19 @@ int user_mode(struct Client *client_p, struct Client *source_p, int parc, char *
 
   return 0;
 }
-        
+
 /*
  * send the MODE string for user (user) to connection client_p
  * -avalon
  */
-void send_umode(struct Client *client_p, struct Client *source_p, int old, 
-		int sendmask,  char *umode_buf)
+void
+send_umode(struct Client *client_p, struct Client *source_p, int old,
+           int sendmask, char *umode_buf)
 {
-  int   i;
+  int i;
   int flag;
-  char  *m;
-  int   what = 0;
+  char *m;
+  int what = 0;
 
   /*
    * build a string in umode_buf to represent the change in the user's
@@ -1087,35 +1108,35 @@ void send_umode(struct Client *client_p, struct Client *source_p, int old,
   m = umode_buf;
   *m = '\0';
 
-  for (i = 0; user_modes[i].letter; i++ )
-    {
-      flag = user_modes[i].mode;
+  for (i = 0; user_modes[i].letter; i++)
+  {
+    flag = user_modes[i].mode;
 
-      if (MyClient(source_p) && !(flag & sendmask))
-        continue;
-      if ((flag & old) && !(source_p->umodes & flag))
-        {
-          if (what == MODE_DEL)
-            *m++ = user_modes[i].letter;
-          else
-            {
-              what = MODE_DEL;
-              *m++ = '-';
-              *m++ = user_modes[i].letter;
-            }
-        }
-      else if (!(flag & old) && (source_p->umodes & flag))
-        {
-          if (what == MODE_ADD)
-            *m++ = user_modes[i].letter;
-          else
-            {
-              what = MODE_ADD;
-              *m++ = '+';
-              *m++ = user_modes[i].letter;
-            }
-        }
+    if (MyClient(source_p) && !(flag & sendmask))
+      continue;
+    if ((flag & old) && !(source_p->umodes & flag))
+    {
+      if (what == MODE_DEL)
+        *m++ = user_modes[i].letter;
+      else
+      {
+        what = MODE_DEL;
+        *m++ = '-';
+        *m++ = user_modes[i].letter;
+      }
     }
+    else if (!(flag & old) && (source_p->umodes & flag))
+    {
+      if (what == MODE_ADD)
+        *m++ = user_modes[i].letter;
+      else
+      {
+        what = MODE_ADD;
+        *m++ = '+';
+        *m++ = user_modes[i].letter;
+      }
+    }
+  }
   *m = '\0';
   if (*umode_buf && client_p)
     sendto_one(client_p, ":%s MODE %s :%s",
@@ -1129,9 +1150,8 @@ void send_umode(struct Client *client_p, struct Client *source_p, int old,
  * output	- NONE
  * side effects - Only send ubuf out to servers that know about this client
  */
-void send_umode_out(struct Client *client_p,
-		    struct Client *source_p,
-		    int old)
+void
+send_umode_out(struct Client *client_p, struct Client *source_p, int old)
 {
   struct Client *target_p;
   char buf[BUFSIZE];
@@ -1139,19 +1159,19 @@ void send_umode_out(struct Client *client_p,
 
   send_umode(NULL, source_p, old, SEND_UMODES, buf);
 
-  for(ptr = serv_list.head; ptr; ptr = ptr->next)
-    {
-      target_p = ptr->data;
+  for (ptr = serv_list.head; ptr; ptr = ptr->next)
+  {
+    target_p = ptr->data;
 
-      if((target_p != client_p) && (target_p != source_p) && (*buf))
-        {
-          if((!(ServerInfo.hub && IsCapable(target_p, CAP_LL)))
-             || (target_p->localClient->serverMask &
-                 source_p->lazyLinkClientExists))
-            sendto_one(target_p, ":%s MODE %s :%s",
-                       source_p->name, source_p->name, buf);
-        }
+    if ((target_p != client_p) && (target_p != source_p) && (*buf))
+    {
+      if ((!(ServerInfo.hub && IsCapable(target_p, CAP_LL)))
+          || (target_p->localClient->serverMask &
+              source_p->lazyLinkClientExists))
+        sendto_one(target_p, ":%s MODE %s :%s",
+                   source_p->name, source_p->name, buf);
     }
+  }
 
   if (client_p && MyClient(client_p))
     send_umode(client_p, source_p, old, ALL_UMODES, buf);
@@ -1164,60 +1184,60 @@ void send_umode_out(struct Client *client_p,
  * output	- NONE
  * side effects	-
  */
-void user_welcome(struct Client *source_p)
+void
+user_welcome(struct Client *source_p)
 {
-  sendto_one(source_p, form_str(RPL_WELCOME), me.name, source_p->name, 
-             ServerInfo.network_name, source_p->name );
-  /* This is a duplicate of the NOTICE but see below...*/
+  sendto_one(source_p, form_str(RPL_WELCOME), me.name, source_p->name,
+             ServerInfo.network_name, source_p->name);
+  /* This is a duplicate of the NOTICE but see below... */
   sendto_one(source_p, form_str(RPL_YOURHOST), me.name, source_p->name,
-	     get_listener_name(source_p->localClient->listener), ircd_version);
-  
+             get_listener_name(source_p->localClient->listener),
+             ircd_version);
+
   /*
-  ** Don't mess with this one - IRCII needs it! -Avalon
-  */
+     ** Don't mess with this one - IRCII needs it! -Avalon
+   */
   sendto_one(source_p,
-	     "NOTICE %s :*** Your host is %s, running version %s",
-	     source_p->name, get_listener_name(source_p->localClient->listener),
-	     ircd_version);
-  
-  sendto_one(source_p, form_str(RPL_CREATED),me.name,source_p->name,creation);
-  sendto_one(source_p, form_str(RPL_MYINFO), me.name, source_p->name,
-	     me.name, ircd_version);
-  
+             "NOTICE %s :*** Your host is %s, running version %s",
+             source_p->name,
+             get_listener_name(source_p->localClient->listener),
+             ircd_version);
+
+  sendto_one(source_p, form_str(RPL_CREATED), me.name, source_p->name,
+             creation);
+  sendto_one(source_p, form_str(RPL_MYINFO), me.name, source_p->name, me.name,
+             ircd_version);
+
   show_isupport(source_p);
-  
+
   show_lusers(source_p);
 
   if (ConfigFileEntry.short_motd)
-    {
-      sendto_one(source_p,"NOTICE %s :*** Notice -- motd was last changed at %s",
-		 source_p->name,
-		 ConfigFileEntry.motd.lastChangedDate);
-      
-      sendto_one(source_p,
-		 "NOTICE %s :*** Notice -- Please read the motd if you haven't read it",
-		 source_p->name);
-    
-      sendto_one(source_p, form_str(RPL_MOTDSTART),
-		 me.name, source_p->name, me.name);
-    
-      sendto_one(source_p,
-		 form_str(RPL_MOTD),
-		 me.name, source_p->name,
-		 "*** This is the short motd ***"
-		 );
+  {
+    sendto_one(source_p,
+               "NOTICE %s :*** Notice -- motd was last changed at %s",
+               source_p->name, ConfigFileEntry.motd.lastChangedDate);
 
-      sendto_one(source_p, form_str(RPL_ENDOFMOTD),
-		 me.name, source_p->name);
-    }
-  else  
+    sendto_one(source_p,
+               "NOTICE %s :*** Notice -- Please read the motd if you haven't read it",
+               source_p->name);
+
+    sendto_one(source_p, form_str(RPL_MOTDSTART),
+               me.name, source_p->name, me.name);
+
+    sendto_one(source_p,
+               form_str(RPL_MOTD),
+               me.name, source_p->name, "*** This is the short motd ***");
+
+    sendto_one(source_p, form_str(RPL_ENDOFMOTD), me.name, source_p->name);
+  }
+  else
     SendMessageFile(source_p, &ConfigFileEntry.motd);
 
   if (IsRestricted(source_p))
-    {
-      sendto_one(source_p,form_str(ERR_RESTRICTED),
-		 me.name, source_p->name);
-    }
+  {
+    sendto_one(source_p, form_str(ERR_RESTRICTED), me.name, source_p->name);
+  }
 }
 
 /*
@@ -1226,42 +1246,41 @@ void user_welcome(struct Client *source_p)
  * outupt	- -1 if exiting 0 if ok
  * side effects	-
  */
-static int check_X_line(struct Client *client_p, struct Client *source_p)
+static int
+check_X_line(struct Client *client_p, struct Client *source_p)
 {
   struct ConfItem *aconf;
   char *reason;
 
-  if(IsOper(source_p))
+  if (IsOper(source_p))
     return 0;
 
   if ((aconf = find_x_conf(source_p->info)))
+  {
+    if (aconf->passwd)
+      reason = aconf->passwd;
+    else
+      reason = "NONE";
+
+    if (aconf->port)
     {
-      if(aconf->passwd)
-	reason = aconf->passwd;
-      else
-	reason = "NONE";
-              
-      if(aconf->port)
-	{
-	  if (aconf->port == 1)
-	    {
-	      sendto_realops_flags(FLAGS_REJ, L_ALL,
-				   "X-line Rejecting [%s] [%s], user %s",
-				   source_p->info,
-				   reason,
-				   get_client_name(client_p, HIDE_IP));
-	    }
-	  ServerStats->is_ref++;      
-	  (void)exit_client(client_p, source_p, &me, "Bad user info");
-	  return (CLIENT_EXITED);
-	}
-      else
-	sendto_realops_flags(FLAGS_REJ, L_ALL,
-			     "X-line Warning [%s] [%s], user %s",
-			     source_p->info,
-			     reason,
-			     get_client_name(client_p, HIDE_IP));
+      if (aconf->port == 1)
+      {
+        sendto_realops_flags(FLAGS_REJ, L_ALL,
+                             "X-line Rejecting [%s] [%s], user %s",
+                             source_p->info,
+                             reason, get_client_name(client_p, HIDE_IP));
+      }
+      ServerStats->is_ref++;
+      (void)exit_client(client_p, source_p, &me, "Bad user info");
+      return (CLIENT_EXITED);
     }
+    else
+      sendto_realops_flags(FLAGS_REJ, L_ALL,
+                           "X-line Warning [%s] [%s], user %s",
+                           source_p->info,
+                           reason, get_client_name(client_p, HIDE_IP));
+  }
 
   return 0;
 }
@@ -1278,54 +1297,56 @@ static int check_X_line(struct Client *client_p, struct Client *source_p)
  * This could also be used by rsa oper routines. 
  */
 
-int oper_up( struct Client *source_p,
-                    struct ConfItem *aconf )
+int
+oper_up(struct Client *source_p, struct ConfItem *aconf)
 {
   int old = (source_p->umodes & ALL_UMODES);
-  char *operprivs=NULL;
+  char *operprivs = NULL;
   dlink_node *ptr;
   struct ConfItem *found_aconf;
   dlink_node *m;
 
   SetOper(source_p);
-  if((int)aconf->hold)
-    {
-      source_p->umodes |= ((int)aconf->hold & ALL_UMODES); 
-      if( !IsOperN(source_p) )
-	source_p->umodes &= ~FLAGS_NCHANGE;
-      
-      sendto_one(source_p, ":%s NOTICE %s :*** Oper flags set from conf",
-		 me.name,source_p->name);
-    }
+  if ((int)aconf->hold)
+  {
+    source_p->umodes |= ((int)aconf->hold & ALL_UMODES);
+    if (!IsOperN(source_p))
+      source_p->umodes &= ~FLAGS_NCHANGE;
+
+    sendto_one(source_p, ":%s NOTICE %s :*** Oper flags set from conf",
+               me.name, source_p->name);
+  }
   else
+  {
+    if (ConfigFileEntry.oper_umodes)
     {
-      if(ConfigFileEntry.oper_umodes)
-        {
-          source_p->umodes |= ConfigFileEntry.oper_umodes & ALL_UMODES;
-        }
-      else
-        {
-          source_p->umodes |= (FLAGS_SERVNOTICE|FLAGS_OPERWALL|FLAGS_WALLOP|FLAGS_LOCOPS) & ALL_UMODES;
-        }
+      source_p->umodes |= ConfigFileEntry.oper_umodes & ALL_UMODES;
     }
-	
+    else
+    {
+      source_p->umodes |=
+        (FLAGS_SERVNOTICE | FLAGS_OPERWALL | FLAGS_WALLOP | FLAGS_LOCOPS) &
+        ALL_UMODES;
+    }
+  }
+
   Count.oper++;
 
   SetExemptKline(source_p);
-      
-  m = make_dlink_node();
-  dlinkAdd(source_p,m,&oper_list);
 
-  if(source_p->localClient->confs.head)
+  m = make_dlink_node();
+  dlinkAdd(source_p, m, &oper_list);
+
+  if (source_p->localClient->confs.head)
+  {
+    ptr = source_p->localClient->confs.head;
+    if (ptr)
     {
-      ptr = source_p->localClient->confs.head;
-      if(ptr)
-	{
-	  found_aconf = ptr->data;
-	  if(found_aconf)
-	    operprivs = oper_privs_as_string(source_p,found_aconf->port);
-	}
+      found_aconf = ptr->data;
+      if (found_aconf)
+        operprivs = oper_privs_as_string(source_p, found_aconf->port);
     }
+  }
   else
     operprivs = "";
 
@@ -1333,13 +1354,13 @@ int oper_up( struct Client *source_p,
     source_p->umodes |= FLAGS_ADMIN;
 
   sendto_realops_flags(FLAGS_ALL, L_ALL,
-		       "%s (%s@%s) is now an operator", source_p->name,
-		       source_p->username, source_p->host);
+                       "%s (%s@%s) is now an operator", source_p->name,
+                       source_p->username, source_p->host);
   send_umode_out(source_p, source_p, old);
   sendto_one(source_p, form_str(RPL_YOUREOPER), me.name, source_p->name);
   sendto_one(source_p, ":%s NOTICE %s :*** Oper privs are %s", me.name,
              source_p->name, operprivs);
   SendMessageFile(source_p, &ConfigFileEntry.opermotd);
-  
+
   return 1;
 }

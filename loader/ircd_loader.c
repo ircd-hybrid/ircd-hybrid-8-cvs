@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  *  USA.
  *
- * $Id: ircd_loader.c,v 1.1 2002/01/04 09:15:07 a1kmm Exp $
+ * $Id: ircd_loader.c,v 1.2 2002/01/04 11:06:15 a1kmm Exp $
  */
 #include "setup.h"
 #include <stdio.h>
@@ -43,16 +43,16 @@ struct config_channel_entry ConfigChannel;
 struct Channel *GlobalChannelList = NULL;
 BlockHeap *channel_heap;
 BlockHeap *ban_heap;
-struct Client *uplink=NULL;
+struct Client *uplink = NULL;
 int MaxConnectionCount = 1;
-int MaxClientCount     = 1;
+int MaxClientCount = 1;
 int refresh_user_links = 0;
 
 /*
  * stats stuff
  */
-static struct ServerStatistics  ircst;
-struct ServerStatistics* ServerStats = &ircst;
+static struct ServerStatistics ircst;
+struct ServerStatistics *ServerStats = &ircst;
 
 int
 main(int argc, char **argv)
@@ -61,13 +61,12 @@ main(int argc, char **argv)
   {
 #ifndef STATIC_MODULES
     void *mod;
-    int (*ircd_main)(int, char **);
-    mod = dlopen(IRCD_PREFIX"/modules/main/ircd.so",
-                 RTLD_NOW | RTLD_GLOBAL);
+    int (*ircd_main) (int, char **);
+    mod = dlopen(IRCD_PREFIX "/modules/main/ircd.so", RTLD_NOW | RTLD_GLOBAL);
     if (mod == NULL)
     {
       fprintf(stderr,
-              "Could not load "IRCD_PREFIX
+              "Could not load " IRCD_PREFIX
               "/modules/main/ircd.so: %s\n", dlerror());
       exit(-1);
     }

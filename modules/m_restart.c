@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_restart.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_restart.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -56,37 +56,37 @@ _moddeinit(void)
   mod_del_cmd(&restart_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_restart
  *
  */
-static void mo_restart(struct Client *client_p,
-                      struct Client *source_p,
-                      int parc,
-                      char *parv[])
+static void
+mo_restart(struct Client *client_p,
+           struct Client *source_p, int parc, char *parv[])
 {
-  char buf[BUFSIZE]; 
+  char buf[BUFSIZE];
   dlink_node *ptr;
   struct Client *target_p;
-  
-  if (!MyClient(source_p) || !IsOper(source_p))
-    {
-      sendto_one(source_p, form_str(ERR_NOPRIVILEGES), me.name, parv[0]);
-      return;
-    }
 
-  if ( !IsOperDie(source_p) )
-    {
-      sendto_one(source_p,":%s NOTICE %s :You have no D flag", me.name, parv[0]);
-      return;
-    }
+  if (!MyClient(source_p) || !IsOper(source_p))
+  {
+    sendto_one(source_p, form_str(ERR_NOPRIVILEGES), me.name, parv[0]);
+    return;
+  }
+
+  if (!IsOperDie(source_p))
+  {
+    sendto_one(source_p, ":%s NOTICE %s :You have no D flag", me.name,
+               parv[0]);
+    return;
+  }
 
   if (parc < 2)
   {
     sendto_one(source_p, ":%s NOTICE %s :Need server name /restart %s",
- 	       me.name, source_p->name, me.name);
+               me.name, source_p->name, me.name);
     return;
   }
   else
@@ -94,30 +94,28 @@ static void mo_restart(struct Client *client_p,
     if (irccmp(parv[1], me.name))
     {
       sendto_one(source_p, ":%s NOTICE %s :Mismatch on /restart %s",
-		 me.name, source_p->name, me.name);
+                 me.name, source_p->name, me.name);
       return;
     }
   }
-  
-  for(ptr = lclient_list.head; ptr; ptr = ptr->next)
+
+  for (ptr = lclient_list.head; ptr; ptr = ptr->next)
   {
     target_p = ptr->data;
 
     sendto_one(target_p,
                ":%s NOTICE %s :Server Restarting. %s",
-	       me.name, target_p->name,
-	       get_client_name(source_p, HIDE_IP));
+               me.name, target_p->name, get_client_name(source_p, HIDE_IP));
   }
 
-  for(ptr = serv_list.head; ptr; ptr = ptr->next)
+  for (ptr = serv_list.head; ptr; ptr = ptr->next)
   {
     target_p = ptr->data;
 
     sendto_one(target_p, ":%s ERROR :Restart by %s",
                me.name, get_client_name(source_p, HIDE_IP));
   }
-  
+
   ircsprintf(buf, "Server RESTART by %s", get_client_name(source_p, HIDE_IP));
   restart(buf);
 }
-

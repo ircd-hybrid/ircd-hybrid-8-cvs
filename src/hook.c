@@ -16,7 +16,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: hook.c,v 1.1 2002/01/04 09:14:02 a1kmm Exp $
+ * $Id: hook.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 
 /* hooks are used by modules to hook into events called by other parts of
@@ -37,130 +37,129 @@ dlink_list hooks;
 void
 init_hooks(void)
 {
-	memset(&hooks, 0, sizeof(hooks));
+  memset(&hooks, 0, sizeof(hooks));
 #ifndef NDEBUG
-        hook_add_event("iosend");
-        hook_add_event("iorecv");
-        hook_add_event("iorecvctrl");
+  hook_add_event("iosend");
+  hook_add_event("iorecv");
+  hook_add_event("iorecvctrl");
 #endif
-	hook_add_event("burst_channel");
+  hook_add_event("burst_channel");
 }
 
 static hook *
 new_hook(char *name)
 {
-	hook *h;
-	
-	h = MyMalloc(sizeof(hook));
-	memset(h, 0, sizeof(*h));
-    DupString(h->name, name);
-	return h;
+  hook *h;
+
+  h = MyMalloc(sizeof(hook));
+  memset(h, 0, sizeof(*h));
+  DupString(h->name, name);
+  return h;
 }
 
 int
 hook_add_event(char *name)
 {
-	dlink_node *node;
-	hook *newhook;
-	
-	node = make_dlink_node();
-	newhook = new_hook(name);
-	
-	dlinkAdd(newhook, node, &hooks);
-	return 0;
+  dlink_node *node;
+  hook *newhook;
+
+  node = make_dlink_node();
+  newhook = new_hook(name);
+
+  dlinkAdd(newhook, node, &hooks);
+  return 0;
 }
 
 int
 hook_del_event(char *name)
 {
-	dlink_node *node;
-	hook *h;
-	
-	for (node = hooks.head; node; node = node->next)
-	{
-		h = node->data;
-		
-		if (!strcmp(h->name, name)) {
-			dlinkDelete(node, &hooks);
-			MyFree(h);
-			return 0;
-		}
-	}
-	return 0;
+  dlink_node *node;
+  hook *h;
+
+  for (node = hooks.head; node; node = node->next)
+  {
+    h = node->data;
+
+    if (!strcmp(h->name, name))
+    {
+      dlinkDelete(node, &hooks);
+      MyFree(h);
+      return 0;
+    }
+  }
+  return 0;
 }
 
 static hook *
 find_hook(char *name)
 {
-	dlink_node *node;
-	hook *h;
-	
-	for (node = hooks.head; node; node = node->next)
-	{
-		h = node->data;
-		
-		if (!strcmp(h->name, name))
-			return h;
-	}
-	return NULL;
-}
+  dlink_node *node;
+  hook *h;
 
-int 
-hook_del_hook(char *event, hookfn *fn)
-{
- hook *h;
- dlink_node *node, *nnode;
- h = find_hook(event);
- if (!h)
-  return -1;
-   
- for (node = h->hooks.head; node; node = node->next)
- {
-  nnode = node->next;
-  if (fn == node->data)
+  for (node = hooks.head; node; node = node->next)
   {
-   dlinkDelete(node, &h->hooks);
-   free_dlink_node(node);
-  } 
- }
- return 0;
+    h = node->data;
+
+    if (!strcmp(h->name, name))
+      return h;
+  }
+  return NULL;
 }
 
 int
-hook_add_hook(char *event, hookfn *fn)
+hook_del_hook(char *event, hookfn * fn)
 {
-	hook *h;
-	dlink_node *node;
-	
-	h = find_hook(event);
-	if (!h) 
-		return -1;
+  hook *h;
+  dlink_node *node, *nnode;
+  h = find_hook(event);
+  if (!h)
+    return -1;
 
-	node = make_dlink_node();
-	
-	dlinkAdd(fn, node, &h->hooks);
-	return 0;
+  for (node = h->hooks.head; node; node = node->next)
+  {
+    nnode = node->next;
+    if (fn == node->data)
+    {
+      dlinkDelete(node, &h->hooks);
+      free_dlink_node(node);
+    }
+  }
+  return 0;
+}
+
+int
+hook_add_hook(char *event, hookfn * fn)
+{
+  hook *h;
+  dlink_node *node;
+
+  h = find_hook(event);
+  if (!h)
+    return -1;
+
+  node = make_dlink_node();
+
+  dlinkAdd(fn, node, &h->hooks);
+  return 0;
 }
 
 int
 hook_call_event(char *event, void *data)
 {
-	hook *h;
-	dlink_node *node;
-	hookfn fn;
-	
-	h = find_hook(event);
-	if (!h)
-		return -1;
+  hook *h;
+  dlink_node *node;
+  hookfn fn;
 
-	for (node = h->hooks.head; node; node = node->next)
-	{
-		fn = (hookfn)node->data;
-		
-		if (fn(data) != 0)
-			return 0;
-	}
-	return 0;
+  h = find_hook(event);
+  if (!h)
+    return -1;
+
+  for (node = h->hooks.head; node; node = node->next)
+  {
+    fn = (hookfn) node->data;
+
+    if (fn(data) != 0)
+      return 0;
+  }
+  return 0;
 }
-
-		

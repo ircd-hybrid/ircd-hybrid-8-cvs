@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_rehash.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_rehash.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -39,7 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mo_rehash(struct Client*, struct Client*, int, char**);
+static void mo_rehash(struct Client *, struct Client *, int, char **);
 
 struct Message rehash_msgtab = {
   "REHASH", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -59,88 +59,91 @@ _moddeinit(void)
   mod_del_cmd(&rehash_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_rehash - REHASH message handler
  *
  */
-static void mo_rehash(struct Client *client_p, struct Client *source_p,
-                     int parc, char *parv[])
+static void
+mo_rehash(struct Client *client_p, struct Client *source_p,
+          int parc, char *parv[])
 {
   int found = NO;
 
-  if ( !IsOperRehash(source_p) )
-    {
-      sendto_one(source_p,":%s NOTICE %s :You need rehash = yes;", me.name, parv[0]);
-      return;
-    }
+  if (!IsOperRehash(source_p))
+  {
+    sendto_one(source_p, ":%s NOTICE %s :You need rehash = yes;", me.name,
+               parv[0]);
+    return;
+  }
 
   if (parc > 1)
+  {
+    if (irccmp(parv[1], "CHANNELS") == 0)
     {
-      if (irccmp(parv[1],"CHANNELS") == 0)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                       "%s is forcing cleanup of channels",parv[0]);
-          found = YES;
-        }
-      else if(irccmp(parv[1],"DNS") == 0)
-        {
-          sendto_one(source_p, form_str(RPL_REHASHING), me.name, parv[0], "DNS");
-          sendto_realops_flags(FLAGS_ALL, L_ALL,"%s is rehashing DNS",
-                               get_oper_name(source_p));
-          restart_resolver();   /* re-read /etc/resolv.conf AGAIN?
-                                   and close/re-open res socket */
-          found = YES;
-        }
-      else if(irccmp(parv[1],"MOTD") == 0)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-		       "%s is forcing re-reading of MOTD file",
-		       get_oper_name(source_p));
-          ReadMessageFile( &ConfigFileEntry.motd );
-          found = YES;
-        }
-      else if(irccmp(parv[1],"OMOTD") == 0)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-		       "%s is forcing re-reading of OPER MOTD file",
-		       get_oper_name(source_p));
-          ReadMessageFile( &ConfigFileEntry.opermotd );
-          found = YES;
-        }
-      else if(irccmp(parv[1],"HELP") == 0)
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-		       "%s is forcing re-reading of oper and user help files",
-                       parv[0]);
-          ReadMessageFile( &ConfigFileEntry.helpfile );
-          ReadMessageFile( &ConfigFileEntry.uhelpfile );
-          found = YES;
-        }
-      if(found)
-        {
-          ilog(L_NOTICE, "REHASH %s From %s\n", parv[1], 
-	       get_client_name(source_p, HIDE_IP));
-          return;
-        }
-      else
-        {
-          sendto_one(source_p,":%s NOTICE %s :rehash one of :CHANNELS DNS HELP MOTD OMOTD" ,me.name,source_p->name);
-          return;
-        }
-    }
-  else
-    {
-      sendto_one(source_p, form_str(RPL_REHASHING), me.name, parv[0],
-                 ConfigFileEntry.configfile);
       sendto_realops_flags(FLAGS_ALL, L_ALL,
-			   "%s is rehashing server config file",
-			   get_oper_name(source_p));
-      ilog(L_NOTICE, "REHASH From %s[%s]", get_oper_name(source_p),
-           source_p->localClient->sockhost);
-      rehash(0);
+                           "%s is forcing cleanup of channels", parv[0]);
+      found = YES;
+    }
+    else if (irccmp(parv[1], "DNS") == 0)
+    {
+      sendto_one(source_p, form_str(RPL_REHASHING), me.name, parv[0], "DNS");
+      sendto_realops_flags(FLAGS_ALL, L_ALL, "%s is rehashing DNS",
+                           get_oper_name(source_p));
+      restart_resolver();       /* re-read /etc/resolv.conf AGAIN?
+                                   and close/re-open res socket */
+      found = YES;
+    }
+    else if (irccmp(parv[1], "MOTD") == 0)
+    {
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "%s is forcing re-reading of MOTD file",
+                           get_oper_name(source_p));
+      ReadMessageFile(&ConfigFileEntry.motd);
+      found = YES;
+    }
+    else if (irccmp(parv[1], "OMOTD") == 0)
+    {
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "%s is forcing re-reading of OPER MOTD file",
+                           get_oper_name(source_p));
+      ReadMessageFile(&ConfigFileEntry.opermotd);
+      found = YES;
+    }
+    else if (irccmp(parv[1], "HELP") == 0)
+    {
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "%s is forcing re-reading of oper and user help files",
+                           parv[0]);
+      ReadMessageFile(&ConfigFileEntry.helpfile);
+      ReadMessageFile(&ConfigFileEntry.uhelpfile);
+      found = YES;
+    }
+    if (found)
+    {
+      ilog(L_NOTICE, "REHASH %s From %s\n", parv[1],
+           get_client_name(source_p, HIDE_IP));
       return;
     }
+    else
+    {
+      sendto_one(source_p,
+                 ":%s NOTICE %s :rehash one of :CHANNELS DNS HELP MOTD OMOTD",
+                 me.name, source_p->name);
+      return;
+    }
+  }
+  else
+  {
+    sendto_one(source_p, form_str(RPL_REHASHING), me.name, parv[0],
+               ConfigFileEntry.configfile);
+    sendto_realops_flags(FLAGS_ALL, L_ALL,
+                         "%s is rehashing server config file",
+                         get_oper_name(source_p));
+    ilog(L_NOTICE, "REHASH From %s[%s]", get_oper_name(source_p),
+         source_p->localClient->sockhost);
+    rehash(0);
+    return;
+  }
 }
-

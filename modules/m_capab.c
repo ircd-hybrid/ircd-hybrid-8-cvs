@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_capab.c,v 1.1 2002/01/04 09:13:13 a1kmm Exp $
+ *   $Id: m_capab.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -31,7 +31,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mr_capab(struct Client*, struct Client*, int, char**);
+static void mr_capab(struct Client *, struct Client *, int, char **);
 
 struct Message capab_msgtab = {
   "CAPAB", 0, 0, 0, 0, MFLG_SLOW | MFLG_UNREG, 0,
@@ -50,7 +50,7 @@ _moddeinit(void)
   mod_del_cmd(&capab_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /*
@@ -59,13 +59,14 @@ char *_version = "$Revision: 1.1 $";
  *      parv[1] = space-separated list of capabilities
  *
  */
-static void mr_capab(struct Client *client_p, struct Client *source_p,
-                    int parc, char *parv[])
+static void
+mr_capab(struct Client *client_p, struct Client *source_p,
+         int parc, char *parv[])
 {
   struct Capability *cap;
   int i;
-  char* p;
-  char* s;
+  char *p;
+  char *s;
 #ifdef HAVE_LIBCRYPTO
   struct EncCapability *ecap;
   unsigned int cipher = 0;
@@ -83,12 +84,12 @@ static void mr_capab(struct Client *client_p, struct Client *source_p,
   else
     client_p->localClient->caps |= CAP_CAP;
 
-  for (i=1; i<parc; i++)
+  for (i = 1; i < parc; i++)
   {
     for (s = strtoken(&p, parv[i], " "); s; s = strtoken(&p, NULL, " "))
     {
 #ifdef HAVE_LIBCRYPTO
-      if ( (strncmp(s, "ENC:", 4) == 0) )
+      if ((strncmp(s, "ENC:", 4) == 0))
       {
         /* Skip the "ENC:" portion */
         s += 4;
@@ -98,7 +99,7 @@ static void mr_capab(struct Client *client_p, struct Client *source_p,
          */
         for (ecap = CipherTable; ecap->name; ecap++)
         {
-          if ( (!irccmp(ecap->name, s)) && (ecap->cap & CAP_ENC_MASK))
+          if ((!irccmp(ecap->name, s)) && (ecap->cap & CAP_ENC_MASK))
           {
             cipher = ecap->cap;
             break;
@@ -118,7 +119,7 @@ static void mr_capab(struct Client *client_p, struct Client *source_p,
           return;
         }
       }
-      else /* normal capab */
+      else                      /* normal capab */
 #endif
         for (cap = captab; cap->name; cap++)
         {
@@ -128,7 +129,6 @@ static void mr_capab(struct Client *client_p, struct Client *source_p,
             break;
           }
         }
-    } /* for */
-  } /* for */
+    }                           /* for */
+  }                             /* for */
 }
-

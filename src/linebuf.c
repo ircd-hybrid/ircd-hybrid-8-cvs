@@ -6,7 +6,7 @@
  * The idea here is that we should really be maintaining pre-munged
  * buffer "lines" which we can later refcount to save needless copies.
  *
- * $Id: linebuf.c,v 1.1 2002/01/04 09:14:12 a1kmm Exp $
+ * $Id: linebuf.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
  */
 
 #include <errno.h>
@@ -49,16 +49,17 @@ static int bufline_count = 0;
  * Initialise the linebuf mechanism
  */
 
-static void linebuf_garbage_collect(void *unused)
+static void
+linebuf_garbage_collect(void *unused)
 {
   BlockHeapGarbageCollect(linebuf_heap);
 }
-      
+
 
 void
 linebuf_init(void)
 {
-  linebuf_heap  = BlockHeapCreate(sizeof(buf_line_t), 2048);
+  linebuf_heap = BlockHeapCreate(sizeof(buf_line_t), 2048);
   eventAddIsh("linebuf_garbage_collect", linebuf_garbage_collect, NULL, 30);
 }
 
@@ -69,13 +70,13 @@ linebuf_allocate(void)
   t = BlockHeapAlloc(linebuf_heap);
   assert(t != NULL);
   t->refcount = 0;
-  return(t);
+  return (t);
 }
 
 void
-linebuf_free(buf_line_t *p)
+linebuf_free(buf_line_t * p)
 {
-   BlockHeapFree(linebuf_heap, p);
+  BlockHeapFree(linebuf_heap, p);
 }
 
 /*
@@ -85,7 +86,7 @@ linebuf_free(buf_line_t *p)
  * It will be initially empty.
  */
 static buf_line_t *
-linebuf_new_line(buf_head_t *bufhead)
+linebuf_new_line(buf_head_t * bufhead)
 {
   buf_line_t *bufline;
   dlink_node *node;
@@ -94,7 +95,7 @@ linebuf_new_line(buf_head_t *bufhead)
   ++bufline_count;
 
   node = make_dlink_node();
-  
+
   bufline->len = 0;
   bufline->terminated = 0;
   bufline->flushing = 0;
@@ -118,8 +119,8 @@ linebuf_new_line(buf_head_t *bufhead)
  * We've finished with the given line, so deallocate it
  */
 static void
-linebuf_done_line(buf_head_t *bufhead, buf_line_t *bufline,
-                  dlink_node *node)
+linebuf_done_line(buf_head_t * bufhead, buf_line_t * bufline,
+                  dlink_node * node)
 {
   /* Remove it from the linked list */
   dlinkDelete(node, &bufhead->list);
@@ -151,24 +152,24 @@ static inline int
 linebuf_skip_crlf(char *ch, int len)
 {
   int orig_len = len;
-  
+
   /* First, skip until the first non-CRLF */
-  for(; len; len--, ch++)
-    {
-      if (*ch == '\r')
-	break;
-      else if(*ch == '\n')
-        break;
-    }
+  for (; len; len--, ch++)
+  {
+    if (*ch == '\r')
+      break;
+    else if (*ch == '\n')
+      break;
+  }
 
   /* Then, skip until the last CRLF */
-  for(; len; len--, ch++)
-    {
-      if ((*ch != '\r') && (*ch != '\n'))
-        break;
-    }
+  for (; len; len--, ch++)
+  {
+    if ((*ch != '\r') && (*ch != '\n'))
+      break;
+  }
   assert(orig_len > len);
-  return(orig_len - len);
+  return (orig_len - len);
 }
 
 
@@ -176,7 +177,7 @@ linebuf_skip_crlf(char *ch, int len)
  * attach a CR/LF/NUL to the end of the line, and update the length.
  */
 static void
-linebuf_terminate_crlf(buf_head_t *bufhead, buf_line_t *bufline)
+linebuf_terminate_crlf(buf_head_t * bufhead, buf_line_t * bufline)
 {
   bufline->buf[bufline->len++] = '\r';
   bufline->buf[bufline->len++] = '\n';
@@ -191,7 +192,7 @@ linebuf_terminate_crlf(buf_head_t *bufhead, buf_line_t *bufline)
  * Initialise the new buffer
  */
 void
-linebuf_newbuf(buf_head_t *bufhead)
+linebuf_newbuf(buf_head_t * bufhead)
 {
   /* not much to do right now :) */
   memset(bufhead, 0, sizeof(buf_head_t));
@@ -209,7 +210,7 @@ client_flush_input(struct Client *client_p)
 {
   /* This way, it can be called for remote client as well */
 
-  if(client_p->localClient == NULL)
+  if (client_p->localClient == NULL)
     return;
 
   linebuf_donebuf(&client_p->localClient->buf_recvq);
@@ -222,13 +223,13 @@ client_flush_input(struct Client *client_p)
  * Flush all the lines associated with this buffer
  */
 void
-linebuf_donebuf(buf_head_t *bufhead)
+linebuf_donebuf(buf_head_t * bufhead)
 {
-    while (bufhead->list.head != NULL)
-      {
-       linebuf_done_line(bufhead, (buf_line_t *)bufhead->list.head->data,
-                         bufhead->list.head);
-      }
+  while (bufhead->list.head != NULL)
+  {
+    linebuf_done_line(bufhead, (buf_line_t *) bufhead->list.head->data,
+                      bufhead->list.head);
+  }
 }
 
 /*
@@ -252,11 +253,11 @@ linebuf_donebuf(buf_head_t *bufhead)
  * -Aaron
  */
 static int
-linebuf_copy_line(buf_head_t *bufhead, buf_line_t *bufline,
+linebuf_copy_line(buf_head_t * bufhead, buf_line_t * bufline,
                   char *data, int len)
 {
-  int cpylen = 0;	/* how many bytes we've copied */
-  char *ch = data;	/* Pointer to where we are in the read data */
+  int cpylen = 0;               /* how many bytes we've copied */
+  char *ch = data;              /* Pointer to where we are in the read data */
   char *bufch = bufline->buf + bufline->len;
   int clen = 0;                 /* how many bytes we've processed,
                                    and don't ever want to see again.. */
@@ -271,45 +272,45 @@ linebuf_copy_line(buf_head_t *bufhead, buf_line_t *bufline,
   clen = cpylen = linebuf_skip_crlf(ch, len);
 
   /* This is the ~overflow case..This doesn't happen often.. */
-  if(cpylen > (BUF_DATA_SIZE - bufline->len - 1))
+  if (cpylen > (BUF_DATA_SIZE - bufline->len - 1))
+  {
+    memcpy(bufch, ch, (BUF_DATA_SIZE - bufline->len - 1));
+    bufline->buf[BUF_DATA_SIZE - 1] = '\0';
+    bufch = bufline->buf + BUF_DATA_SIZE - 2;
+    while (cpylen && (*bufch == '\r' || *bufch == '\n'))
     {
-      memcpy(bufch, ch, (BUF_DATA_SIZE - bufline->len - 1));
-      bufline->buf[BUF_DATA_SIZE-1] = '\0';
-      bufch = bufline->buf + BUF_DATA_SIZE - 2;
-      while(cpylen && (*bufch == '\r' || *bufch == '\n'))
-        {
-          *bufch = '\0';
-          cpylen--;
-          bufch--;
-        }
-      bufline->terminated = 1;
-      bufline->len = BUF_DATA_SIZE - 1;
-      bufhead->len += BUF_DATA_SIZE - 1;
-      return clen;
+      *bufch = '\0';
+      cpylen--;
+      bufch--;
     }
+    bufline->terminated = 1;
+    bufline->len = BUF_DATA_SIZE - 1;
+    bufhead->len += BUF_DATA_SIZE - 1;
+    return clen;
+  }
 
   memcpy(bufch, ch, cpylen);
   bufch += cpylen;
   *bufch = '\0';
   bufch--;
 
-  if(*bufch != '\r' && *bufch != '\n')
-    { 
-      /* No linefeed, bail for the next time */
-      bufhead->len += cpylen;
-      bufline->len += cpylen;
-      bufline->terminated = 0;
-      return clen;
-    }
+  if (*bufch != '\r' && *bufch != '\n')
+  {
+    /* No linefeed, bail for the next time */
+    bufhead->len += cpylen;
+    bufline->len += cpylen;
+    bufline->terminated = 0;
+    return clen;
+  }
 
   /* Yank the CRLF off this, replace with a \0 */
-  while(cpylen && (*bufch == '\r' || *bufch == '\n'))
-    {
-      *bufch = '\0';
-      cpylen--;
-      bufch--;
-    }
-  
+  while (cpylen && (*bufch == '\r' || *bufch == '\n'))
+  {
+    *bufch = '\0';
+    cpylen--;
+    bufch--;
+  }
+
   bufline->terminated = 1;
   bufhead->len += cpylen;
   bufline->len += cpylen;
@@ -325,15 +326,15 @@ linebuf_copy_line(buf_head_t *bufhead, buf_line_t *bufline,
  * -David-T
  */
 static int
-linebuf_copy_raw(buf_head_t *bufhead, buf_line_t *bufline,
+linebuf_copy_raw(buf_head_t * bufhead, buf_line_t * bufline,
                  char *data, int len)
 {
-  char *ch = data;	/* Pointer to where we are in the read data */
+  char *ch = data;              /* Pointer to where we are in the read data */
   char *bufch = bufline->buf + bufline->len;
   int clen = 0;                 /* how many bytes we've processed,
                                    and don't ever want to see again.. */
   int remaining;
-  
+
   /* If its full or terminated, ignore it */
   if ((bufline->len == BUF_DATA_SIZE) || (bufline->terminated == 1))
     return 0;
@@ -399,7 +400,7 @@ linebuf_copy_raw(buf_head_t *bufhead, buf_line_t *bufline,
  *   to dodge copious copies.
  */
 int
-linebuf_parse(buf_head_t *bufhead, char *data, int len, int raw)
+linebuf_parse(buf_head_t * bufhead, char *data, int len, int raw)
 {
   buf_line_t *bufline;
   int cpylen;
@@ -407,43 +408,43 @@ linebuf_parse(buf_head_t *bufhead, char *data, int len, int raw)
 
   /* First, if we have a partial buffer, try to squeze data into it */
   if (bufhead->list.tail != NULL)
-    {
-      /* Check we're doing the partial buffer thing */
-      bufline = bufhead->list.tail->data;
-      assert(!bufline->flushing);
-      /* just try, the worst it could do is *reject* us .. */
-      if (raw) /* if we could be dealing with 8-bit data */
-        cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
-      else
-        cpylen = linebuf_copy_line(bufhead, bufline, data, len);
-      linecnt++;
-      /* If we've copied the same as what we've got, quit now */
-      if (cpylen == len)
-	return linecnt; /* all the data done so soon? */
+  {
+    /* Check we're doing the partial buffer thing */
+    bufline = bufhead->list.tail->data;
+    assert(!bufline->flushing);
+    /* just try, the worst it could do is *reject* us .. */
+    if (raw)                    /* if we could be dealing with 8-bit data */
+      cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
+    else
+      cpylen = linebuf_copy_line(bufhead, bufline, data, len);
+    linecnt++;
+    /* If we've copied the same as what we've got, quit now */
+    if (cpylen == len)
+      return linecnt;           /* all the data done so soon? */
 
-      /* Skip the data and update len .. */
-      len -= cpylen;
-      assert(len >= 0);
-      data += cpylen;
-    }
+    /* Skip the data and update len .. */
+    len -= cpylen;
+    assert(len >= 0);
+    data += cpylen;
+  }
 
-    /* Next, the loop */
-    while (len > 0)
-      {
-        /* We obviously need a new buffer, so .. */
-        bufline = linebuf_new_line(bufhead);
-        
-        /* And parse */
-        if (raw) /* if we could be dealing with 8-bit data */
-          cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
-        else
-          cpylen = linebuf_copy_line(bufhead, bufline, data, len);
-        len -= cpylen;
-	assert(len >= 0);
-        data += cpylen;
-        linecnt++;
-      }
-    return linecnt;
+  /* Next, the loop */
+  while (len > 0)
+  {
+    /* We obviously need a new buffer, so .. */
+    bufline = linebuf_new_line(bufhead);
+
+    /* And parse */
+    if (raw)                    /* if we could be dealing with 8-bit data */
+      cpylen = linebuf_copy_raw(bufhead, bufline, data, len);
+    else
+      cpylen = linebuf_copy_line(bufhead, bufline, data, len);
+    len -= cpylen;
+    assert(len >= 0);
+    data += cpylen;
+    linecnt++;
+  }
+  return linecnt;
 }
 
 
@@ -454,8 +455,7 @@ linebuf_parse(buf_head_t *bufhead, char *data, int len, int raw)
  * data into the given buffer and free the underlying linebuf.
  */
 int
-linebuf_get(buf_head_t *bufhead, char *buf, int buflen, int partial,
-            int raw)
+linebuf_get(buf_head_t * bufhead, char *buf, int buflen, int partial, int raw)
 {
   buf_line_t *bufline;
   int cpylen;
@@ -463,13 +463,13 @@ linebuf_get(buf_head_t *bufhead, char *buf, int buflen, int partial,
 
   /* make sure we have a line */
   if (bufhead->list.head == NULL)
-    return 0; /* Obviously not.. hrm. */
+    return 0;                   /* Obviously not.. hrm. */
 
-  bufline = bufhead->list.head->data; 
+  bufline = bufhead->list.head->data;
 
   /* make sure that the buffer was actually *terminated */
   if (!(partial || bufline->terminated))
-    return 0;  /* Wait for more data! */
+    return 0;                   /* Wait for more data! */
 
   /* make sure we've got the space, including the NULL */
   cpylen = bufline->len;
@@ -484,20 +484,20 @@ linebuf_get(buf_head_t *bufhead, char *buf, int buflen, int partial,
   if (bufline->raw && !raw)
   {
     /* skip leading EOL characters */
-    while(cpylen && (*start == '\r' || *start == '\n'))
+    while (cpylen && (*start == '\r' || *start == '\n'))
     {
       start++;
       cpylen--;
     }
     /* skip trailing EOL characters */
-    ch = &start[cpylen-1];
-    while(cpylen && (*ch == '\r' || *ch == '\n'))
+    ch = &start[cpylen - 1];
+    while (cpylen && (*ch == '\r' || *ch == '\n'))
     {
       ch--;
       cpylen--;
     }
   }
-  memcpy(buf, start, cpylen+1);
+  memcpy(buf, start, cpylen + 1);
 
   /* convert CR/LF to NUL */
   buf[cpylen] = '\0';
@@ -518,15 +518,15 @@ linebuf_get(buf_head_t *bufhead, char *buf, int buflen, int partial,
  * without copying the data (using refcounts).
  */
 void
-linebuf_attach(buf_head_t *bufhead, buf_head_t *new)
+linebuf_attach(buf_head_t * bufhead, buf_head_t * new)
 {
   dlink_node *new_node;
   dlink_node *node;
   buf_line_t *line;
-  
+
   for (node = new->list.head; node; node = node->next)
   {
-    line = (buf_line_t *)node->data;
+    line = (buf_line_t *) node->data;
     new_node = make_dlink_node();
     dlinkAddTail(line, new_node, &bufhead->list);
 
@@ -548,19 +548,19 @@ linebuf_attach(buf_head_t *bufhead, buf_head_t *new)
  * Then format/va_args is appended to the buffer.
  */
 void
-linebuf_putmsg(buf_head_t *bufhead, const char *format, va_list va_args,
+linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list va_args,
                const char *prefixfmt, ...)
 {
   buf_line_t *bufline;
   int len = 0;
   va_list prefix_args;
-  
+
   /* make sure the previous line is terminated */
   if (bufhead->list.tail)
-    {
-      bufline = bufhead->list.tail->data;
-      assert(bufline->terminated);
-    }
+  {
+    bufline = bufhead->list.tail->data;
+    assert(bufline->terminated);
+  }
 
   /* Create a new line */
   bufline = linebuf_new_line(bufhead);
@@ -575,24 +575,24 @@ linebuf_putmsg(buf_head_t *bufhead, const char *format, va_list va_args,
   if (va_args)
   {
     len += vsnprintf((bufline->buf + len), (BUF_DATA_SIZE - len), format,
-                    va_args);
+                     va_args);
   }
-  
+
   /* Truncate the data if required */
   if (len > 510)
     len = 510;
 
   /* Chop trailing CRLF's .. */
-  len--; /* change len to index of last char */
+  len--;                        /* change len to index of last char */
   while ((bufline->buf[len] == '\r') || (bufline->buf[len] == '\n') ||
          (bufline->buf[len] == '\0'))
     len--;
 
   bufline->buf[++len] = '\r';
   bufline->buf[++len] = '\n';
-  bufline->buf[++len] = '\0'; /* this restores len to correct length */
+  bufline->buf[++len] = '\0';   /* this restores len to correct length */
 
-  bufline->len  = len;
+  bufline->len = len;
   bufhead->len += len;
 
   bufline->terminated = 1;
@@ -607,16 +607,16 @@ linebuf_putmsg(buf_head_t *bufhead, const char *format, va_list va_args,
  * DO know you are getting a single line.
  */
 void
-linebuf_put(buf_head_t *bufhead, char *buf, int buflen)
+linebuf_put(buf_head_t * bufhead, char *buf, int buflen)
 {
   buf_line_t *bufline;
 
   /* make sure the previous line is terminated */
   if (bufhead->list.tail)
-    {
-      bufline = bufhead->list.tail->data;
-      assert(bufline->terminated);
-    }
+  {
+    bufline = bufhead->list.tail->data;
+    assert(bufline->terminated);
+  }
 
   /* Create a new line */
   bufline = linebuf_new_line(bufhead);
@@ -666,39 +666,39 @@ linebuf_put(buf_head_t *bufhead, char *buf, int buflen)
  *        we have a CRLF.
  */
 int
-linebuf_flush(int fd, buf_head_t *bufhead)
+linebuf_flush(int fd, buf_head_t * bufhead)
 {
   buf_line_t *bufline;
   int retval;
-  
+
   /* Check we actually have a first buffer */
   if (bufhead->list.head == NULL)
-    {
-      /* nope, so we return none .. */
-      errno = EWOULDBLOCK;
-      return -1;    
-    }
+  {
+    /* nope, so we return none .. */
+    errno = EWOULDBLOCK;
+    return -1;
+  }
 
   bufline = bufhead->list.head->data;
 
   /* And that its actually full .. */
   if (!bufline->terminated)
-    {
-      errno = EWOULDBLOCK;
-      return -1;
-    }
-    
+  {
+    errno = EWOULDBLOCK;
+    return -1;
+  }
+
   /* Check we're flushing the first buffer */
   if (!bufline->flushing)
-    {
-      bufline->flushing = 1;
-      bufhead->writeofs = 0;
-    }
+  {
+    bufline->flushing = 1;
+    bufhead->writeofs = 0;
+  }
 
   /* Now, try writing data */
   retval = write(fd, bufline->buf + bufhead->writeofs, bufline->len
-		 - bufhead->writeofs);
-   
+                 - bufhead->writeofs);
+
   /* Deal with return code */
   if (retval < 0)
     return retval;
@@ -711,11 +711,11 @@ linebuf_flush(int fd, buf_head_t *bufhead)
   /* if we've written everything *and* the CRLF, deallocate and update
      bufhead */
   if (bufhead->writeofs == bufline->len)
-    {
-      bufhead->writeofs = 0;
-      assert(bufhead->len >=0);
-      linebuf_done_line(bufhead, bufline, bufhead->list.head);
-    }
+  {
+    bufhead->writeofs = 0;
+    assert(bufhead->len >= 0);
+    linebuf_done_line(bufhead, bufline, bufhead->list.head);
+  }
 
   /* Return line length */
   return retval;
@@ -725,7 +725,8 @@ linebuf_flush(int fd, buf_head_t *bufhead)
  * count linebufs for s_debug
  */
 
-void count_linebuf_memory(int *count, u_long *linebuf_memory_used)
+void
+count_linebuf_memory(int *count, u_long * linebuf_memory_used)
 {
   *count = bufline_count;
   *linebuf_memory_used = bufline_count * sizeof(buf_line_t);

@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_ping.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_ping.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -34,8 +34,8 @@
 #include "hash.h"
 #include "s_conf.h"
 
-static void m_ping(struct Client*, struct Client*, int, char**);
-static void ms_ping(struct Client*, struct Client*, int, char**);
+static void m_ping(struct Client *, struct Client *, int, char **);
+static void ms_ping(struct Client *, struct Client *, int, char **);
 
 struct Message ping_msgtab = {
   "PING", 0, 0, 1, 0, MFLG_SLOW, 0,
@@ -55,7 +55,7 @@ _moddeinit(void)
   mod_del_cmd(&ping_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** m_ping
@@ -63,13 +63,12 @@ char *_version = "$Revision: 1.1 $";
 **      parv[1] = origin
 **      parv[2] = destination
 */
-static void m_ping(struct Client *client_p,
-                  struct Client *source_p,
-                  int parc,
-                  char *parv[])
+static void
+m_ping(struct Client *client_p,
+       struct Client *source_p, int parc, char *parv[])
 {
   struct Client *target_p;
-  char  *origin, *destination;
+  char *origin, *destination;
 
   if (parc < 2 || *parv[1] == '\0')
   {
@@ -78,13 +77,13 @@ static void m_ping(struct Client *client_p,
   }
 
   origin = parv[1];
-  destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
+  destination = parv[2];        /* Will get NULL or pointer (parc >= 2!!) */
 
   if (ConfigServerHide.disable_remote && !IsOper(source_p))
   {
-   sendto_one(source_p,":%s PONG %s :%s", me.name,
-              (destination) ? destination : me.name, origin);
-   return;
+    sendto_one(source_p, ":%s PONG %s :%s", me.name,
+               (destination) ? destination : me.name, origin);
+    return;
   }
 
 /* Screw this, origin == clients nick if remote, what they sent if local --fl_  */
@@ -102,8 +101,7 @@ static void m_ping(struct Client *client_p,
     /* We're sending it across servers.. origin == client_p->name --fl_ */
     origin = client_p->name;
     if ((target_p = find_server(destination)))
-      sendto_one(target_p,":%s PING %s :%s", parv[0],
-                 origin, destination);
+      sendto_one(target_p, ":%s PING %s :%s", parv[0], origin, destination);
     else
     {
       sendto_one(source_p, form_str(ERR_NOSUCHSERVER),
@@ -112,17 +110,16 @@ static void m_ping(struct Client *client_p,
     }
   }
   else
-    sendto_one(source_p,":%s PONG %s :%s", me.name,
+    sendto_one(source_p, ":%s PONG %s :%s", me.name,
                (destination) ? destination : me.name, origin);
 }
 
-static void ms_ping(struct Client *client_p,
-                   struct Client *source_p,
-                   int parc,
-                   char *parv[])
+static void
+ms_ping(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   struct Client *target_p;
-  char  *origin, *destination;
+  char *origin, *destination;
 
   if (parc < 2 || *parv[1] == '\0')
   {
@@ -135,7 +132,7 @@ static void ms_ping(struct Client *client_p,
   origin = parv[1];
 #endif
   origin = source_p->name;
-  destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
+  destination = parv[2];        /* Will get NULL or pointer (parc >= 2!!) */
 
 #if 0
   target_p = find_client(origin, NULL);
@@ -148,8 +145,7 @@ static void ms_ping(struct Client *client_p,
   if (!EmptyString(destination) && !match(destination, me.name))
   {
     if ((target_p = find_server(destination)))
-      sendto_one(target_p,":%s PING %s :%s", parv[0],
-                 origin, destination);
+      sendto_one(target_p, ":%s PING %s :%s", parv[0], origin, destination);
     else
     {
       sendto_one(source_p, form_str(ERR_NOSUCHSERVER),
@@ -158,7 +154,6 @@ static void ms_ping(struct Client *client_p,
     }
   }
   else
-    sendto_one(source_p,":%s PONG %s :%s", me.name,
+    sendto_one(source_p, ":%s PONG %s :%s", me.name,
                (destination) ? destination : me.name, origin);
 }
-

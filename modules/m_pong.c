@@ -20,13 +20,13 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_pong.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ *   $Id: m_pong.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "ircd.h"
 #include "handlers.h"
 #include "s_user.h"
 #include "client.h"
-#include "hash.h"       /* for find_client() */
+#include "hash.h"               /* for find_client() */
 #include "numeric.h"
 #include "s_conf.h"
 #include "send.h"
@@ -38,8 +38,8 @@
 #include "hash.h"
 #include "modules.h"
 
-static void mr_pong(struct Client*, struct Client*, int, char**);
-static void ms_pong(struct Client*, struct Client*, int, char**);
+static void mr_pong(struct Client *, struct Client *, int, char **);
+static void ms_pong(struct Client *, struct Client *, int, char **);
 
 struct Message pong_msgtab = {
   "PONG", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0,
@@ -59,21 +59,20 @@ _moddeinit(void)
   mod_del_cmd(&pong_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
-static void ms_pong(struct Client *client_p,
-                   struct Client *source_p,
-                   int parc,
-                   char *parv[])
+static void
+ms_pong(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   struct Client *target_p;
-  char  *origin, *destination;
+  char *origin, *destination;
 
   if (parc < 2 || *parv[1] == '\0')
-    {
-      sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, parv[0]);
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, parv[0]);
+    return;
+  }
 
   origin = parv[1];
   destination = parv[2];
@@ -86,18 +85,17 @@ static void ms_pong(struct Client *client_p,
    * case can be made to allow them only from servers). -Shadowfax
    */
   if (!EmptyString(destination) && !match(destination, me.name))
+  {
+    if ((target_p = find_client(destination)) ||
+        (target_p = find_server(destination)))
+      sendto_one(target_p, ":%s PONG %s %s", parv[0], origin, destination);
+    else
     {
-      if ((target_p = find_client(destination)) ||
-          (target_p = find_server(destination)))
-        sendto_one(target_p,":%s PONG %s %s",
-                   parv[0], origin, destination);
-      else
-        {
-          sendto_one(source_p, form_str(ERR_NOSUCHSERVER),
-                     me.name, parv[0], destination);
-          return;
-        }
+      sendto_one(source_p, form_str(ERR_NOSUCHSERVER),
+                 me.name, parv[0], destination);
+      return;
     }
+  }
 
 #ifdef  DEBUGMODE
   else
@@ -107,35 +105,36 @@ static void ms_pong(struct Client *client_p,
   return;
 }
 
-static void mr_pong(struct Client *client_p,
-                    struct Client *source_p,
-                    int parc,
-                    char *parv[])
+static void
+mr_pong(struct Client *client_p,
+        struct Client *source_p, int parc, char *parv[])
 {
   if (parc == 2 && *parv[1] != '\0')
+  {
+    if (ConfigFileEntry.ping_cookie && source_p->user && source_p->name[0])
     {
-      if(ConfigFileEntry.ping_cookie && source_p->user && source_p->name[0])
+      unsigned long incoming_ping = strtoul(parv[1], (char **)NULL, 10);
+      if (incoming_ping)
       {
-	unsigned long incoming_ping = strtoul(parv[1], (char **)NULL, 10);
-	if(incoming_ping)
-	{
-	  if(source_p->random_ping == incoming_ping)
-	  {
-		char buf[USERLEN+1];
-		strlcpy(buf, source_p->username, USERLEN);
-		source_p->flags2 |= FLAGS2_PING_COOKIE;
-		register_local_user(client_p, source_p, source_p->name, buf);
-	  } else
-	  {
-		sendto_one(source_p, form_str(ERR_WRONGPONG), me.name, source_p->name, source_p->random_ping);
-		return;
-	  }
-	}
+        if (source_p->random_ping == incoming_ping)
+        {
+          char buf[USERLEN + 1];
+          strlcpy(buf, source_p->username, USERLEN);
+          source_p->flags2 |= FLAGS2_PING_COOKIE;
+          register_local_user(client_p, source_p, source_p->name, buf);
+        }
+        else
+        {
+          sendto_one(source_p, form_str(ERR_WRONGPONG), me.name,
+                     source_p->name, source_p->random_ping);
+          return;
+        }
       }
-     
-    } else
-    	sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, parv[0]);
-  
+    }
+
+  }
+  else
+    sendto_one(source_p, form_str(ERR_NOORIGIN), me.name, parv[0]);
+
   source_p->flags &= ~FLAGS_PINGSENT;
 }
-

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_nburst.c,v 1.1 2002/01/04 09:13:28 a1kmm Exp $
+ * $Id: m_nburst.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "tools.h"
 #include "channel.h"
@@ -41,7 +41,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static void ms_nburst(struct Client*, struct Client*, int, char**);
+static void ms_nburst(struct Client *, struct Client *, int, char **);
 
 struct Message nburst_msgtab = {
   "NBURST", 0, 0, 1, 0, MFLG_SLOW | MFLG_UNREG, 0L,
@@ -61,7 +61,7 @@ _moddeinit(void)
   mod_del_cmd(&nburst_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
 ** m_nburst
@@ -75,10 +75,9 @@ char *_version = "$Revision: 1.1 $";
  * the given LL capable server.
  */
 
-static void ms_nburst(struct Client *client_p,
-                     struct Client *source_p,
-                     int parc,
-                     char *parv[])
+static void
+ms_nburst(struct Client *client_p,
+          struct Client *source_p, int parc, char *parv[])
 {
   char *nick;
   char *nick_new = NULL;
@@ -86,15 +85,15 @@ static void ms_nburst(struct Client *client_p,
   struct Client *target_p;
   char status;
 
-  if( parc < 2 || *parv[1] == '\0' )
-     return;
+  if (parc < 2 || *parv[1] == '\0')
+    return;
 
   nick = parv[1];
 
-  if( parc > 2 )
+  if (parc > 2)
     nick_new = parv[2];
 
-  if( parc > 3 )
+  if (parc > 3)
     nick_old = parv[3];
 
   if (!ServerInfo.hub && IsCapable(client_p, CAP_LL))
@@ -102,10 +101,9 @@ static void ms_nburst(struct Client *client_p,
 
 #ifdef DEBUGLL
   sendto_realops_flags(FLAGS_ALL, L_ALL, "NBURST called by %s for %s %s %s",
-    client_p->name,
-    nick,
-    nick_new ? nick_new : "",
-    nick_old ? nick_old : "" );
+                       client_p->name,
+                       nick,
+                       nick_new ? nick_new : "", nick_old ? nick_old : "");
 #endif
 
   status = 'N';

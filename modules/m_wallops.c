@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_wallops.c,v 1.1 2002/01/04 09:13:35 a1kmm Exp $
+ *   $Id: m_wallops.c,v 1.2 2002/01/04 11:06:20 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -35,8 +35,8 @@
 #include "modules.h"
 #include "client.h"
 
-static void ms_wallops(struct Client*, struct Client*, int, char**);
-static void mo_wallops(struct Client*, struct Client*, int, char**);
+static void ms_wallops(struct Client *, struct Client *, int, char **);
+static void mo_wallops(struct Client *, struct Client *, int, char **);
 
 struct Message wallops_msgtab = {
   "WALLOPS", 0, 0, 2, 0, MFLG_SLOW, 0,
@@ -55,27 +55,28 @@ _moddeinit(void)
 {
   mod_del_cmd(&wallops_msgtab);
 }
- 
-char *_version = "$Revision: 1.1 $";
+
+char *_version = "$Revision: 1.2 $";
 #endif
 /*
  * mo_wallops (write to *all* opers currently online)
  *      parv[0] = sender prefix
  *      parv[1] = message text
  */
-static void mo_wallops(struct Client *client_p, struct Client *source_p,
-                      int parc, char *parv[])
-{ 
-  char* message;
+static void
+mo_wallops(struct Client *client_p, struct Client *source_p,
+           int parc, char *parv[])
+{
+  char *message;
 
   message = parv[1];
-  
+
   if (EmptyString(message))
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "WALLOPS");
-      return;
-    }
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "WALLOPS");
+    return;
+  }
 
   sendto_wallops_flags(FLAGS_OPERWALL, source_p, "%s", message);
   sendto_server(NULL, source_p, NULL, NOCAPS, NOCAPS, LL_ICLIENT,
@@ -87,26 +88,26 @@ static void mo_wallops(struct Client *client_p, struct Client *source_p,
  *      parv[0] = sender prefix
  *      parv[1] = message text
  */
-static void ms_wallops(struct Client *client_p, struct Client *source_p,
-                      int parc, char *parv[])
-{ 
-  char* message;
+static void
+ms_wallops(struct Client *client_p, struct Client *source_p,
+           int parc, char *parv[])
+{
+  char *message;
 
   message = parv[1];
-  
-  if (EmptyString(message))
-    {
-      sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
-                 me.name, parv[0], "WALLOPS");
-      return;
-    }
 
-  if(IsClient(source_p))
+  if (EmptyString(message))
+  {
+    sendto_one(source_p, form_str(ERR_NEEDMOREPARAMS),
+               me.name, parv[0], "WALLOPS");
+    return;
+  }
+
+  if (IsClient(source_p))
     sendto_wallops_flags(FLAGS_OPERWALL, source_p, "%s", message);
   else
-    sendto_wallops_flags(FLAGS_WALLOP, source_p, "%s", message); 
+    sendto_wallops_flags(FLAGS_WALLOP, source_p, "%s", message);
 
   sendto_server(client_p, source_p, NULL, NOCAPS, NOCAPS, LL_ICLIENT,
                 ":%s WALLOPS :%s", parv[0], message);
 }
-

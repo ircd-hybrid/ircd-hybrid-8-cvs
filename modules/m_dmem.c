@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_dmem.c,v 1.1 2002/01/04 09:13:16 a1kmm Exp $
+ *   $Id: m_dmem.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -39,7 +39,7 @@
 #include "parse.h"
 #include "modules.h"
 
-static void mo_dmem(struct Client*, struct Client*, int, char**);
+static void mo_dmem(struct Client *, struct Client *, int, char **);
 
 struct Message dmem_msgtab = {
   "DMEM", 0, 0, 0, 0, MFLG_SLOW, 0,
@@ -58,10 +58,10 @@ _moddeinit(void)
   mod_del_cmd(&dmem_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 #ifdef MEMDEBUG
-void ReportAllocated(struct Client*);
+void ReportAllocated(struct Client *);
 #endif
 
 /*
@@ -69,7 +69,8 @@ void ReportAllocated(struct Client*);
  *
  */
 static void
-mo_dmem(struct Client *client_p, struct Client *source_p, int parc, char *parv[])
+mo_dmem(struct Client *client_p, struct Client *source_p, int parc,
+        char *parv[])
 {
 #ifdef MEMDEBUG
   if (parc < 2)
@@ -78,6 +79,6 @@ mo_dmem(struct Client *client_p, struct Client *source_p, int parc, char *parv[]
     log_memory();
 #else
   sendto_one(source_p, ":%s NOTICE %s :Compiled without memory debugging",
-    me.name, source_p->name);
+             me.name, source_p->name);
 #endif
 }

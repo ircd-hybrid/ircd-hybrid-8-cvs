@@ -20,7 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: m_message.c,v 1.1 2002/01/04 09:13:25 a1kmm Exp $
+ *   $Id: m_message.c,v 1.2 2002/01/04 11:06:19 a1kmm Exp $
  */
 #include "handlers.h"
 #include "client.h"
@@ -122,7 +122,7 @@ _moddeinit(void)
   mod_del_cmd(&notice_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 #endif
 
 /*
@@ -176,7 +176,7 @@ m_message(int p_or_n,
 {
   int i;
 
-#if 0  /* Allow servers to send notices to individual people */
+#if 0                           /* Allow servers to send notices to individual people */
   if (!IsPerson(source_p))
     return;
 #endif
@@ -261,8 +261,7 @@ m_message(int p_or_n,
 
 static int
 build_target_list(int p_or_n, char *command, struct Client *client_p,
-                  struct Client *source_p, char *nicks_channels,
-                  char *text)
+                  struct Client *source_p, char *nicks_channels, char *text)
 {
   int type;
   char *p, *nick, *target_list, ncbuf[BUFSIZE];
@@ -276,7 +275,7 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
     target_list = ncbuf;
   }
   else
-    target_list = nicks_channels; /* skip strcpy for non-lazyleafs */
+    target_list = nicks_channels;       /* skip strcpy for non-lazyleafs */
 
   ntargets = 0;
 
@@ -330,7 +329,7 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
         continue;
       }
     }
-    
+
     /* @#channel or +#channel message ? */
 
     type = 0;
@@ -366,13 +365,13 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
       if ((chptr = hash_find_channel(nick)) != NULL)
       {
 
-        if(!is_any_op(chptr, source_p) && !is_voiced(chptr, source_p))
+        if (!is_any_op(chptr, source_p) && !is_voiced(chptr, source_p))
         {
           sendto_one(source_p, form_str(ERR_NOSUCHNICK),
                      me.name, source_p->name, with_prefix);
           continue;
         }
-	
+
         if (!duplicate_ptr(chptr))
         {
           targets[ntargets].ptr = (void *)chptr;
@@ -395,7 +394,7 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
       }
     }
 
-    if(IsOper(source_p) && ((*nick == '$') || strchr(nick, '@')))
+    if (IsOper(source_p) && ((*nick == '$') || strchr(nick, '@')))
     {
       handle_opers(p_or_n, command, client_p, source_p, nick, text);
       continue;
@@ -404,9 +403,9 @@ build_target_list(int p_or_n, char *command, struct Client *client_p,
     {
       if (!ServerInfo.hub && uplink && IsCapable(uplink, CAP_LL))
         return -1;
-      else if(p_or_n != NOTICE)
+      else if (p_or_n != NOTICE)
         sendto_one(source_p, form_str(ERR_NOSUCHNICK),
-	           me.name, source_p->name, nick);
+                   me.name, source_p->name, nick);
       continue;
     }
   }
@@ -549,8 +548,8 @@ msg_channel_flags(int p_or_n, char *command, struct Client *client_p,
     return;
 
   sendto_channel_remote(source_p, client_p, type, CAP_CHW, NOCAPS, vchan,
-                ":%s %s %c%s :%s", source_p->name, command, c,
-                vchan->chname, text);
+                        ":%s %s %c%s :%s", source_p->name, command, c,
+                        vchan->chname, text);
   /* non CAP_CHW servers? */
 }
 
@@ -799,18 +798,18 @@ handle_opers(int p_or_n,
      **
      ** Armin, 8Jun90 (gruner@informatik.tu-muenchen.de)
    */
-  if(*nick == '$')
+  if (*nick == '$')
   {
-    if((*(nick+1) == '$' || *(nick+1) == '#'))
+    if ((*(nick + 1) == '$' || *(nick + 1) == '#'))
       nick++;
-    else if(MyOper(source_p))
+    else if (MyOper(source_p))
     {
-      sendto_one(source_p, 
+      sendto_one(source_p,
                  ":%s NOTICE %s :The command %s %s is no longer supported, please use $%s",
-		 me.name, source_p->name, command, nick, nick);
+                 me.name, source_p->name, command, nick, nick);
       return;
     }
-      
+
     if (!(s = (char *)strrchr(nick, '.')))
     {
       sendto_one(source_p, form_str(ERR_NOTOPLEVEL),
@@ -826,7 +825,7 @@ handle_opers(int p_or_n,
                  me.name, source_p->name, nick);
       return;
     }
-    
+
     sendto_match_butone(IsServer(client_p) ? client_p : NULL, source_p,
                         nick + 1,
                         (*nick == '#') ? MATCH_HOST : MATCH_SERVER,
