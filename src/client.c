@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: client.c,v 1.5 2002/02/26 04:55:54 a1kmm Exp $
+ *  $Id: client.c,v 1.6 2002/04/19 10:56:20 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -461,67 +461,26 @@ check_klines(void)
 
     if (IsPerson(client_p))
     {
-      if (ConfigFileEntry.glines &&
-          (aconf = find_gkill(client_p, client_p->username)))
+      if ((aconf = find_kill(client_p)))
       {
-        if (IsExemptKline(client_p))
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "GLINE over-ruled for %s, client is kline_exempt",
-                               get_client_name(client_p, HIDE_IP));
-          continue;
-        }
-
-        if (IsExemptGline(client_p))
-        {
-          sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "GLINE over-ruled for %s, client is gline_exempt",
-                               get_client_name(client_p, HIDE_IP));
-          continue;
-        }
-
-        sendto_realops_flags(FLAGS_ALL, L_ALL, "GLINE active for %s",
-                             get_client_name(client_p, HIDE_IP));
-
-        if (ConfigFileEntry.kline_with_connection_closed &&
-            ConfigFileEntry.kline_with_reason)
-        {
-          reason = "Connection closed";
-
-          sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
-                     me.name, client_p->name,
-                     aconf->passwd ? aconf->passwd : "G-lined");
-        }
+        char *type;
+        if (aconf->flags & BAN_FLAGS_GLINE)
+          type = "GLINE";
+        else if (aconf->flags & BAN_FLAGS_TEMPORARY)
+          type = "TKLINE";
         else
-        {
-          if (ConfigFileEntry.kline_with_connection_closed)
-            reason = "Connection closed";
-          else if (ConfigFileEntry.kline_with_reason && aconf->passwd)
-            reason = aconf->passwd;
-          else
-            reason = "G-lined";
-
-          sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
-                     me.name, client_p->name, reason);
-        }
-
-        (void)exit_client(client_p, client_p, &me, reason);
-        /* and go examine next fd/client_p */
-        continue;
-      }
-      else if ((aconf = find_kill(client_p)))
-      {
+          type = "KLINE";
         /* if there is a returned struct ConfItem.. then kill it */
         if (IsExemptKline(client_p))
         {
           sendto_realops_flags(FLAGS_ALL, L_ALL,
-                               "KLINE over-ruled for %s, client is kline_exempt",
-                               get_client_name(client_p, HIDE_IP));
+                               "%s over-ruled for %s, client is kline_exempt",
+                               type, get_client_name(client_p, HIDE_IP));
           continue;
         }
 
-        sendto_realops_flags(FLAGS_ALL, L_ALL, "KLINE active for %s",
-                             get_client_name(client_p, HIDE_IP));
+        sendto_realops_flags(FLAGS_ALL, L_ALL, "%s active for %s",
+                             type, get_client_name(client_p, HIDE_IP));
 
         if (ConfigFileEntry.kline_with_connection_closed &&
             ConfigFileEntry.kline_with_reason)
@@ -530,7 +489,7 @@ check_klines(void)
 
           sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
                      me.name, client_p->name,
-                     aconf->passwd ? aconf->passwd : "K-lined");
+                     aconf->passwd ? aconf->passwd : type);
         }
         else
         {
@@ -539,7 +498,7 @@ check_klines(void)
           else if (ConfigFileEntry.kline_with_reason && aconf->passwd)
             reason = aconf->passwd;
           else
-            reason = "K-lined";
+            reason = "Banned";
 
           sendto_one(client_p, form_str(ERR_YOUREBANNEDCREEP),
                      me.name, client_p->name, reason);

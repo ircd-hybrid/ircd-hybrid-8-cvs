@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: s_conf.c,v 1.5 2002/02/26 04:55:55 a1kmm Exp $
+ *  $Id: s_conf.c,v 1.6 2002/04/19 10:56:20 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -1794,7 +1794,7 @@ add_temp_kline(struct ConfItem *aconf)
   dlink_node *kill_node;
   kill_node = make_dlink_node();
   dlinkAdd(aconf, kill_node, &temporary_klines);
-  aconf->flags |= CONF_FLAGS_TEMPORARY;
+  aconf->flags |= BAN_FLAGS_TEMPORARY;
   add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
 }
 
@@ -1833,8 +1833,9 @@ expire_tklines(dlink_list * tklist)
     if (kill_ptr->hold <= CurrentTime)
     {
       /* Alert opers that a TKline expired - Hwy */
-      sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "Temporary K-line for [%s@%s] expired",
+      sendto_realops_flags(FLAGS_ALL, L_ALL, "%s-line for [%s@%s] expired",
+                           (kill_ptr->flags & BAN_FLAGS_GLINE) ? "G"
+                             : "Temporary K",
                            (kill_ptr->user) ? kill_ptr->user : "*",
                            (kill_ptr->host) ? kill_ptr->host : "*");
 
@@ -2298,31 +2299,31 @@ flush_deleted_I_P(void)
 }
 
 /*
- * WriteKlineOrDline
+ * write_ban
  *
- * inputs       - kline or dline type flag
- *              - client pointer to report to
- *              - user name of target
- *              - host name of target
- *              - reason for target
- *              - time_t cur_time
- * output       - NONE
- * side effects - This function takes care of
- *                finding right kline or dline conf file, writing
- *                the right lines to this file, 
- *                notifying the oper that their kline/dline is in place
- *                notifying the opers on the server about the k/d line
- *                forwarding the kline onto the next U lined server
- *                
+ * inputs: type       - type of ban
+ *         source_p   - client pointer to report to
+ *         user       - user name of target
+ *         host       - host name of target
+ *         reason     - reason for target
+ *         oper_reason- reason only admins can see
+ *         cur_time   - time ban was placed
+ * output: none
+ * side effects: This function takes care of
+ *               finding right kline or dline conf file, writing
+ *               the right lines to this file, 
+ *               notifying the oper that their kline/dline is in place
+ *               notifying the opers on the server about the k/d line
+ *               forwarding the kline onto the next U lined server
  */
 void
-WriteKlineOrDline(KlineType type,
-                  struct Client *source_p,
-                  char *user,
-                  char *host,
-                  const char *reason,
-                  const char *oper_reason,
-                  const char *current_date, time_t cur_time)
+write_ban(KlineType type,
+          struct Client *source_p,
+          char *user,
+          char *host,
+          const char *reason,
+          const char *oper_reason,
+          const char *current_date, time_t cur_time)
 {
   char buffer[1024];
   FBFILE *out;
@@ -2330,49 +2331,40 @@ WriteKlineOrDline(KlineType type,
 
   filename = get_conf_name(type);
 
-  if (type == DLINE_TYPE)
+  if (oper_reason == NULL)
+    oper_reason = "";
+  switch (type)
   {
-    sendto_realops_flags(FLAGS_ALL, L_ALL,
-                         "%s added D-Line for [%s] [%s]",
-                         get_oper_name(source_p), host, reason);
-    sendto_one(source_p, ":%s NOTICE %s :Added D-Line [%s] to %s",
-               me.name, source_p->name, host, filename);
-
+    case DLINE_TYPE:
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "%s added D-Line for [%s] [%s]",
+                           get_oper_name(source_p), host, reason);
+      sendto_one(source_p, ":%s NOTICE %s :Added D-Line [%s] to %s",
+                 me.name, source_p->name, host, filename);
+      ircsprintf(buffer, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n",
+                 user, host, reason, oper_reason, current_date,
+                 get_oper_name(source_p), (long)cur_time);
+      break;
+    case KLINE_TYPE:
+      sendto_realops_flags(FLAGS_ALL, L_ALL,
+                           "%s added K-Line for [%s@%s] [%s]",
+                           get_oper_name(source_p), user, host, reason);
+      sendto_one(source_p, ":%s NOTICE %s :Added K-Line [%s@%s]",
+                 me.name, source_p->name, user, host);
+    default:
+      ircsprintf(buffer, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n", host,
+                 reason, oper_reason, current_date, get_oper_name(source_p),
+                 (long)cur_time);
+      break;
   }
-  else
-  {
-    sendto_realops_flags(FLAGS_ALL, L_ALL,
-                         "%s added K-Line for [%s@%s] [%s]",
-                         get_oper_name(source_p), user, host, reason);
-    sendto_one(source_p, ":%s NOTICE %s :Added K-Line [%s@%s]",
-               me.name, source_p->name, user, host);
-  }
 
+  /* Now actually write it... */
   if ((out = fbopen(filename, "a")) == NULL)
   {
     sendto_realops_flags(FLAGS_ALL, L_ALL,
                          "*** Problem opening %s ", filename);
     return;
   }
-
-  if (oper_reason == NULL)
-    oper_reason = "";
-
-  if (type == KLINE_TYPE)
-    ircsprintf(buffer, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n",
-               user,
-               host,
-               reason,
-               oper_reason,
-               current_date, get_oper_name(source_p), (long)cur_time);
-  else
-    ircsprintf(buffer, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld\n",
-               host,
-               reason,
-               oper_reason,
-               current_date, get_oper_name(source_p), (long)cur_time);
-
-
   if (fbputs(buffer, out) == -1)
   {
     sendto_realops_flags(FLAGS_ALL, L_ALL,
@@ -2380,15 +2372,15 @@ WriteKlineOrDline(KlineType type,
     fbclose(out);
     return;
   }
-
   fbclose(out);
 
   if (type == KLINE_TYPE)
     ilog(L_TRACE, "%s added K-Line for [%s@%s] [%s]",
          source_p->name, user, host, reason);
-  else
+  else if (type == DLINE_TYPE)
     ilog(L_TRACE, "%s added D-Line for [%s] [%s]",
          get_oper_name(source_p), host, reason);
+  /* glines have their own logging. */
 }
 
 /* get_conf_name
@@ -2401,15 +2393,12 @@ const char *
 get_conf_name(KlineType type)
 {
   if (type == CONF_TYPE)
-  {
-    return (ConfigFileEntry.configfile);
-  }
+    return ConfigFileEntry.configfile;
   else if (type == KLINE_TYPE)
-  {
-    return (ConfigFileEntry.klinefile);
-  }
-
-  return (ConfigFileEntry.dlinefile);
+    return ConfigFileEntry.klinefile;
+  else if (type == GLINE_TYPE)
+    return ConfigFileEntry.glineconffile;
+  return ConfigFileEntry.dlinefile;
 }
 
 /*

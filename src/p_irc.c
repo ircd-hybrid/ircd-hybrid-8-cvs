@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_irc.c,v 1.2 2002/02/26 04:55:55 a1kmm Exp $
+ *   $Id: p_irc.c,v 1.3 2002/04/19 10:56:20 a1kmm Exp $
  */
 
 #include "client.h"
@@ -126,36 +126,26 @@ usr_burst_channel(struct Client *client_p, struct Channel *chptr,
 /* Some special protocols are declared here... */
 struct Protocol p_unregistered =
 {
-  NULL,                /* Parent. */
-  &irc_unregistered,   /* Outgoing: Unregistered. */
-  NULL,                /* Outgoing: Registered. */
-  &irc_not_oper,       /* Outgoing: Not an IRC operator. */
-  &irc_error,          /* Incoming/Outgoing: error. */
-  NULL,                /* Outgoing: No such command. */
-  &irc_toofew_params,  /* Outgoing: Too few parameters. */
-  NULL,                /* Outgoing: Burst channel. */
+  m_unregistered: &irc_unregistered,
+  m_not_oper: &irc_not_oper,
+  m_error: &irc_error,
+  toofew_params: &irc_toofew_params
 };
 
 struct Protocol p_user =
 {
-  NULL,                /* Parent. */
-  NULL,                /* Outgoing: Unregistered. */
-  &irc_registered,     /* Outgoing: Registered. */
-  &irc_not_oper,       /* Outgoing: Not an IRC operator. */
-  NULL,                /* Incoming/Outgoing: error. */
-  &irc_illegal_command,/* Outgoing: No such command. */
-  &irc_toofew_params,  /* Outgoing: Too few parameters. */
-  &usr_burst_channel,  /* Outgoing: Burst channel. */
+  m_registered: &irc_registered,
+  m_not_oper: &irc_not_oper,
+  illegal_command: &irc_illegal_command,
+  toofew_params: &irc_toofew_params,
+  burst_channel: &usr_burst_channel
 };
 
 struct Protocol p_operuser =
 {
-  &p_user,             /* Parent. */
-  NULL,                /* Outgoing: Unregistered. */
-  &irc_registered,     /* Outgoing: Registered. */
-  NULL,                /* Outgoing: Not an IRC operator. */
-  NULL,                /* Incoming/Outgoing: error. */
-  &irc_illegal_command,/* Outgoing: No such command. */
-  &irc_toofew_params,  /* Outgoing: Too few parameters. */
-  &usr_burst_channel,  /* Outgoing: Burst channel. */
+  parent: &p_user,
+  m_registered: &irc_registered,
+  illegal_command: &irc_illegal_command,
+  toofew_params: &irc_toofew_params,
+  burst_channel: &usr_burst_channel
 };

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- * $Id: s_conf.h,v 1.3 2002/01/06 07:18:13 a1kmm Exp $
+ * $Id: s_conf.h,v 1.4 2002/04/19 10:56:14 a1kmm Exp $
  */
 
 #ifndef INCLUDED_s_conf_h
@@ -134,8 +134,12 @@ struct ConfItem
 #define CONF_FLAGS_LAZY_LINK            0x00010000
 #define CONF_FLAGS_ENCRYPTED            0x00020000
 #define CONF_FLAGS_COMPRESSED           0x00040000
-#define CONF_FLAGS_TEMPORARY            0x00080000
-#define CONF_FLAGS_CRYPTLINK            0x00100000
+#define CONF_FLAGS_CRYPTLINK            0x00080000
+
+/* ban conf flags... */
+#define BAN_FLAGS_TEMPORARY             0x00000001
+#define BAN_FLAGS_GLINE                 0x00000002
+
 /* Macros for struct ConfItem */
 
 #define IsLimitIp(x)            ((x)->flags & CONF_FLAGS_LIMIT_IP)
@@ -174,6 +178,7 @@ struct config_file_entry
   char *configfile;
   char *klinefile;
   char *dlinefile;
+  char *glineconffile;
 
   char *glinefile;
 
@@ -381,17 +386,17 @@ extern int conf_fbgets(char *, int, FBFILE *);
 typedef enum {
   CONF_TYPE,
   KLINE_TYPE,
-  DLINE_TYPE
+  DLINE_TYPE,
+  GLINE_TYPE
 } KlineType;
 
-extern void WriteKlineOrDline( KlineType, struct Client *,
-			       char *user, char *host, const char *reason,
-			       const char *oper_reason,
-			       const char *current_date, time_t cur_time );
-extern  void    add_temp_kline(struct ConfItem *);
-extern  void    report_temp_klines(struct Client *);
-extern  void    show_temp_klines(struct Client *, dlink_list *);
-extern  void    cleanup_tklines(void *notused);
+extern void write_ban(KlineType, struct Client *, char *user, char *host,
+                      const char *reason, const char *oper_reason,
+                      const char *current_date, time_t cur_time);
+extern void add_temp_kline(struct ConfItem *);
+extern void report_temp_klines(struct Client *);
+extern void show_temp_klines(struct Client *, dlink_list *);
+extern void cleanup_tklines(void *notused);
 
 extern  const   char *get_conf_name(KlineType);
 extern  int     rehash (int);

@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: config.h,v 1.3 2002/01/13 07:15:10 a1kmm Exp $
+ * $Id: config.h,v 1.4 2002/04/19 10:56:14 a1kmm Exp $
  */
 
 #ifndef INCLUDED_config_h
@@ -99,6 +99,7 @@
 #define SLPATH  BINPATH "]SERVLINK.EXE"          /* servlink executable */
 #define CPATH   ETCPATH "]IRCD.CONF"             /* config file */
 #define KPATH   ETCPATH "]KLINE.CONF"            /* kline file */
+#define GCPATH  ETCPATH "]GLINE.CONF"            /* gline file */
 #define DLPATH  ETCPATH "]DLINE.CONF"            /* dline file */
 #define GPATH   LOGPATH "]GLINE.LOG"             /* gline logfile */
 #define RPATH   ETCPATH "]IRCD.RSA"              /* RSA private key file */
@@ -145,6 +146,7 @@
 #define SLPATH  BINPATH "/servlink"             /* servlink executable */
 #define CPATH   ETCPATH "/ircd.conf"            /* ircd.conf file */
 #define KPATH   ETCPATH "/kline.conf"           /* kline file */
+#define GCPATH  ETCPATH "/gline.conf"           /* gline file */
 #define DLPATH  ETCPATH "/dline.conf"           /* dline file */
 #define GPATH   LOGPATH "/gline.log"            /* gline logfile */
 #define RPATH   ETCPATH "/ircd.rsa"             /* ircd rsa private keyfile */

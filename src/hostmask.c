@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * $Id: hostmask.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $ 
+ * $Id: hostmask.c,v 1.4 2002/04/19 10:56:20 a1kmm Exp $ 
  */
 
 #include <stdlib.h>
@@ -236,6 +236,122 @@ parse_netmask(const char *text, struct irc_inaddr *addr, int *b)
   if (strchr(text, '.'))
     return try_parse_v4_netmask(text, addr, b);
   return HM_HOST;
+}
+
+#define RecordHex(ptr,num)\
+{\
+  int p1 = (num & 0xF0) >> 4, p2 = num & 0xF;\
+  *ptr++ = p1 >= 0xA ? (p1 + 'A' - 0xA) : (p1 + '0')\
+  *ptr++ = p2 >= 0xA ? (p2 + 'A' - 0xA) : (p2 + '0')\
+}
+
+#define RecordDec(ptr,num)\
+{\
+  int d1 = num / 100, d2 = num / 10 % 10, d3 = num % 10;\
+  if (d1 > 0)\
+    *ptr++ = d1 + '0';\
+  if (d2 > 0)\
+    *ptr++ = d2 + '0';\
+  if (d3 > 0)\
+    *ptr++ = d3 + '0';\
+}
+
+/* Lets us display an address as CIDR. */
+/* Input: addr    - an IPV4/6 address.
+ *        bits    - number of bits in the mask.
+ *        type    - HM_IPV4 or HM_IPV6
+ * Output: A pointer to a static buffer containing the formated string.
+ * Side-effects: Clobbers the pointer returned by previous calls to
+ *               this function.
+ */
+const char*
+format_netmask(struct irc_inaddr *addr, int bits, int type)
+{
+  static char buffer[3 * 7 + 2 + 1 + 3 + 1];
+  char *p = buffer;
+#ifdef IPV6
+  if (type == HM_IPV6)
+  {
+    int bl = bits, i = 0;
+    if (bits > 128 || bits < 0)
+    {
+      bits = 128;
+      bl = 128;
+    }
+    while (bl >= 16)
+    {
+      RecordHex(p, addr->sins.sin6.s6_addr16[i++]);
+      if (i < 8)
+        *p++ = ':';
+    }
+    if (i < 8 && bl != 0)
+    {
+      /* Mask off the remaining bits... */
+      unsigned long n = addr->sins.sin6.s6_addr16[i++];
+      n &= ~ (1 << bl) - 1;
+      RecordHex(p, n);
+      if (i < 8)
+        *p++ = ':';
+    }
+    /* Fill in the remainder with zeros... */
+    while (i < 8)
+    {
+      *p++ = '0';
+      *p++ = '0';
+      if (++i < 8)
+        *p++ = ':';
+    }
+    if (bits < 128)
+    {
+      *p++ = '/';
+      RecordDec(p, bits);
+    }
+    *p++ = 0;
+    return buffer;
+  }
+  else
+  {
+#endif
+    int bl = bits, i = 0;
+    if (bits > 32 || bits < 0)
+    {
+      bits = 32;
+      bl = 32;
+    }
+    while (bl >= 8)
+    {
+      RecordDec(p, (addr->sins.sin.s_addr & (3<<i)) << 8 >> i++);
+      if (i < 4)
+        *p++ = '.';
+    }
+    if (i < 8 && bl != 0)
+    {
+      /* Mask off the remaining bits... */
+      unsigned long n = (addr->sins.sin.s_addr & (3<<i)) << 8 >> i++;
+      n &= ~ (1 << bl) - 1;
+      RecordDec(p, n);
+      if (i < 4)
+        *p++ = '.';
+    }
+    /* Fill in the remainder with zeros... */
+    while (i < 4)
+    {
+      *p++ = '0';
+      if (++i < 8)
+        *p++ = '.';
+    }
+    if (bits < 128)
+    {
+      *p++ = '/';
+      RecordDec(p, bits);
+    }
+    *p++ = 0;
+    return buffer;
+#ifdef IPV6
+  }
+  /* Not reached. */
+  return NULL;
+#endif
 }
 
 /* The address matching stuff... */
@@ -628,14 +744,14 @@ clear_out_address_conf(void)
       arecn = arec->next;
       /* We keep the temporary K-lines and destroy the
        * permanent ones, just to be confusing :) -A1kmm */
-      if (arec->aconf->flags & CONF_FLAGS_TEMPORARY)
+      if (arec->aconf->flags & BAN_FLAGS_TEMPORARY)
       {
         *store_next = arec;
         store_next = &arec->next;
       }
       else
       {
-        arec->aconf->flags |= CONF_ILLEGAL;
+        arec->aconf->status |= CONF_ILLEGAL;
         if (!arec->aconf->clients)
           free_conf(arec->aconf);
         MyFree(arec);
@@ -757,9 +873,9 @@ report_Klines(struct Client *client_p, int tkline, int mask)
     for (arec = atable[i]; arec; arec = arec->next)
       if (arec->type == CONF_KILL)
       {
-        if ((tkline && !((aconf = arec->aconf)->flags & CONF_FLAGS_TEMPORARY))
+        if ((tkline && !((aconf = arec->aconf)->flags & BAN_FLAGS_TEMPORARY))
             || (!tkline
-                && ((aconf = arec->aconf)->flags & CONF_FLAGS_TEMPORARY)))
+                && ((aconf = arec->aconf)->flags & BAN_FLAGS_TEMPORARY)))
           continue;
         get_printable_conf(aconf, &name, &host, &pass, &user, &port,
                            &classname);

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: balloc.c,v 1.5 2002/01/06 09:20:35 a1kmm Exp $
+ *   $Id: balloc.c,v 1.6 2002/04/19 10:56:19 a1kmm Exp $
  */
 
 /* A note on the algorithm:
@@ -102,6 +102,10 @@ static INLINE void* get_block(size_t size);
 
 #ifdef HAVE_MMAP /* We've got mmap() that is good */
 #include <sys/mman.h>
+
+#if defined(MMAP_ANONYMOUS) && !defined(MMAP_ANON)
+#define MMAP_ANON MMAP_ANONYMOUS
+#endif
 
 /*
  * static inline void free_block(void *ptr, size_t size)

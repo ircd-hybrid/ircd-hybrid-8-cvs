@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: p_ts.c,v 1.1 2002/01/13 07:15:39 a1kmm Exp $
+ *   $Id: p_ts.c,v 1.2 2002/04/19 10:56:20 a1kmm Exp $
  */
 
 #include "s_protocol.h"
@@ -54,13 +54,8 @@ tsm_error(struct Client *client_p, struct Client *source_p,
 
 struct Protocol p_ts5 =
 {
-  NULL, /* parent */
-  NULL, /* Unregistered. */
-  NULL, /* Registered. */
-  NULL, /* Not operator. */
-  tsm_error, /* Error. */
-  NULL, /* No such command. */
-  NULL /* Not enough parameters. */
+  m_error: tsm_error,
+  /* burst_channel: ts_burst_channel */
 };
 
 #endif

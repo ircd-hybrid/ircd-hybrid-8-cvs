@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_gline.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
+ *  $Id: m_gline.c,v 1.6 2002/04/19 10:56:16 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -57,11 +57,7 @@
 #include "list.h"
 
 /* internal functions */
-static void set_local_gline(const char *oper_nick,
-                            const char *oper_user,
-                            const char *oper_host,
-                            const char *oper_server,
-                            const char *user,
+static void set_local_gline(struct Client *oper, const char *user,
                             const char *host, const char *reason);
 
 static void log_gline_request(const char *, const char *, const char *,
@@ -75,10 +71,7 @@ static void log_gline(struct Client *, struct gline_pending *,
 
 
 static void check_majority_gline(struct Client *source_p,
-                                 const char *oper_nick,
-                                 const char *oper_user,
-                                 const char *oper_host,
-                                 const char *oper_server,
+                                 struct Client *oper,
                                  const char *user, const char *host,
                                  const char *reason);
 
@@ -123,7 +116,7 @@ _moddeinit(void)
   mod_del_cmd(gline_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 /*
  * mo_gline()
@@ -168,19 +161,22 @@ mo_gline(struct Client *client_p,
         user = parv[1];         /* here is user part */
         *(host++) = '\0';       /* and now here is host */
       }
+      else if (strchr(parv[1], '.') == NULL)
+      {
+        /* no ., no @, its a username... */
+        host = "*";
+        user = parv[1];
+      }
       else
       {
-        user = "*";             /* no @ found, assume its *@somehost */
+        /* No @ but we have a . so its a host. */
+        user = "*";
         host = parv[1];
       }
 
-      if (!*host)               /* duh. no host found, assume its '*' host */
-        host = "*";
-
-      strncpy_irc(tempuser, user, USERLEN + 1); /* allow for '*' */
-      tempuser[USERLEN + 1] = '\0';
-      strncpy_irc(temphost, host, HOSTLEN);
-      temphost[HOSTLEN] = '\0';
+      /* USERLEN + 1 to allow for '*' + full length username. */
+      strlcpy(tempuser, user, sizeof(tempuser));
+      strlcpy(temphost, host, sizeof(temphost));
       user = tempuser;
       host = temphost;
     }
@@ -208,10 +204,7 @@ mo_gline(struct Client *client_p,
 
     /* If at least 3 opers agree this user should be G lined then do it */
 
-    check_majority_gline(source_p,
-                         source_p->name,
-                         (const char *)source_p->username,
-                         source_p->host, me.name, user, host, reason);
+    check_majority_gline(source_p, source_p, user, host, reason);
 
     /* 4 param version for hyb-7 servers */
     sendto_server(NULL, source_p, NULL, CAP_GLN | CAP_UID, NOCAPS,
@@ -307,25 +300,13 @@ ms_gline(struct Client *client_p,
    * and its faked, as the oper isnt sending the gline..
    * check they're real --fl_ */
   /* we need acptr for LL introduction anyway -davidt */
-  if ((acptr = find_server(oper_server)))
-  {
-    if ((acptr = find_client(oper_nick)) == NULL)
-      return;
-  }
-  else
+  if ((acptr = find_server(oper_server)) == NULL ||
+      (acptr = find_client(oper_nick)) == NULL ||
+      strcasecmp(oper_server, acptr->servptr->name))
     return;
 
   if (invalid_gline(acptr, user, host, (char *)reason))
     return;
-
-  /* send in hyb-7 to compatable servers */
-  sendto_server(client_p, acptr, NULL, CAP_GLN, NOCAPS, LL_ICLIENT,
-                ":%s GLINE %s %s :%s", oper_nick, user, host, reason);
-  /* hyb-6 version to the rest */
-  sendto_server(client_p, NULL, NULL, NOCAPS, CAP_GLN, NOFLAGS,
-                ":%s GLINE %s %s %s %s %s %s :%s",
-                oper_server, oper_nick, oper_user, oper_host,
-                oper_server, user, host, reason);
 
   if (ConfigFileEntry.glines)
   {
@@ -335,10 +316,16 @@ ms_gline(struct Client *client_p,
     if (check_wild_gline(user, host))
     {
       sendto_realops_flags(FLAGS_ALL, L_ALL,
-                           "%s!%s@%s on %s is requesting a gline without %d non-wildcard characters for [%s@%s] [%s]",
+                           "%s!%s@%s on %s is requesting a gline without %u "
+                           "non-wildcard characters for [%s@%s] [%s]",
                            oper_nick, oper_user, oper_host, oper_server,
                            ConfigFileEntry.min_nonwildcard, user, host,
                            reason);
+      sendto_one(client_p, ":%s NOTICE %s :Your GLINE of %s@%s[%s] does not "
+                 "have %u non-wildcard characters. It will not take effect "
+                 "behind %s. Please repeat with a more specific GLINE if "
+                 "abuse continues.", me.name, oper_nick, user, host,
+                 reason, ConfigFileEntry.min_nonwildcard, me.name);
       return;
     }
 
@@ -352,11 +339,16 @@ ms_gline(struct Client *client_p,
                          oper_host, oper_server, user, host, reason);
 
     /* If at least 3 opers agree this user should be G lined then do it */
-    check_majority_gline(source_p,
-                         oper_nick,
-                         oper_user,
-                         oper_host, oper_server, user, host, reason);
+    check_majority_gline(source_p, acptr, user, host, reason);
   }
+  /* send in hyb-7 to compatable servers */
+  sendto_server(client_p, acptr, NULL, CAP_GLN, NOCAPS, LL_ICLIENT,
+                ":%s GLINE %s %s :%s", oper_nick, user, host, reason);
+  /* hyb-6 version to the rest */
+  sendto_server(client_p, NULL, NULL, NOCAPS, CAP_GLN, NOFLAGS,
+                ":%s GLINE %s %s %s %s %s %s :%s",
+                oper_server, oper_nick, oper_user, oper_host,
+                oper_server, user, host, reason);
 }
 
 /*
@@ -442,17 +434,13 @@ invalid_gline(struct Client *source_p, char *luser, char *lhost,
  */
 static void
 check_majority_gline(struct Client *source_p,
-                     const char *oper_nick,
-                     const char *oper_user,
-                     const char *oper_host,
-                     const char *oper_server,
+                     struct Client *oper,
                      const char *user, const char *host, const char *reason)
 {
-  if (majority_gline(source_p, oper_nick, oper_user, oper_host,
-                     oper_server, user, host, reason))
+  if (majority_gline(source_p, oper->name, oper->username, oper->host,
+                     oper->servptr->name, user, host, reason))
   {
-    set_local_gline(oper_nick, oper_user, oper_host, oper_server,
-                    user, host, reason);
+    set_local_gline(oper, user, host, reason);
     cleanup_glines();
   }
 }
@@ -471,10 +459,7 @@ check_majority_gline(struct Client *source_p,
  * side effects	-
  */
 static void
-set_local_gline(const char *oper_nick,
-                const char *oper_user,
-                const char *oper_host,
-                const char *oper_server,
+set_local_gline(struct Client *oper,
                 const char *user, const char *host, const char *reason)
 {
   char buffer[IRCD_BUFSIZE];
@@ -490,15 +475,17 @@ set_local_gline(const char *oper_nick,
   ircsprintf(buffer, "%s (%s)", reason, current_date);
 
   DupString(aconf->passwd, buffer);
-  DupString(aconf->name, (char *)user);
-  DupString(aconf->host, (char *)host);
+  DupString(aconf->user, user);
+  DupString(aconf->host, host);
   aconf->hold = CurrentTime + ConfigFileEntry.gline_time;
-  add_gline(aconf);
+  add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
+  write_ban(GLINE_TYPE, oper, aconf->user, aconf->host, aconf->passwd, "",
+            current_date, CurrentTime);
 
-  sendto_realops_flags(FLAGS_ALL, L_ALL,
-                       "%s!%s@%s on %s has triggered gline for [%s@%s] [%s]",
-                       oper_nick,
-                       oper_user, oper_host, oper_server, user, host, reason);
+  sendto_realops_flags(FLAGS_ALL, L_ALL, "%s!%s@%s{%s} on %s has triggered "
+                       "gline for [%s@%s] [%s]", oper->name, oper->username,
+                       oper->host, get_oper_name(oper), oper->servptr->name,
+                       user, host, reason);
   check_klines();
 }
 

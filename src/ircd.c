@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: ircd.c,v 1.6 2002/02/26 04:55:55 a1kmm Exp $
+ * $Id: ircd.c,v 1.7 2002/04/19 10:56:20 a1kmm Exp $
  */
 
 #include <sys/types.h>
@@ -612,6 +612,7 @@ ircd_main(int argc, char *argv[])
     ConfigFileEntry.configfile = CPATH; /* Server configuration file */
     ConfigFileEntry.klinefile = KPATH;  /* Server kline file */
     ConfigFileEntry.dlinefile = DLPATH; /* dline file */
+    ConfigFileEntry.glineconffile = GCPATH; /* gline conf file */
     ConfigFileEntry.glinefile = GPATH;  /* gline log file */
 
     myargv = argv;

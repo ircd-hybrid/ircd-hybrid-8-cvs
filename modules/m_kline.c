@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.5 2002/02/26 04:55:46 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.6 2002/04/19 10:56:16 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -84,7 +84,7 @@ _moddeinit(void)
   mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.5 $";
+char *_version = "$Revision: 1.6 $";
 #endif
 
 /* Local function prototypes */
@@ -369,8 +369,8 @@ apply_kline(struct Client *source_p, struct ConfItem *aconf,
             const char *current_date, time_t cur_time)
 {
   add_conf_by_address(aconf->host, CONF_KILL, aconf->user, aconf);
-  WriteKlineOrDline(KLINE_TYPE, source_p, aconf->user, aconf->host,
-                    reason, oper_reason, current_date, cur_time);
+  write_ban(KLINE_TYPE, source_p, aconf->user, aconf->host,
+            reason, oper_reason, current_date, cur_time);
   /* Now, activate kline against current online clients */
   check_klines();
 }
@@ -582,7 +582,6 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   struct Client *target_p;
 #endif
   struct irc_inaddr daddr;
-  char cidr_form_host[HOSTLEN + 1];
   struct ConfItem *aconf;
   int bits, t;
   char dlbuffer[1024];
@@ -597,22 +596,13 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   }
 
   dlhost = parv[1];
-  strncpy_irc(cidr_form_host, dlhost, HOSTLEN);
-  cidr_form_host[HOSTLEN] = '\0';
 
   if ((t = parse_netmask(dlhost, NULL, &bits)) == HM_HOST)
   {
-#ifdef IPV6
-    sendto_one(source_p, ":%s NOTICE %s :Sorry, please supply an address.",
-               me.name, parv[0]);
-    return;
-#else
     if (!(target_p = find_chasing(source_p, parv[1], NULL)))
       return;
-
     if (!target_p->user)
       return;
-    t = HM_IPV4;
     if (IsServer(target_p))
     {
       sendto_one(source_p,
@@ -632,45 +622,25 @@ mo_dline(struct Client *client_p, struct Client *source_p,
     if (IsExemptKline(target_p))
     {
       sendto_one(source_p,
-                 ":%s NOTICE %s :%s is E-lined", me.name, parv[0],
+                 ":%s NOTICE %s :%s is exempt from K-lines", me.name, parv[0],
                  target_p->name);
       return;
     }
-
-    /*
-     * XXX - this is always a fixed length output, we can get away
-     * with strcpy here
-     *
-     * strncpy_irc(cidr_form_host, inetntoa((char *)&target_p->ip), 32);
-     * cidr_form_host[32] = '\0';
+#ifdef IPV6
+    t = (target_p->aftype == AF_INET6) ? HM_IPV6 : HM_IPV4;
+    /* There has been some discussion amongst the coders on how wide the
+     * IPv6 mask should be, but the problem we came up with is that
+     * although many individuals have a personal /64, this could also
+     * serve several ISPs, and could hold thousands of billions of 
+     * users. So I am following the v4 convention of being 8 bits less
+     * than full mask(i.e. /120)
      */
-    strcpy(cidr_form_host, inetntoa((char *)&target_p->localClient->ip));
-
-    if ((p = strchr(cidr_form_host, '.')) == NULL)
-      return;
-    /* 192. <- p */
-
-    p++;
-    if ((p = strchr(p, '.')) == NULL)
-      return;
-    /* 192.168. <- p */
-
-    p++;
-    if ((p = strchr(p, '.')) == NULL)
-      return;
-    /* 192.168.0. <- p */
-
-    p++;
-    *p++ = '0';
-    *p++ = '/';
-    *p++ = '2';
-    *p++ = '4';
-    *p++ = '\0';
-    dlhost = cidr_form_host;
-
-    bits = 0xFFFFFF00L;
-/* XXX: Fix me for IPV6 */
+    bits = (t == HM_IPV6) ? 120 : 24;
+#else
+    t = HM_IPV4;
+    bits = 24;
 #endif
+    dlhost = format_netmask(&target_p->localClient->ip, bits, t);
   }
 
 
@@ -700,7 +670,11 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   }
   else
   {
+#ifdef IPV6
+    if (bits < (t == HM_IPV6) ? 64 : 24)
+#else
     if (bits < 24)
+#endif
     {
       sendto_one(source_p,
                  ":%s NOTICE %s :Dline bitmasks less than 24 are for admins only.",
@@ -749,8 +723,8 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   /*
    * Write dline to configuration file
    */
-  WriteKlineOrDline(DLINE_TYPE, source_p, NULL, dlhost, reason,
-                    oper_reason, current_date, cur_time);
+  write_ban(DLINE_TYPE, source_p, NULL, dlhost, reason,
+            oper_reason, current_date, cur_time);
   check_klines();
 }                               /* m_dline() */
 

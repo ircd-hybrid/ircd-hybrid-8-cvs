@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: m_testline.c,v 1.4 2002/01/13 07:15:19 a1kmm Exp $
+ *   $Id: m_testline.c,v 1.5 2002/04/19 10:56:17 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -56,7 +56,7 @@ _moddeinit(void)
   mod_del_cmd(testline_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
  * mo_testline
@@ -149,7 +149,7 @@ mo_testline(struct Client *client_p, struct Client *source_p,
         sendto_one(source_p,
                    ":%s NOTICE %s :%c-line name [%s] host [%s] pass [%s]",
                    me.name, parv[0],
-                   (aconf->flags & CONF_FLAGS_TEMPORARY) ? 'k' : 'K',
+                   (aconf->flags & BAN_FLAGS_TEMPORARY) ? 'k' : 'K',
                    user, host, pass);
       }
       else if (aconf->status & CONF_CLIENT)
