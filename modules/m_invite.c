@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_invite.c,v 1.3 2002/01/06 07:18:27 a1kmm Exp $
+ *   $Id: m_invite.c,v 1.4 2002/01/06 07:42:31 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -61,7 +61,7 @@ _moddeinit(void)
   mod_del_cmd(&invite_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*
@@ -214,7 +214,8 @@ m_invite(struct Client *client_p,
                         chptr, ":%s INVITE %s :%s", parv[0],
                         target_p->name, vchan->chname);
 
-  if (!MyConnect(target_p) && target_p->from->serial != current_serial)
+  if (!MyConnect(target_p) && target_p->from->serial != current_serial &&
+      target_p->from == client_p)
     sendto_one(target_p->from, ":%s INVITE %s :%s", parv[0],
                target_p->name, vchan->chname);
   if (vchan->mode.mode & MODE_PRIVATE)
