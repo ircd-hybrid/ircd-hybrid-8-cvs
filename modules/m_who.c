@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_who.c,v 1.4 2002/01/13 07:15:20 a1kmm Exp $
+ *   $Id: m_who.c,v 1.5 2002/02/12 08:15:16 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -66,7 +66,7 @@ _moddeinit(void)
   mod_del_cmd(who_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 static void do_who_on_channel(struct Client *source_p,
                               struct Channel *chptr, char *real_name,
@@ -109,7 +109,7 @@ m_who(struct Client *client_p,
 
   /* See if mask is there, collapse it or return if not there */
 
-  if (mask != (char *)NULL)
+  if (mask != NULL)
   {
     (void)collapse(mask);
 
@@ -250,13 +250,12 @@ m_who(struct Client *client_p,
     sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, parv[0], mask);
     return;
   }
-  /* '/who 0' */
+  /* '/who 0' */ 
   if ((*(mask + 1) == '\0') && (*mask == '0'))
-  {
-    mask = NULL;
-  }
+    who_global(source_p, NULL, server_oper);
+  else
+    who_global(source_p, mask, server_oper);
   /* Wasn't a nick, wasn't a channel, wasn't a '*' so ... */
-  who_global(source_p, mask, server_oper);
   sendto_one(source_p, form_str(RPL_ENDOFWHO), me.name, parv[0], mask);
 }
 
@@ -290,7 +289,7 @@ who_common_channel(struct Client *source_p, dlink_list chain,
 
     SetMark(target_p);
 
-    if (!mask ||
+    if (mask == NULL ||
         match(mask, target_p->name) || match(mask, target_p->username) ||
         match(mask, target_p->host) || match(mask, target_p->user->server) ||
         match(mask, target_p->info))
