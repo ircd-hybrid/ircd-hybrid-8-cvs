@@ -1,4 +1,4 @@
-/* $Id: memory.h,v 1.1 2002/01/04 09:12:56 a1kmm Exp $ */
+/* $Id: memory.h,v 1.2 2002/01/04 10:57:22 a1kmm Exp $ */
 
 #ifndef _I_MEMORY_H
 #define _I_MEMORY_H
@@ -31,7 +31,7 @@ extern void*       _MyMalloc(size_t size, char *file, int line);
 extern void*       _MyRealloc(void* p, size_t size, char * file, int line);
 extern void        _MyFree(void* p, char * file, int line);
 extern void        _DupString(char**, const char*, char*, int);
-extern int         _BlockHeapFree(BlockHeap *bh, void *ptr);
+extern void         _BlockHeapFree(BlockHeap *bh, void *ptr);
 extern void *	  _BlockHeapAlloc(BlockHeap *bh);
 #define MyMalloc(x) _MyMalloc(x, __FILE__, __LINE__)
 #define MyRealloc(x,y) _MyRealloc(x, y, __FILE__, __LINE__)
@@ -39,7 +39,7 @@ extern void *	  _BlockHeapAlloc(BlockHeap *bh);
 #define DupString(x,y) _DupString(&x, y, __FILE__, __LINE__)
 #ifndef NOBALLOC
 #define BlockHeapAlloc(x) memlog(_BlockHeapAlloc(x), \
-                                 x->elemSize-sizeof(MemoryEntry), \
+                                 x->elsize-sizeof(MemoryEntry), \
                                  __FILE__, __LINE__)
 #define BlockHeapFree(x, y) memulog(y); \
                             _BlockHeapFree(x, \
@@ -64,9 +64,9 @@ extern MemoryEntry *first_mem_entry;
 
 extern void * _MyMalloc(size_t size);
 extern void* _MyRealloc(void* x, size_t y);
-extern void _MyFree(void *x);
-extern void _DupString(char **x, const char *y);
-extern int         _BlockHeapFree(BlockHeap *bh, void *ptr);
+extern inline void _MyFree(void *x);
+extern inline void _DupString(char **x, const char *y);
+extern void         _BlockHeapFree(BlockHeap *bh, void *ptr);
 extern void *	  _BlockHeapAlloc(BlockHeap *bh);
 
 #define MyMalloc(x) _MyMalloc(x)
@@ -85,4 +85,3 @@ extern void *	  _BlockHeapAlloc(BlockHeap *bh);
 #endif
 
 #endif /* _I_MEMORY_H */
-

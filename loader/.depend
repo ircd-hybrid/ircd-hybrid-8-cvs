@@ -1,2 +1,8 @@
-# $Id: .depend,v 1.1 2002/01/04 09:15:07 a1kmm Exp $
-ircd_loader.o: ircd_loader.c ../include/setup.h
+# $Id: .depend,v 1.2 2002/01/04 10:57:24 a1kmm Exp $
+ircd_loader.o: ircd_loader.c ../include/setup.h ../include/tools.h \
+  ../include/channel.h ../include/config.h ../include/defaults.h \
+  ../include/ircd_defs.h ../include/memory.h ../include/balloc.h \
+  ../include/s_conf.h ../include/fileio.h ../include/motd.h \
+  ../include/class.h ../include/client.h ../include/ircd_handler.h \
+  ../include/linebuf.h ../include/res.h ../adns/adns.h ../include/ircd.h \
+  ../include/irc_string.h ../include/sprintf_irc.h ../include/s_stats.h
