@@ -1,27 +1,27 @@
-/************************************************************************
- *   IRC - Internet Relay Chat, modules/m_accept.c
- *   Copyright (C) 1990 Jarkko Oikarinen and
- *                      University of Oulu, Computing Center
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  m_accept.c: Allows a user to talk to a +g user.
  *
- *   See file AUTHORS in IRC package for additional names of
- *   the programmers. 
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *  USA
  *
- *   $Id: m_accept.c,v 1.2 2002/01/04 11:06:18 a1kmm Exp $
+ *   $Id: m_accept.c,v 1.3 2002/01/06 07:18:26 a1kmm Exp $
  */
+
 #include "handlers.h"
 #include "client.h"
 #include "hash.h"               /* for find_client() */
@@ -59,7 +59,7 @@ _moddeinit(void)
   mod_del_cmd(&accept_msgtab);
 }
 
-char *_version = "$Revision: 1.2 $";
+char *_version = "$Revision: 1.3 $";
 #endif
 /*
  * m_accept - ACCEPT command handler
@@ -224,7 +224,8 @@ add_accept(struct Client *source_p, struct Client *target_p)
   m = make_dlink_node();
   dlinkAdd(target_p, m, &source_p->allow_list);
 
-  m = make_dlink_node()dlinkAdd(source_p, m, &target_p->on_allow_list);
+  m = make_dlink_node();
+  dlinkAdd(source_p, m, &target_p->on_allow_list);
 }
 
 

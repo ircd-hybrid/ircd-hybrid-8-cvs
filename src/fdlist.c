@@ -1,10 +1,17 @@
-/* 
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  fdlist.c: Maintains a list of file descriptors.
  *
- * fdlist.c   maintain lists of file descriptors
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- * $Id: fdlist.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
+ * $Id: fdlist.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
  */
+
 #include "fdlist.h"
 #include "client.h"             /* struct Client */
 #include "event.h"

@@ -1,4 +1,28 @@
-/* $Id: getopt.c,v 1.2 2002/01/04 11:06:40 a1kmm Exp $
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  getopt.c: Uses getopt to fetch the command line options.
+ *
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *  USA
+ *
+ *  $Id: getopt.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ */
+
+/* $Id: getopt.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
  */
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,11 +1,10 @@
 /*
- * tools.c
- * 
- * Useful stuff, ripped from places ..
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  tools.c: Various functions needed here and there.
  *
- * adrian chadd <adrian@creative.net.au>
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
- * $Id: tools.c,v 1.2 2002/01/04 11:06:44 a1kmm Exp $
+ * $Id: tools.c,v 1.3 2002/01/06 07:18:53 a1kmm Exp $
  */
 
 #include <assert.h>

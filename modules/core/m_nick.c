@@ -1,8 +1,8 @@
 /*
- * modules/m_nick.c
- * Copyright (C) 2001 Hybrid Development Team
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  m_nick.c: Sets a users nick.
  *
- * $Id: m_nick.c,v 1.3 2002/01/06 06:19:40 a1kmm Exp $
+ * $Id: m_nick.c,v 1.4 2002/01/06 07:18:43 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -92,7 +92,7 @@ _moddeinit(void)
   mod_del_cmd(&client_msgtab);
 }
 
-char *_version = "$Revision: 1.3 $";
+char *_version = "$Revision: 1.4 $";
 #endif
 
 /*

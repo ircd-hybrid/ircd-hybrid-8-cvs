@@ -1,22 +1,20 @@
-/************************************************************************
- *   IRC - Internet Relay Chat, doc/example_module.c
- *   Copyright (C) 2001 Hybrid Development Team
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  m_mkpasswd.c: Encrypts a password.
  *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- *   $Id: m_mkpasswd.c,v 1.1 2002/01/04 09:12:05 a1kmm Exp $
+ *   $Id: m_mkpasswd.c,v 1.2 2002/01/06 07:18:07 a1kmm Exp $
  */
 
 /* List of ircd includes from ../include/ */
@@ -64,7 +62,7 @@ void _moddeinit(void)
   mod_del_cmd(&test_msgtab);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 
 static void m_mkpasswd(struct Client *client_p, struct Client *source_p,
                    int parc, char *parv[])

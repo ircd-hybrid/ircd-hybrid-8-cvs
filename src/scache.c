@@ -1,7 +1,8 @@
 /*
- * scache.c
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  scache.c: Server names cache.
  *
- * $Id: scache.c,v 1.2 2002/01/04 11:06:43 a1kmm Exp $
+ * $Id: scache.c,v 1.3 2002/01/06 07:18:52 a1kmm Exp $
  */
 
 #include "client.h"

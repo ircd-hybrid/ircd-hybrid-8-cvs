@@ -1,9 +1,10 @@
 /*
- * modules/m_resv.c
- * Copyright (C) 2001 Hybrid Development Team
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  m_resv.c: Reserves(jupes) a nickname or channel.
  *
- * $Id: m_resv.c,v 1.2 2002/01/04 11:06:20 a1kmm Exp $
+ * $Id: m_resv.c,v 1.3 2002/01/06 07:18:28 a1kmm Exp $
  */
+
 #include "handlers.h"
 #include "client.h"
 #include "channel.h"
@@ -46,7 +47,7 @@ _moddeinit(void)
   mod_del_cmd(&unresv_msgtab);
 }
 
-char *_version = "$Revision: 1.2 $";
+char *_version = "$Revision: 1.3 $";
 #endif
 
 /*

@@ -1,7 +1,8 @@
-/************************************************************************
- *  ircd hybrid - Internet Relay Chat Daemon, include/balloc.h
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
  *  balloc.h: The block allocator header.
- *  Copyright(C) 2001 by the past and present ircd-hybrid teams.
+ *
+ *  Copyright (C) 2002 by the past and present ircd coders, and others.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -15,9 +16,10 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ *  USA
  *
- * $Id: balloc.h,v 1.2 2002/01/04 10:57:21 a1kmm Exp $
+ *  $Id: balloc.h,v 1.3 2002/01/06 07:18:11 a1kmm Exp $
  */
 
 #ifndef _I_BALLOC_H

@@ -1,8 +1,10 @@
 /*
- * restart.c
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  restart.c: Functions to allow the ircd to restart.
  *
- * $Id: restart.c,v 1.2 2002/01/04 11:06:41 a1kmm Exp $
+ * $Id: restart.c,v 1.3 2002/01/06 07:18:50 a1kmm Exp $
  */
+
 #include "tools.h"
 #include "restart.h"
 #include "common.h"

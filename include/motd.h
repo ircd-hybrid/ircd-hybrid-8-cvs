@@ -1,8 +1,10 @@
 /*
- * motd.h
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  motd.h: A header for the MOTD functions.
  *
- * $Id: motd.h,v 1.1 2002/01/04 09:12:56 a1kmm Exp $
+ * $Id: motd.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
  */
+
 #ifndef INCLUDED_motd_h
 #define INCLUDED_motd_h
 #ifndef INCLUDED_ircd_defs_h

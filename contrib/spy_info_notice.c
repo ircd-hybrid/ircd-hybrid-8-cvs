@@ -1,7 +1,8 @@
-/* contrib/spy_info_notice.c
- * Copyright (c) 2001 Hybrid Development Team
+/*
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  spy_info_notice.c: Sends a notice when someone uses INFO.
  *
- * $Id: spy_info_notice.c,v 1.1 2002/01/04 09:12:05 a1kmm Exp $
+ * $Id: spy_info_notice.c,v 1.2 2002/01/06 07:18:07 a1kmm Exp $
  */
 
 #include "modules.h"
@@ -24,7 +25,7 @@ _moddeinit(void)
   hook_del_hook("doing_info", (hookfn *)show_info);
 }
 
-char *_version = "$Revision: 1.1 $";
+char *_version = "$Revision: 1.2 $";
 
 int show_info(struct hook_spy_data *data)
 {

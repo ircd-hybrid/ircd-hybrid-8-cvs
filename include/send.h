@@ -1,8 +1,8 @@
 /*
- * send.h
- * Copyright (C) 1999 Patrick Alken
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  send.h: A header for the message sending functions.
  *
- * $Id: send.h,v 1.1 2002/01/04 09:13:02 a1kmm Exp $
+ * $Id: send.h,v 1.2 2002/01/06 07:18:13 a1kmm Exp $
  */
 
 #ifndef INCLUDED_send_h

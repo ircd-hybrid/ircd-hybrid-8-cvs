@@ -1,9 +1,10 @@
 /*
- * event.h - defines for event.c, the event system. This has been ported
- * from squid by adrian to simplify scheduling events.
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  event.h: The ircd event header.
  *
- * $Id: event.h,v 1.1 2002/01/04 09:12:54 a1kmm Exp $
+ * $Id: event.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
  */
+
 #ifndef __EVENT_H__
 #define __EVENT_H__
 

@@ -1,8 +1,10 @@
 /*
- * fdlist.h
+ *  ircd-hybrid: an advanced Internet Relay Chat Daemon(ircd).
+ *  fdlist.h: The file descriptor list header.
  *
- * $Id: fdlist.h,v 1.1 2002/01/04 09:12:54 a1kmm Exp $
+ * $Id: fdlist.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
  */
+
 #ifndef INCLUDED_fdlist_h
 #define INCLUDED_fdlist_h
 #ifndef INCLUDED_sys_types_h
