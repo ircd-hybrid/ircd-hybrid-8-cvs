@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: hook.c,v 1.3 2002/01/06 07:18:48 a1kmm Exp $
+ * $Id: hook.c,v 1.4 2002/02/09 08:56:52 a1kmm Exp $
  */
 
 /* hooks are used by modules to hook into events called by other parts of
@@ -113,7 +113,7 @@ hook_del_hook(char *event, hookfn * fn)
   if (!h)
     return -1;
 
-  for (node = h->hooks.head; node; node = node->next)
+  for (node = h->hooks.head; node; node = nnode)
   {
     nnode = node->next;
     if (fn == node->data)
