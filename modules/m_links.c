@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_links.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
+ *   $Id: m_links.c,v 1.5 2002/01/30 08:10:24 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -43,7 +43,7 @@ static void m_links(struct Client *, struct Client *, int, char **);
 static void mo_links(struct Client *, struct Client *, int, char **);
 static void ms_links(struct Client *, struct Client *, int, char **);
 
-struct Message links_msgtab = {
+struct Message links_msgtab[] = {
   {"LINKS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
   {"LINKS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_links},
   {"LINKS", 0, 0, 0, 0, MFLG_SLOW, 0, &p_operuser, &mo_links},
@@ -58,17 +58,17 @@ void
 _modinit(void)
 {
   hook_add_event("doing_links");
-  mod_add_cmd(&links_msgtab);
+  mod_add_cmd(links_msgtab);
 }
 
 void
 _moddeinit(void)
 {
   hook_del_event("doing_links");
-  mod_del_cmd(&links_msgtab);
+  mod_del_cmd(links_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
  * m_links - LINKS message handler

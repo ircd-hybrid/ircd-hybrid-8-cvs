@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *   $Id: parse.c,v 1.4 2002/01/13 07:15:39 a1kmm Exp $
+ *   $Id: parse.c,v 1.5 2002/01/30 08:10:29 a1kmm Exp $
  */
 
 #include <assert.h>
@@ -469,7 +469,6 @@ hash_parse(struct Client *from, char *cmd)
         if (p == NULL)
           continue;
       }
-      ilog(L_WARN, "Found a command handler for %s.", ptr->cmd);
       return (ptr->msg);
     }
   }

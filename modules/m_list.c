@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  $Id: m_list.c,v 1.4 2002/01/13 07:15:18 a1kmm Exp $
+ *  $Id: m_list.c,v 1.5 2002/01/30 08:10:24 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -48,6 +48,7 @@ static void list_one_channel(struct Client *, struct Channel *);
 struct Message list_msgtab[] = {
   {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
   {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &m_list},
+  {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_user, &mo_list},
 #ifdef ENABLE_TS5
   {"LIST", 0, 0, 0, 0, MFLG_SLOW, 0, &p_ts5, &ms_list},
 #endif
@@ -67,7 +68,7 @@ _moddeinit(void)
   mod_del_cmd(list_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 static int list_all_channels(struct Client *source_p);
 static int list_named_channel(struct Client *source_p, char *name);

@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kill.c,v 1.4 2002/01/13 07:15:34 a1kmm Exp $
+ *   $Id: m_kill.c,v 1.5 2002/01/30 08:10:27 a1kmm Exp $
  */
 
 #include "handlers.h"
@@ -49,6 +49,7 @@ static void relay_kill(struct Client *, struct Client *, struct Client *,
 struct Message kill_msgtab[] = {
   {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_unregistered, &m_unregistered},
   {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_user, &m_not_oper},
+  {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_operuser, &mo_kill},
 #ifdef ENABLE_TS5
   {"KILL", 0, 0, 2, 0, MFLG_SLOW, 0, &p_ts5, &ms_kill},
 #endif
@@ -68,7 +69,7 @@ _moddeinit(void)
   mod_del_cmd(kill_msgtab);
 }
 
-char *_version = "$Revision: 1.4 $";
+char *_version = "$Revision: 1.5 $";
 #endif
 /*
 ** mo_kill
