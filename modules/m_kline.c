@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *   $Id: m_kline.c,v 1.6 2002/04/19 10:56:16 a1kmm Exp $
+ *   $Id: m_kline.c,v 1.7 2002/04/19 11:25:32 a1kmm Exp $
  */
 
 #include "tools.h"
@@ -84,7 +84,7 @@ _moddeinit(void)
   mod_del_cmd(kline_msgtab);
 }
 
-char *_version = "$Revision: 1.6 $";
+char *_version = "$Revision: 1.7 $";
 #endif
 
 /* Local function prototypes */
@@ -576,11 +576,9 @@ static void
 mo_dline(struct Client *client_p, struct Client *source_p,
          int parc, char *parv[])
 {
-  char *dlhost, *reason, *oper_reason;
-#ifndef IPV6
-  char *p;
+  const char *dlhost;
+  char *reason, *oper_reason;
   struct Client *target_p;
-#endif
   struct irc_inaddr daddr;
   struct ConfItem *aconf;
   int bits, t;
@@ -723,7 +721,7 @@ mo_dline(struct Client *client_p, struct Client *source_p,
   /*
    * Write dline to configuration file
    */
-  write_ban(DLINE_TYPE, source_p, NULL, dlhost, reason,
+  write_ban(DLINE_TYPE, source_p, NULL, (char*)dlhost, reason,
             oper_reason, current_date, cur_time);
   check_klines();
 }                               /* m_dline() */
