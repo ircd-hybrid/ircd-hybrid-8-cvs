@@ -14,7 +14,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- * $Id: common.h,v 1.2 2002/01/06 07:18:12 a1kmm Exp $
+ * $Id: common.h,v 1.3 2002/01/06 09:20:33 a1kmm Exp $
  */
 
 #ifndef INCLUDED_common_h
@@ -57,5 +57,15 @@
 
 /* Right out of the RFC */
 #define IRCD_BUFSIZE 512
+
+#ifdef __GNUC__
+#define INLINE inline
+#define CONSTFUNC __attribute__((const))
+#define REGPARAM(x) __attribute__((regparm(x)))
+#else
+#define INLINE
+#define CONSTFUNC
+#define REGPARAM(x)
+#endif
 
 #endif /* INCLUDED_common_h */
